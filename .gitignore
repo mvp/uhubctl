@@ -1,0 +1,8 @@
+# Executables
+uhubctl
+
+# Object files
+*.o
+
+# Mac symbols
+*.dSYM
