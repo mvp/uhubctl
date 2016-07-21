@@ -23,6 +23,7 @@ This is list of known compatible USB hubs:
 * Hawking Technology: UH214
 * Apple: USB Keyboard With Numeric Pad (internal USB hub)
 * Apple: Thunderbolt Display 27" (internal USB hub)
+* Linksys: USB2HUB4
 
 Some modern motherboards have built-in root hubs that do support
 this feature, but you need to use option `-i` to enable it.
