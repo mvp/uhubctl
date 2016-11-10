@@ -331,7 +331,7 @@ static int usb_find_hubs()
 
                 int bus = libusb_get_bus_number(dev);
                 sprintf(hubs[hub_count].location, "%d", bus);
-                int pcount = libusb_get_port_numbers(dev, port_numbers, MAX_HUB_CHAIN);
+                int pcount = libusb_get_port_path(NULL, dev, port_numbers, MAX_HUB_CHAIN);
                 int k;
                 for (k=0; k<pcount; k++) {
                     char s[8];
