@@ -66,7 +66,7 @@ specific hub to control using `-l` (location) parameter.
 Copyright
 =========
 
-Copyright (C) 2009-2014 Vadim Mikhailov
+Copyright (C) 2009-2016 Vadim Mikhailov
 
 This file can be distributed under the terms and conditions of the
 GNU General Public License version 2.
