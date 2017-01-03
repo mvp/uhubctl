@@ -434,10 +434,18 @@ int main(int argc, char *argv[])
             break;
         case '?':
             /* getopt_long has already printed an error message here */
+            fprintf(stderr, "Run with -h to get usage info.\n");
+            exit(1);
             break;
         default:
             abort();
         }
+    }
+    if (optind < argc) {
+        /* non-option parameters are found? */
+        fprintf(stderr, "Invalid command line syntax!\n");
+        fprintf(stderr, "Run with -h to get usage info.\n");
+        exit(1);
     }
 
     rc = libusb_init(NULL);
