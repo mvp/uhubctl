@@ -332,7 +332,15 @@ static int usb_find_hubs()
 
                 int bus = libusb_get_bus_number(dev);
                 sprintf(hubs[hub_count].location, "%d", bus);
+#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000102)
+                /*
+                 * libusb_get_port_path is deprecated since libusb v1.0.16,
+                 * therefore use libusb_get_port_numbers when supported
+                 */
+                int pcount = libusb_get_port_numbers(dev, port_numbers, MAX_HUB_CHAIN);
+#else
                 int pcount = libusb_get_port_path(NULL, dev, port_numbers, MAX_HUB_CHAIN);
+#endif
                 int k;
                 for (k=0; k<pcount; k++) {
                     char s[8];
