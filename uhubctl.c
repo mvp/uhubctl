@@ -17,6 +17,7 @@
 #include <getopt.h>
 #include <errno.h>
 #include <ctype.h>
+#include <unistd.h>
 
 #include <libusb-1.0/libusb.h>
 
