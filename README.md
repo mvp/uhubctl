@@ -16,14 +16,17 @@ Some of them are no longer manufactured and can be hard to find.
 
 This is list of known compatible USB hubs:
 
-* D-Link: DUB-H7 (Silver edition, new Black edition is not compatible!)
-* Elecom: U2H-G4S
-* Sanwa Supply: USB-HUB14GPH
-* Targus: PAUH212
-* Hawking Technology: UH214
-* Apple: USB Keyboard With Numeric Pad (internal USB hub)
-* Apple: Thunderbolt Display 27" (internal USB hub)
-* Linksys: USB2HUB4
+| Manufacturer        | Product                                          | VID    | PID    |
+| ------------------- | ------------------------------------------------ | ------:| ------:|
+| Apple               | Thunderbolt Display 27" (internal USB hub)       | `    ` | `    ` |
+| Apple               | USB Keyboard With Numeric Pad (internal USB hub) | `    ` | `    ` |
+| D-Link              | DUB-H7 (Silver edition only!)                    | `    ` | `    ` |
+| Elecom              | U2H-G4S                                          | `    ` | `    ` |
+| Hawking Technology  | UH214                                            | `    ` | `    ` |
+| Lenovo              | ThinkPad EU Ultra Dockingstation (40A20090EU)    | `17EF` | `100F` |
+| Linksys             | USB2HUB4                                         | `    ` | `    ` |
+| Sanwa Supply        | USB-HUB14GPH                                     | `    ` | `    ` |
+| Targus              | PAUH212                                          | `    ` | `    ` |
 
 Some modern motherboards have built-in root hubs that do support
 this feature, but you need to use option `-i` to enable it.
