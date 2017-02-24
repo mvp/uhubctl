@@ -8,9 +8,6 @@
  * GNU General Public License version 2.
  *
  */
-
-#define PROGRAM_VERSION "1.5"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

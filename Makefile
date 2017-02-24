@@ -1,5 +1,10 @@
 # uhubctl Makefile
 #
+VERSION = 1
+PATCHLEVEL = 6
+EXTRAVERSION = "-dev"
+UHUBCTLVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL))$(EXTRAVERSION)
+
 UNAME_S := $(shell uname -s)
 
 DESTDIR ?=
@@ -14,7 +19,8 @@ RM		:= rm -rf
 CC ?= gcc
 CFLAGS ?= -g -O0
 
-CFLAGS	+= -Wall -Wextra
+CFLAGS += -Wall -Wextra
+CFLAGS += -DPROGRAM_VERSION=\"$(UHUBCTLVERSION)\"
 
 ifeq ($(UNAME_S),Linux)
 	LDFLAGS	+= -Wl,-z,relro
