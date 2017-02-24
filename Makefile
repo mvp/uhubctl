@@ -19,7 +19,7 @@ RM		:= rm -rf
 CC ?= gcc
 CFLAGS ?= -g -O0
 
-CFLAGS += -Wall -Wextra
+CFLAGS += -std=c99 -Wall -Wextra -pedantic
 CFLAGS += -DPROGRAM_VERSION=\"$(UHUBCTLVERSION)\"
 
 ifeq ($(UNAME_S),Linux)
