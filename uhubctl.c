@@ -11,10 +11,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <getopt.h>
 #include <errno.h>
 #include <ctype.h>
 #include <unistd.h>
+
+#if _POSIX_C_SOURCE >= 199309L
+#include <time.h>
+#else
+#include <unistd.h>
+#endif
 
 #include <libusb-1.0/libusb.h>
 
@@ -164,6 +171,25 @@ int print_usage()
     );
     return 0;
 }
+
+/* sleep for given milliseconds
+ * This function is implemented for cross-platform compatibility
+ */
+void sleep_ms(unsigned int ms)
+{
+#if _POSIX_C_SOURCE >= 199309L
+    /* usleep was deprecated in favor of nanosleep. Therefore use it if it
+     * is available
+     */
+    struct timespec ts;
+    ts.tv_sec = ms / 1000;
+    ts.tv_nsec = (ms % 1000) * 1000000;
+    nanosleep(&ts, NULL);
+#else
+    usleep(ms * 1000);
+#endif
+}
+
 /* checks if hub is smart hub
  * use min_current above 0 to only consider external hubs
  * (external hubs have non-zero bHubContrCurrent)
@@ -546,13 +572,13 @@ int main(int argc, char *argv[])
                                 perror("Failed to control port power!\n");
                             }
                             if (repeat > 0) {
-                                usleep(opt_wait * 1000);
+                                sleep_ms(opt_wait);
                             }
                         }
                     }
                 }
                 if (k==0 && opt_action == POWER_CYCLE)
-                    sleep(opt_delay);
+                    sleep_ms(opt_delay * 1000);
                 printf("Sent power %s request\n",
                     request == LIBUSB_REQUEST_CLEAR_FEATURE ? "off" : "on"
                 );

@@ -2,7 +2,7 @@
 #
 VERSION = 1
 PATCHLEVEL = 6
-EXTRAVERSION = "-dev"
+EXTRAVERSION = -dev
 UHUBCTLVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL))$(EXTRAVERSION)
 
 UNAME_S := $(shell uname -s)
@@ -20,7 +20,11 @@ CC ?= gcc
 CFLAGS ?= -g -O0
 
 CFLAGS += -std=c99 -Wall -Wextra -pedantic
-CFLAGS += -DPROGRAM_VERSION=\"$(UHUBCTLVERSION)\"
+CFLAGS += -D'PROGRAM_VERSION="$(UHUBCTLVERSION)"'
+
+# Remove the following if your system doesn't support IEEE Standard 1003.1b-1993
+# a.k.a 1993 edition of the POSIX.1b standard
+CFLAGS += -D'_POSIX_C_SOURCE=199309L'
 
 ifeq ($(UNAME_S),Linux)
 	LDFLAGS	+= -Wl,-z,relro
