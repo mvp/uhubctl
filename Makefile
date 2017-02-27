@@ -32,7 +32,7 @@ endif
 
 PROGRAM = uhubctl
 
-$(PROGRAM): $(PROGRAM).c
+$(PROGRAM): $(PROGRAM).c $(PROGRAM).h
 	$(CC) $(CFLAGS) $@.c -o $@ -lusb-1.0 $(LDFLAGS)
 
 install:
