@@ -458,16 +458,16 @@ int main(int argc, char *argv[])
             break;
         case 'v':
             printf("%s\n", PROGRAM_VERSION);
-            exit(0);
+            exit(EXIT_SUCCESS);
             break;
         case 'h':
             print_usage();
-            exit(1);
+            exit(EXIT_FAILURE);
             break;
         case '?':
             /* getopt_long has already printed an error message here */
             fprintf(stderr, "Run with -h to get usage info.\n");
-            exit(1);
+            exit(EXIT_FAILURE);
             break;
         default:
             abort();
@@ -477,7 +477,7 @@ int main(int argc, char *argv[])
         /* non-option parameters are found? */
         fprintf(stderr, "Invalid command line syntax!\n");
         fprintf(stderr, "Run with -h to get usage info.\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     rc = libusb_init(NULL);
@@ -485,7 +485,7 @@ int main(int argc, char *argv[])
         fprintf(stderr,
             "Error initializing USB!\n"
         );
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     rc = libusb_get_device_list(NULL, &usb_devs);
@@ -590,7 +590,7 @@ int main(int argc, char *argv[])
             libusb_close(devh);
         }
     }
-    rc = 0;
+    rc = EXIT_SUCCESS;
 cleanup:
     if (usb_devs)
         libusb_free_device_list(usb_devs, 1);
