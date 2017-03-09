@@ -21,6 +21,7 @@ This is list of known compatible USB hubs:
 | Anker               | Ultra Slim 4-Port USB 3.0 Data Hub with 12W Power Adapter |      |      |
 | Apple               | Thunderbolt Display 27" (internal USB hub)                |      |      |
 | Apple               | USB Keyboard With Numeric Pad (internal USB hub)          |      |      |
+| Circuitco           | Beagleboard-xM (internal USB hub)                         |`0424`|`9514`|
 | D-Link              | DUB-H7 (Silver edition only!)                             |      |      |
 | Elecom              | U2H-G4S                                                   |      |      |
 | Hawking Technology  | UH214                                                     |      |      |
