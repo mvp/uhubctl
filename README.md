@@ -32,6 +32,11 @@ This is list of known compatible USB hubs:
 | Sanwa Supply        | USB-HUB14GPH                                              |      |      |
 | Targus              | PAUH212                                                   |      |      |
 
+This table is by no means complete.
+If your hub works with uhubctl, but is not listed above, please report it
+by opening new issue https://github.com/mvp/uhubctl/issues,
+so we can add it to supported table.
+
 Some modern motherboards have built-in root hubs that do support
 this feature, but you need to use option `-i` to enable it.
 
