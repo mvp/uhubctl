@@ -18,11 +18,13 @@ This is list of known compatible USB hubs:
 
 | Manufacturer        | Product                                                   | VID  | PID  |
 |:------------------- |:--------------------------------------------------------- | ----:| ----:|
-| Anker               | Ultra Slim 4-Port USB 3.0 Data Hub with 12W Power Adapter |      |      |
+| Anker               | AK-A7518111                                               |      |      |
 | Apple               | Thunderbolt Display 27" (internal USB hub)                |      |      |
 | Apple               | USB Keyboard With Numeric Pad (internal USB hub)          |      |      |
+| B&B Electronics     | UHR204                                                    |      |      |
+| Belkin              | F5U701-BLK                                                |      |      |
 | Circuitco           | Beagleboard-xM (internal USB hub)                         |`0424`|`9514`|
-| D-Link              | DUB-H7 (Silver edition only!)                             |      |      |
+| D-Link              | DUB-H7 (Silver edition only!)                             |`2001`|`F103`|
 | Elecom              | U2H-G4S                                                   |      |      |
 | Hawking Technology  | UH214                                                     |      |      |
 | Lenovo              | ThinkPad EU Ultra Dockingstation (40A20090EU)             |`17EF`|`100F`|
