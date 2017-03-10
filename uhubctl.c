@@ -323,9 +323,8 @@ static int usb_find_hubs()
                 hubs[hub_count].nports = nports;
 
                 /* Convert bus and ports array into USB location string */
-                snprintf(
+                sprintf(
                     hubs[hub_count].vendor,
-                    sizeof(hubs[hub_count].vendor),
                     "%04x:%04x",
                     desc.idVendor, desc.idProduct
                 );
@@ -344,7 +343,7 @@ static int usb_find_hubs()
                 int k;
                 for (k=0; k<pcount; k++) {
                     char s[8];
-                    snprintf(s, sizeof(s), "%s%d", k==0 ? "-" : ".", port_numbers[k]);
+                    sprintf(s, "%s%d", k==0 ? "-" : ".", port_numbers[k]);
                     strcat(hubs[hub_count].location, s);
                 }
 
