@@ -29,6 +29,7 @@ This is list of known compatible USB hubs:
 | Hawking Technology  | UH214                                                     |      |      |
 | Lenovo              | ThinkPad EU Ultra Dockingstation (40A20090EU)             |`17EF`|`100F`|
 | Linksys             | USB2HUB4                                                  |      |      |
+| Plugable            | USB2-HUB10S                                               |      |      |
 | Sanwa Supply        | USB-HUB14GPH                                              |      |      |
 | Targus              | PAUH212                                                   |      |      |
 
