@@ -18,6 +18,7 @@ This is list of known compatible USB hubs:
 
 | Manufacturer        | Product                                                   | VID  | PID  |
 |:------------------- |:--------------------------------------------------------- | ----:| ----:|
+| Amazon              | AmazonBasics 7 Port USB 3.0 Hub with 12V/3A Power Adapter |`2109`|`2811`|
 | Anker               | AK-A7518111                                               |      |      |
 | Apple               | Thunderbolt Display 27" (internal USB hub)                |      |      |
 | Apple               | USB Keyboard With Numeric Pad (internal USB hub)          |      |      |
