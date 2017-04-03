@@ -32,12 +32,13 @@ This is list of known compatible USB hubs:
 | Lenovo              | ThinkPad EU Ultra Dockingstation (40A20090EU)             |`17EF`|`100F`|
 | Linksys             | USB2HUB4                                                  |      |      |
 | Plugable            | USB2-HUB10S                                               |      |      |
+| Rosewill            | RHUB-210                                                  |`0409`|`005A`|
 | Sanwa Supply        | USB-HUB14GPH                                              |      |      |
 | Targus              | PAUH212                                                   |      |      |
 
 This table is by no means complete.
 If your hub works with uhubctl, but is not listed above, please report it
-by opening new issue https://github.com/mvp/uhubctl/issues,
+by opening new issue at https://github.com/mvp/uhubctl/issues,
 so we can add it to supported table.
 
 Some modern motherboards have built-in root hubs that do support
