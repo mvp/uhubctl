@@ -16,6 +16,12 @@ CFLAGS ?= -g -O0
 
 CFLAGS	+= -Wall -Wextra
 
+ifeq ($(UNAME_S),FreeBSD)
+	CFLAGS	+= -lusb
+else
+	LDFLAGS	+= -lusb-1.0
+endif
+
 ifeq ($(UNAME_S),Linux)
 	LDFLAGS	+= -Wl,-z,relro
 endif
@@ -23,7 +29,7 @@ endif
 PROGRAM = uhubctl
 
 $(PROGRAM): $(PROGRAM).c
-	$(CC) $(CFLAGS) $@.c -o $@ -lusb-1.0 $(LDFLAGS)
+	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
 
 install:
 	$(INSTALL_DIR) $(DESTDIR)$(sbindir)
