@@ -20,6 +20,10 @@ ifeq ($(UNAME_S),Linux)
 	LDFLAGS	+= -Wl,-z,relro
 endif
 
+ifeq ($(UNAME_S),Darwin)
+	LDFLAGS	+= -L /opt/local/lib -I /opt/local/include
+endif
+
 PROGRAM = uhubctl
 
 $(PROGRAM): $(PROGRAM).c

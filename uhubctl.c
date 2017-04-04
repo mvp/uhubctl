@@ -205,7 +205,8 @@ int is_smart_hub(struct libusb_device *dev, int min_current)
             /* Over-Current Protection Mode */
             int ocpm = uhd->wHubCharacteristics[0] & HUB_CHAR_OCPM;
             /* Both LPSM and OCPM must be supported per-port: */
-            if ((lpsm == HUB_CHAR_INDV_PORT_LPSM) &&
+            fprintf(stderr, "DEBUG: %d %d %d %d\n", lpsm, HUB_CHAR_INDV_PORT_LPSM, ocpm, HUB_CHAR_INDV_PORT_OCPM);
+            if ((lpsm == HUB_CHAR_INDV_PORT_LPSM || 1) &&
                 (ocpm == HUB_CHAR_INDV_PORT_OCPM))
             {
                 rc = uhd->bNbrPorts;
