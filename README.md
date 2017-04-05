@@ -49,7 +49,7 @@ Compiling
 =========
 
 This utility was tested to compile and work on Linux
-(Ubuntu, Redhat/Fedora/CentOS) and on Mac OS X.
+(Ubuntu, Redhat/Fedora/CentOS), FreeBSD and on Mac OS X.
 It should be possible to compile it for Windows as well -
 please report if you succeed in doing that.
 
@@ -58,6 +58,7 @@ First, you need to install library libusb-1.0 (version 1.0.12 or later):
 * Ubuntu: sudo apt-get install libusb-1.0-0-dev
 * Redhat: sudo yum install libusb1-devel
 * MacOSX: brew install libusb
+* FreeBSD: libusb is included by default
 * Windows: TBD?
 
 To compile, simply run `make` - this will generate `uhubctl` binary.

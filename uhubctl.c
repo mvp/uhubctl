@@ -19,7 +19,7 @@
 #include <ctype.h>
 #include <unistd.h>
 
-#include <libusb-1.0/libusb.h>
+#include <libusb.h>
 
 /* Max number of hub ports supported.
  * This is somewhat artifically limited by "-p" option parser.
