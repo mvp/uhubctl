@@ -19,7 +19,11 @@
 #include <ctype.h>
 #include <unistd.h>
 
+#ifdef __FreeBSD__
+#include <libusb.h>
+#else
 #include <libusb-1.0/libusb.h>
+#endif
 
 /* Max number of hub ports supported.
  * This is somewhat artifically limited by "-p" option parser.

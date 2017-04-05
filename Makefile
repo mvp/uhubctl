@@ -13,17 +13,29 @@ RM		:= rm -rf
 
 CC ?= gcc
 CFLAGS ?= -g -O0
-
-CFLAGS	+= -Wall -Wextra
+CFLAGS += -Wall -Wextra
 
 ifeq ($(UNAME_S),Linux)
-	LDFLAGS	+= -Wl,-z,relro
+	LDFLAGS += -Wl,-z,relro -lusb-1.0
+endif
+
+ifeq ($(UNAME_S),Darwin)
+ifneq ($(wildcard /opt/local/include),)
+	# MacPorts
+	CFLAGS  += -I/opt/local/include
+	LDFLAGS += -L/opt/local/lib
+endif
+	LDFLAGS += -lusb-1.0
+endif
+
+ifeq ($(UNAME_S),FreeBSD)
+	LDFLAGS += -lusb
 endif
 
 PROGRAM = uhubctl
 
 $(PROGRAM): $(PROGRAM).c
-	$(CC) $(CFLAGS) $@.c -o $@ -lusb-1.0 $(LDFLAGS)
+	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
 
 install:
 	$(INSTALL_DIR) $(DESTDIR)$(sbindir)
