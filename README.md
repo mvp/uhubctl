@@ -16,25 +16,25 @@ Some of them are no longer manufactured and can be hard to find.
 
 This is list of known compatible USB hubs:
 
-| Manufacturer        | Product                                                   | VID  | PID  |
-|:------------------- |:--------------------------------------------------------- | ----:| ----:|
-| AmazonBasics        | HU3770V1, 7 Port USB 3.0 Hub with 12V/3A Power Adapter    |`2109`|`2811`|
-| Anker               | AK-A7518111                                               |      |      |
-| Apple               | Thunderbolt Display 27" (internal USB hub)                |      |      |
-| Apple               | USB Keyboard With Numeric Pad (internal USB hub)          |      |      |
-| Asus                | Z87-PLUS Motherboard (onboard USB hubs)                   |      |      |
-| B&B Electronics     | UHR204                                                    |      |      |
-| Belkin              | F5U701-BLK                                                |      |      |
-| Circuitco           | Beagleboard-xM (internal USB hub)                         |`0424`|`9514`|
-| D-Link              | DUB-H7 (Silver edition only!)                             |`2001`|`F103`|
-| Elecom              | U2H-G4S                                                   |      |      |
-| Hawking Technology  | UH214                                                     |      |      |
-| Lenovo              | ThinkPad EU Ultra Dockingstation (40A20090EU)             |`17EF`|`100F`|
-| Linksys             | USB2HUB4                                                  |      |      |
-| Plugable            | USB2-HUB10S                                               |      |      |
-| Rosewill            | RHUB-210                                                  |`0409`|`005A`|
-| Sanwa Supply        | USB-HUB14GPH                                              |      |      |
-| Targus              | PAUH212                                                   |      |      |
+| Manufacturer       | Product                                                | VID:PID   | Release | EOL  |
+|:-------------------|:-------------------------------------------------------|:----------|:--------|:-----|
+| AmazonBasics       | HU3770V1, 7 Port USB 3.0 Hub with 12V/3A Power Adapter |`2109:2811`| 2013    |      |
+| Anker              | AK-A7518111                                            |           | 2015    |      |
+| Apple              | Thunderbolt Display 27" (internal USB hub)             |           | 2014    |      |
+| Apple              | USB Keyboard With Numeric Pad (internal USB hub)       |           | 2011    |      |
+| Asus               | Z87-PLUS Motherboard (onboard USB hubs)                |           | 2013    | 2016 |
+| B&B Electronics    | UHR204                                                 |           | 2013    |      |
+| Belkin             | F5U701-BLK                                             |           | 2008    | 2012 |
+| Circuitco          | Beagleboard-xM (internal USB hub)                      |`0424:9514`| 2010    |      |
+| D-Link             | DUB-H7 (silver edition only, new black not working)    |`2001:F103`| 2005    | 2010 |
+| Elecom             | U2H-G4S                                                |           | 2006    | 2011 |
+| Hawking Technology | UH214                                                  |           | 2003    | 2008 |
+| Lenovo             | ThinkPad EU Ultra Dockingstation (40A20090EU)          |`17EF:100F`| 2015    |      |
+| Linksys            | USB2HUB4                                               |           | 2004    | 2010 |
+| Plugable           | USB2-HUB10S                                            |           | 2010    |      |
+| Rosewill           | RHUB-210                                               |`0409:005A`| 2011    | 2014 |
+| Sanwa Supply       | USB-HUB14GPH                                           |           | 2001    | 2003 |
+| Targus             | PAUH212U                                               |           | 2004    | 2009 |
 
 This table is by no means complete.
 If your hub works with uhubctl, but is not listed above, please report it
