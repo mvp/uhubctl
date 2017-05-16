@@ -128,6 +128,7 @@ static int opt_action = POWER_KEEP;
 static int opt_delay  = 2;
 static int opt_repeat = 1;
 static int opt_wait   = 20; /* wait before repeating in ms */
+static int opt_reset  = 0; /* reset hub after operation(s) */
 
 static const struct option long_options[] = {
     { "loc",      required_argument, NULL, 'l' },
@@ -138,6 +139,7 @@ static const struct option long_options[] = {
     { "delay",    required_argument, NULL, 'd' },
     { "repeat",   required_argument, NULL, 'r' },
     { "wait",     required_argument, NULL, 'w' },
+    { "reset",    no_argument,       NULL, 'R' },
     { "version",  no_argument,       NULL, 'v' },
     { "help",     no_argument,       NULL, 'h' },
     { 0,          0,                 NULL, 0   },
@@ -157,6 +159,7 @@ int print_usage()
         "--vendor,   -n - limit hub by vendor id [%s] (partial ok).\n"
         "--delay,    -d - delay for cycle action [%d sec].\n"
         "--repeat,   -r - repeat power off count [%d] (some devices need it to turn off).\n"
+        "--reset,    -R - reset hub after each action.\n"
         "--wait,     -w - wait before repeat power off [%d ms].\n"
         "--internal, -i - include internal hubs  [off].\n"
         "--version,  -v - print program version.\n"
@@ -374,7 +377,7 @@ int main(int argc, char *argv[])
     int option_index = 0;
 
     for (;;) {
-        c = getopt_long(argc, argv, "l:n:a:p:d:r:w:hvi",
+        c = getopt_long(argc, argv, "l:n:a:p:d:r:w:hviR",
             long_options, &option_index);
         if (c == -1)
             break;  /* no more options left */
@@ -432,6 +435,9 @@ int main(int argc, char *argv[])
             break;
         case 'r':
             opt_repeat = atoi(optarg);
+            break;
+        case 'R':
+            opt_reset = 1;
             break;
         case 'w':
             opt_wait = atoi(optarg);
@@ -566,6 +572,16 @@ int main(int argc, char *argv[])
                     hubs[i].location, hubs[i].vendor, hubs[i].nports
                 );
                 hub_port_status(hubs[i].dev, hubs[i].nports, opt_ports);
+
+                if (k == 1 && opt_reset == 1) {
+                    printf("Resetting hub...\n");
+                    rc = libusb_reset_device(devh);
+                    if (rc < 0) {
+                        perror("Reset failed!\n");
+                    } else {
+                        printf("Reset succesful!\n");
+                    }
+                }
             }
             libusb_close(devh);
         }
