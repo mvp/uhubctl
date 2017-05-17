@@ -128,6 +128,7 @@ static int opt_action = POWER_KEEP;
 static int opt_delay  = 2;
 static int opt_repeat = 1;
 static int opt_wait   = 20; /* wait before repeating in ms */
+static int opt_verbose = 0; /* show device info in list */
 
 static const struct option long_options[] = {
     { "loc",      required_argument, NULL, 'l' },
@@ -139,6 +140,7 @@ static const struct option long_options[] = {
     { "repeat",   required_argument, NULL, 'r' },
     { "wait",     required_argument, NULL, 'w' },
     { "version",  no_argument,       NULL, 'v' },
+    { "verbose",  no_argument,       NULL, 'V' },
     { "help",     no_argument,       NULL, 'h' },
     { 0,          0,                 NULL, 0   },
 };
@@ -160,6 +162,7 @@ int print_usage()
         "--wait,     -w - wait before repeat power off [%d ms].\n"
         "--internal, -i - include internal hubs  [off].\n"
         "--version,  -v - print program version.\n"
+        "--verbose,  -V - show device information as well as location.\n"
         "--help,     -h - print this text.\n"
         "\n"
         "Send bugs and requests to: https://github.com/mvp/uhubctl\n",
@@ -278,7 +281,31 @@ static int hub_port_status(struct libusb_device * dev, int nports, int portmask)
                 break;
             }
 
-            printf("   Port %d: %04x", port, port_status);
+            if (opt_verbose == 1) {
+                struct libusb_device *devi;
+                struct libusb_device_descriptor descr = { 0 };
+                int i = 0;
+                int found = 0;
+                while ((devi = usb_devs[i++]) != NULL) {
+                    if (libusb_get_parent(devi) == dev) {
+                        if (libusb_get_port_number(devi) == port) {
+                            rc = libusb_get_device_descriptor(devi, &descr);
+                            if (rc < 0) {
+                                perror("Failed to get device descriptor!\n");
+                            }
+                            found = 1;
+                            break;
+                        }
+                    }
+                }
+                if (found == 1) {
+                    printf("   Port %d (%04x:%04x): %04x", port, descr.idVendor, descr.idProduct, port_status);
+                } else {
+                    printf("   Port %d (no device): %04x", port, port_status);
+                }
+            } else {
+                printf("   Port %d: %04x", port, port_status);
+            }
             printf("%s%s%s%s%s%s%s%s%s%s%s\n",
                 port_status & USB_PORT_STAT_INDICATOR    ? " indicator" : "",
                 port_status & USB_PORT_STAT_TEST         ? " test"      : "",
@@ -374,7 +401,7 @@ int main(int argc, char *argv[])
     int option_index = 0;
 
     for (;;) {
-        c = getopt_long(argc, argv, "l:n:a:p:d:r:w:hvi",
+        c = getopt_long(argc, argv, "l:n:a:p:d:r:w:hviV",
             long_options, &option_index);
         if (c == -1)
             break;  /* no more options left */
@@ -439,6 +466,9 @@ int main(int argc, char *argv[])
         case 'v':
             printf("%s\n", PROGRAM_VERSION);
             exit(0);
+            break;
+        case 'V':
+            opt_verbose = 1;
             break;
         case 'h':
             print_usage();
