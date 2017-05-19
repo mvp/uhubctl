@@ -34,6 +34,7 @@ This is list of known compatible USB hubs:
 | Plugable           | USB2-HUB10S                                            |           | 2010    |      |
 | Rosewill           | RHUB-210                                               |`0409:005A`| 2011    | 2014 |
 | Sanwa Supply       | USB-HUB14GPH                                           |           | 2001    | 2003 |
+| Sunix              | SHB4200MA                                              |`0409:0058`| 2006    | 2009 |
 | Targus             | PAUH212U                                               |           | 2004    | 2009 |
 
 This table is by no means complete.
