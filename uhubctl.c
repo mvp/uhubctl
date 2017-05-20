@@ -159,7 +159,7 @@ int print_usage()
         "--vendor,   -n - limit hub by vendor id [%s] (partial ok).\n"
         "--delay,    -d - delay for cycle action [%d sec].\n"
         "--repeat,   -r - repeat power off count [%d] (some devices need it to turn off).\n"
-        "--reset,    -R - reset hub after each action.\n"
+        "--reset,    -R - reset hub after each power-on action, causing all devices to reassociate.\n"
         "--wait,     -w - wait before repeat power off [%d ms].\n"
         "--internal, -i - include internal hubs  [off].\n"
         "--version,  -v - print program version.\n"
