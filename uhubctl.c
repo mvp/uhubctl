@@ -9,7 +9,7 @@
  *
  */
 
-#define PROGRAM_VERSION "1.5"
+#define PROGRAM_VERSION "1.6"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -282,7 +282,46 @@ static int hub_port_status(struct libusb_device * dev, int nports, int portmask)
             }
 
             printf("   Port %d: %04x", port, port_status);
-            printf("%s%s%s%s%s%s%s%s%s%s%s\n",
+
+            int id_vendor  = 0;
+            int id_product = 0;
+            unsigned char vendor[64]  = "";
+            unsigned char product[64] = "";
+            unsigned char serial[64]  = "";
+            struct libusb_device * udev;
+            int i = 0;
+            while ((udev = usb_devs[i++]) != NULL) {
+                if (libusb_get_parent(udev)      == dev &&
+                    libusb_get_port_number(udev) == port)
+                {
+                    struct libusb_device_descriptor desc;
+                    struct libusb_device_handle *devh = NULL;
+                    rc = libusb_get_device_descriptor(udev, &desc);
+                    if (rc)
+                        continue;
+                    id_vendor  = desc.idVendor;
+                    id_product = desc.idProduct;
+                    rc = libusb_open(udev, &devh);
+                    if (rc)
+                        continue;
+                    if (desc.iManufacturer) {
+                        libusb_get_string_descriptor_ascii(devh,
+                            desc.iManufacturer, vendor, sizeof(vendor));
+                    }
+                    if (desc.iProduct) {
+                        libusb_get_string_descriptor_ascii(devh,
+                            desc.iProduct, product, sizeof(product));
+                    }
+                    if (desc.iSerialNumber) {
+                        libusb_get_string_descriptor_ascii(devh,
+                            desc.iSerialNumber, serial, sizeof(serial));
+                    }
+                    libusb_close(devh);
+                    break;
+                }
+            }
+
+            printf("%s%s%s%s%s%s%s%s%s%s%s ",
                 port_status & USB_PORT_STAT_INDICATOR    ? " indicator" : "",
                 port_status & USB_PORT_STAT_TEST         ? " test"      : "",
                 port_status & USB_PORT_STAT_HIGH_SPEED   ? " highspeed" : "",
@@ -295,6 +334,15 @@ static int hub_port_status(struct libusb_device * dev, int nports, int portmask)
                 port_status & USB_PORT_STAT_CONNECTION   ? " connect"   : "",
                 port_status == 0                         ? " off"       : ""
             );
+            if (port_status & USB_PORT_STAT_CONNECTION) {
+                printf("[%04x:%04x%s%s%s%s%s%s]",
+                    id_vendor, id_product,
+                    vendor[0]  ? " " : "", vendor,
+                    product[0] ? " " : "", product,
+                    serial[0]  ? " " : "", serial
+                );
+            }
+            printf("\n");
         }
         libusb_close(devh);
     }
@@ -579,7 +627,7 @@ int main(int argc, char *argv[])
                     if (rc < 0) {
                         perror("Reset failed!\n");
                     } else {
-                        printf("Reset succesful!\n");
+                        printf("Reset successful!\n");
                     }
                 }
             }
