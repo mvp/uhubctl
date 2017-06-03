@@ -30,6 +30,7 @@ This is list of known compatible USB hubs:
 | Elecom             | U2H-G4S                                                |           | 2006    | 2011 |
 | Hawking Technology | UH214                                                  |           | 2003    | 2008 |
 | Lenovo             | ThinkPad EU Ultra Dockingstation (40A20090EU)          |`17EF:100F`| 2015    |      |
+| Lenovo             | ThinkPad X200 Ultrabase 42X4963                        |`17EF:1005`| 2008    | 2011 |
 | Linksys            | USB2HUB4                                               |           | 2004    | 2010 |
 | Plugable           | USB2-HUB10S                                            |           | 2010    |      |
 | Rosewill           | RHUB-210                                               |`0409:005A`| 2011    | 2014 |
@@ -40,7 +41,8 @@ This is list of known compatible USB hubs:
 This table is by no means complete.
 If your hub works with uhubctl, but is not listed above, please report it
 by opening new issue at https://github.com/mvp/uhubctl/issues,
-so we can add it to supported table.
+so we can add it to supported table. In your report, please provide
+exact product model and add output from uhubctl.
 
 Some modern motherboards have built-in root hubs that do support
 this feature, but you need to use option `-i` to enable it.
