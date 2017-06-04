@@ -15,6 +15,12 @@ CC ?= gcc
 CFLAGS ?= -g -O0
 CFLAGS += -Wall -Wextra
 
+ifeq ($(UNAME_S),FreeBSD)
+	CFLAGS	+= -lusb
+else
+	LDFLAGS	+= -lusb-1.0
+endif
+
 ifeq ($(UNAME_S),Linux)
 	LDFLAGS += -Wl,-z,relro -lusb-1.0
 endif
