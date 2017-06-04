@@ -32,6 +32,10 @@ ifeq ($(UNAME_S),FreeBSD)
 	LDFLAGS += -lusb
 endif
 
+ifeq ($(UNAME_S),Darwin)
+	LDFLAGS	+= -L /opt/local/lib -I /opt/local/include
+endif
+
 PROGRAM = uhubctl
 
 $(PROGRAM): $(PROGRAM).c
