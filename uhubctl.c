@@ -9,7 +9,7 @@
  *
  */
 
-#define PROGRAM_VERSION "1.6"
+#define PROGRAM_VERSION "1.7"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -211,9 +211,10 @@ int is_smart_hub(struct libusb_device *dev, int min_current)
             int lpsm = uhd->wHubCharacteristics[0] & HUB_CHAR_LPSM;
             /* Over-Current Protection Mode */
             int ocpm = uhd->wHubCharacteristics[0] & HUB_CHAR_OCPM;
-            /* Both LPSM and OCPM must be supported per-port: */
+            /* LPSM must be supported per-port, and OCPM per port or ganged */
             if ((lpsm == HUB_CHAR_INDV_PORT_LPSM) &&
-                (ocpm == HUB_CHAR_INDV_PORT_OCPM))
+                (ocpm == HUB_CHAR_INDV_PORT_OCPM ||
+                 ocpm == HUB_CHAR_COMMON_OCPM))
             {
                 rc = uhd->bNbrPorts;
                 /* Internal hubs have zero bHubContrCurrent.
