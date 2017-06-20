@@ -32,6 +32,7 @@ This is list of known compatible USB hubs:
 | Lenovo             | ThinkPad EU Ultra Dockingstation (40A20090EU)          |`17EF:100F`| 2015    |      |
 | Lenovo             | ThinkPad X200 Ultrabase 42X4963                        |`17EF:1005`| 2008    | 2011 |
 | Linksys            | USB2HUB4                                               |           | 2004    | 2010 |
+| Maplin             | A08CQ                                                  |`0409:0059`| 2008    | 2011 |
 | Microchip          | EVB-USB2517                                            |           | 2008    |      |
 | Plugable           | USB2-HUB10S                                            |           | 2010    |      |
 | Raspberry Pi       | Model B+, Model 2 B, Model 3 B                         |           | 2011    |      |
