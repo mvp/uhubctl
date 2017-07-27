@@ -69,6 +69,13 @@ First, you need to install library libusb-1.0 (version 1.0.12 or later):
 
 To compile, simply run `make` - this will generate `uhubctl` binary.
 
+Alternatively, for macOS you can build an executable with homebrew's custom tap:
+
+```
+brew tap mvp/uhubctl https://github.com/mvp/uhubctl/
+brew install --HEAD uhubctl
+```
+
 Usage
 =====
 
