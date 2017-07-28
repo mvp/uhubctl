@@ -17,39 +17,32 @@
 #include <getopt.h>
 #include <errno.h>
 #include <ctype.h>
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 #include <io.h>
 #include <process.h>
-#else
-#include <unistd.h>
 #endif
 
-
-#ifdef __FreeBSD__
-#include <libusb.h>
-#elif defined(_WIN32) || defined(_WIN64)
+#if defined(__FreeBSD__) || defined(_WIN32)
 #include <libusb.h>
 #else
 #include <libusb-1.0/libusb.h>
 #endif
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
+#include <windows.h>
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
-
-#endif
-
-#if defined(_WIN32) || defined(_WIN64)
-#include <windows.h>
 #elif _POSIX_C_SOURCE >= 199309L
-#include <time.h>   // for nanosleep
+#include <time.h>   /* for nanosleep */
 #else
-#include <unistd.h> // for usleep
+#include <unistd.h> /* for usleep */
 #endif
 
-void sleep_ms(int milliseconds) // cross-platform sleep function
+/* cross-platform sleep function */
+
+void sleep_ms(int milliseconds)
 {
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
     Sleep(milliseconds);
 #elif _POSIX_C_SOURCE >= 199309L
     struct timespec ts;
@@ -99,12 +92,10 @@ struct usb_hub_descriptor {
  * See USB 2.0 spec Table 11-19 and Table 11-20
  */
 #pragma pack(push,1)
-
 struct usb_port_status {
     int16_t wPortStatus;
     int16_t wPortChange;
 };
-
 #pragma pack(push,1)
 
 /*
@@ -214,6 +205,7 @@ int print_usage()
     );
     return 0;
 }
+
 /* checks if hub is smart hub
  * use min_current above 0 to only consider external hubs
  * (external hubs have non-zero bHubContrCurrent)
@@ -303,6 +295,7 @@ static int get_port_status(struct libusb_device_handle *devh, int port)
  * portmask is bitmap of ports to display
  * if portmask is 0, show all ports
  */
+
 static int hub_port_status(struct libusb_device * dev, int nports, int portmask)
 {
     int port_status;

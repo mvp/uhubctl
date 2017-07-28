@@ -13,7 +13,7 @@ RM		:= rm -rf
 
 CC ?= gcc
 CFLAGS ?= -g -O0
-CFLAGS += -Wall -Wextra
+CFLAGS += -Wall -Wextra -std=c99 -pedantic
 
 ifeq ($(UNAME_S),Linux)
 	LDFLAGS += -Wl,-z,relro -lusb-1.0
