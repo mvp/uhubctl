@@ -20,12 +20,13 @@ This is list of known compatible USB hubs:
 |:-------------------|:-------------------------------------------------------|:----------|:--------|:-----|
 | AmazonBasics       | HU3770V1, 7 Port USB 3.0 Hub with 12V/3A Power Adapter |`2109:2811`| 2013    |      |
 | Anker              | AK-A7518111                                            |           | 2015    |      |
-| Apple              | Thunderbolt Display 27" (internal USB hub)             |           | 2014    |      |
+| Apple              | Thunderbolt Display 27" (internal USB hub)             |           | 2011    | 2016 |
 | Apple              | USB Keyboard With Numeric Pad (internal USB hub)       |           | 2011    |      |
 | Asus               | Z87-PLUS Motherboard (onboard USB hubs)                |           | 2013    | 2016 |
 | B&B Electronics    | UHR204                                                 |           | 2013    |      |
 | Belkin             | F5U701-BLK                                             |           | 2008    | 2012 |
 | Circuitco          | Beagleboard-xM (internal USB hub)                      |`0424:9514`| 2010    |      |
+| CyberPower         | CP-H420P                                               |`0409:0059`| 2004    |      |
 | D-Link             | DUB-H7 (silver edition only, new black not working)    |`2001:F103`| 2005    | 2010 |
 | Elecom             | U2H-G4S                                                |           | 2006    | 2011 |
 | Hawking Technology | UH214                                                  |           | 2003    | 2008 |
