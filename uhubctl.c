@@ -10,16 +10,24 @@
  */
 
 #define PROGRAM_VERSION "1.7"
+#define _XOPEN_SOURCE 500
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <getopt.h>
 #include <errno.h>
 #include <ctype.h>
+
 #if defined(_WIN32)
+#include <windows.h>
 #include <io.h>
 #include <process.h>
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
+#else
+#include <unistd.h>
 #endif
 
 #if defined(__FreeBSD__) || defined(_WIN32)
@@ -28,14 +36,8 @@
 #include <libusb-1.0/libusb.h>
 #endif
 
-#if defined(_WIN32)
-#include <windows.h>
-#define strcasecmp _stricmp
-#define strncasecmp _strnicmp
-#elif _POSIX_C_SOURCE >= 199309L
+#if _POSIX_C_SOURCE >= 199309L
 #include <time.h>   /* for nanosleep */
-#else
-#include <unistd.h> /* for usleep */
 #endif
 
 /* cross-platform sleep function */
