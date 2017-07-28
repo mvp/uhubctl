@@ -98,7 +98,7 @@ struct usb_port_status {
     int16_t wPortStatus;
     int16_t wPortChange;
 };
-#pragma pack(push,1)
+#pragma pack(pop)
 
 /*
  * wPortStatus bit field
