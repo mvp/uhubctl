@@ -56,8 +56,11 @@ Compiling
 
 This utility was tested to compile and work on Linux
 (Ubuntu, Redhat/Fedora/CentOS), FreeBSD and Mac OS X.
-It should be possible to compile it for Windows as well -
-please report if you succeed in doing that.
+
+While `uhubctl` compiles on Windows, USB power switching does not work on Windows because `libusb`
+is using `winusb.sys` driver, which according to Microsoft does not support
+[necessary USB control requests](https://social.msdn.microsoft.com/Forums/sqlserver/en-US/f680b63f-ca4f-4e52-baa9-9e64f8eee101).
+This may be fixed if `libusb` starts supporting different driver on Windows.
 
 First, you need to install library libusb-1.0 (version 1.0.12 or later):
 
