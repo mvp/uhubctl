@@ -17,13 +17,49 @@
 #include <getopt.h>
 #include <errno.h>
 #include <ctype.h>
+#if defined(_WIN32) || defined(_WIN64)
+#include <io.h>
+#include <process.h>
+#else
 #include <unistd.h>
+#endif
+
 
 #ifdef __FreeBSD__
+#include <libusb.h>
+#elif defined(_WIN32) || defined(_WIN64)
 #include <libusb.h>
 #else
 #include <libusb-1.0/libusb.h>
 #endif
+
+#if defined(_WIN32) || defined(_WIN64)
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
+
+#endif
+
+#if defined(_WIN32) || defined(_WIN64)
+#include <windows.h>
+#elif _POSIX_C_SOURCE >= 199309L
+#include <time.h>   // for nanosleep
+#else
+#include <unistd.h> // for usleep
+#endif
+
+void sleep_ms(int milliseconds) // cross-platform sleep function
+{
+#if defined(_WIN32) || defined(_WIN64)
+    Sleep(milliseconds);
+#elif _POSIX_C_SOURCE >= 199309L
+    struct timespec ts;
+    ts.tv_sec = milliseconds / 1000;
+    ts.tv_nsec = (milliseconds % 1000) * 1000000;
+    nanosleep(&ts, NULL);
+#else
+    usleep(milliseconds * 1000);
+#endif
+}
 
 /* Max number of hub ports supported.
  * This is somewhat artifically limited by "-p" option parser.
@@ -62,10 +98,14 @@ struct usb_hub_descriptor {
  * Hub Status and Hub Change results
  * See USB 2.0 spec Table 11-19 and Table 11-20
  */
+#pragma pack(push,1)
+
 struct usb_port_status {
     int16_t wPortStatus;
     int16_t wPortChange;
-} __attribute__ ((packed));
+};
+
+#pragma pack(push,1)
 
 /*
  * wPortStatus bit field
@@ -607,13 +647,13 @@ int main(int argc, char *argv[])
                                 perror("Failed to control port power!\n");
                             }
                             if (repeat > 0) {
-                                usleep(opt_wait * 1000);
+                                sleep_ms(opt_wait);
                             }
                         }
                     }
                 }
                 if (k==0 && opt_action == POWER_CYCLE)
-                    sleep(opt_delay);
+                    sleep_ms(opt_delay);
                 printf("Sent power %s request\n",
                     request == LIBUSB_REQUEST_CLEAR_FEATURE ? "off" : "on"
                 );
