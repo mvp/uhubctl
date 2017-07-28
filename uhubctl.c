@@ -653,7 +653,7 @@ int main(int argc, char *argv[])
                     }
                 }
                 if (k==0 && opt_action == POWER_CYCLE)
-                    sleep_ms(opt_delay);
+                    sleep_ms(opt_delay * 1000);
                 printf("Sent power %s request\n",
                     request == LIBUSB_REQUEST_CLEAR_FEATURE ? "off" : "on"
                 );
