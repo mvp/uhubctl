@@ -9,7 +9,7 @@
  *
  */
 
-#define PROGRAM_VERSION "1.7"
+#define PROGRAM_VERSION "1.8"
 #define _XOPEN_SOURCE 500
 
 #include <stdio.h>
@@ -155,7 +155,6 @@ static int hub_count = 0;
 /* default options */
 static char opt_vendor[16]   = "";
 static char opt_location[16] = "";     /* Hub location a-b.c.d */
-static int opt_internal = 0;           /* Allow scanning internal hubs */
 static int opt_ports  = ALL_HUB_PORTS; /* Bitmask of ports to operate on */
 static int opt_action = POWER_KEEP;
 static int opt_delay  = 2;
@@ -166,6 +165,7 @@ static int opt_reset  = 0; /* reset hub after operation(s) */
 static const struct option long_options[] = {
     { "loc",      required_argument, NULL, 'l' },
     { "vendor",   required_argument, NULL, 'n' },
+    /* -i is deprecated, keep it only for backwards compatibility: */
     { "internal", no_argument,       NULL, 'i' },
     { "ports",    required_argument, NULL, 'p' },
     { "action",   required_argument, NULL, 'a' },
@@ -194,7 +194,6 @@ int print_usage()
         "--repeat,   -r - repeat power off count [%d] (some devices need it to turn off).\n"
         "--reset,    -R - reset hub after each power-on action, causing all devices to reassociate.\n"
         "--wait,     -w - wait before repeat power off [%d ms].\n"
-        "--internal, -i - include internal hubs  [off].\n"
         "--version,  -v - print program version.\n"
         "--help,     -h - print this text.\n"
         "\n"
@@ -208,7 +207,8 @@ int print_usage()
     return 0;
 }
 
-/* checks if hub is smart hub
+/*
+ * checks if hub is smart hub
  * use min_current above 0 to only consider external hubs
  * (external hubs have non-zero bHubContrCurrent)
  * return value is number of hub ports
@@ -266,7 +266,8 @@ int is_smart_hub(struct libusb_device *dev, int min_current)
     return rc;
 }
 
-/* Assuming that devh is opened device handle for USB hub,
+/*
+ * Assuming that devh is opened device handle for USB hub,
  * return state for given hub port.
  * In case of error, returns -1 (inspect errno for more information).
  */
@@ -292,7 +293,8 @@ static int get_port_status(struct libusb_device_handle *devh, int port)
     return ust.wPortStatus;
 }
 
-/* show status for hub ports
+/*
+ * show status for hub ports
  * nports is number of hub ports
  * portmask is bitmap of ports to display
  * if portmask is 0, show all ports
@@ -404,7 +406,7 @@ static int usb_find_hubs()
         /* only scan for hubs: */
         if (rc == 0 && desc.bDeviceClass != LIBUSB_CLASS_HUB)
            continue;
-        int nports = is_smart_hub(dev, opt_internal ? 0 : 1);
+        int nports = is_smart_hub(dev, 0);
         if (nports < 0) {
             perm_ok = 0; /* USB permission issue? */
         }
@@ -477,14 +479,12 @@ int main(int argc, char *argv[])
             break;
         case 'l':
             strncpy(opt_location, optarg, sizeof(opt_location));
-            opt_internal = 1;
             break;
         case 'n':
             strncpy(opt_vendor, optarg, sizeof(opt_vendor));
             break;
         case 'i':
-            strncpy(opt_vendor, "", sizeof(opt_vendor));
-            opt_internal = 1; /* enable internal hubs if location was specified */
+            /* ignored for backwards compatibility */
             break;
         case 'p':
             if (!strcasecmp(optarg, "all")) { /* all ports is the default */

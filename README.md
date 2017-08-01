@@ -47,8 +47,10 @@ by opening new issue at https://github.com/mvp/uhubctl/issues,
 so we can add it to supported table. In your report, please provide
 exact product model and add output from uhubctl.
 
-Some modern motherboards have built-in root hubs that do support
-this feature, but you need to use option `-i` to enable it.
+Note that quite a few modern motherboards have built-in root hubs that
+do support this feature - you may not even need to buy any external hub.
+WARNING: turning off built-in USB ports may cut off your keyboard or mouse,
+so be careful what ports you are turning off!
 
 
 Compiling
