@@ -19,7 +19,6 @@ This is list of known compatible USB hubs:
 | Manufacturer       | Product                                                | VID:PID   | Release | EOL  |
 |:-------------------|:-------------------------------------------------------|:----------|:--------|:-----|
 | AmazonBasics       | HU3770V1, 7 Port USB 3.0 Hub with 12V/3A Power Adapter |`2109:2811`| 2013    |      |
-| Anker              | AK-A7518111                                            |           | 2015    |      |
 | Apple              | Thunderbolt Display 27" (internal USB hub)             |           | 2011    | 2016 |
 | Apple              | USB Keyboard With Numeric Pad (internal USB hub)       |           | 2011    |      |
 | Asus               | Z87-PLUS Motherboard (onboard USB hubs)                |           | 2013    | 2016 |
