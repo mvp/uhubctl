@@ -14,6 +14,8 @@ RM		:= rm -rf
 CC ?= gcc
 CFLAGS ?= -g -O0
 CFLAGS += -Wall -Wextra -std=c99 -pedantic
+GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always --tags)
+CFLAGS += -DPROGRAM_VERSION=\"$(GIT_VERSION)\"
 
 ifeq ($(UNAME_S),Linux)
 	LDFLAGS += -Wl,-z,relro -lusb-1.0

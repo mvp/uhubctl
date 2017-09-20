@@ -9,7 +9,6 @@
  *
  */
 
-#define PROGRAM_VERSION "1.8"
 #define _XOPEN_SOURCE 500
 
 #include <stdio.h>
@@ -181,7 +180,7 @@ static const struct option long_options[] = {
 int print_usage()
 {
     printf(
-        "uhubctl v%s: utility to control USB port power for smart hubs.\n"
+        "uhubctl %s: utility to control USB port power for smart hubs.\n"
         "Usage: uhubctl [options]\n"
         "Without options, show status for all smart hubs.\n"
         "\n"
