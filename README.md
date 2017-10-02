@@ -35,7 +35,7 @@ This is list of known compatible USB hubs:
 | Maplin             | A08CQ                                                  |`0409:0059`| 2008    | 2011 |
 | Microchip          | EVB-USB2517                                            |           | 2008    |      |
 | Plugable           | USB2-HUB10S                                            |           | 2010    |      |
-| Raspberry Pi       | Model B+, Model 2 B, Model 3 B                         |           | 2011    |      |
+| Raspberry Pi       | Model B+, Model 2 B, Model 3 B (port 2 only)           |           | 2011    |      |
 | Rosewill           | RHUB-210                                               |`0409:005A`| 2011    | 2014 |
 | Sanwa Supply       | USB-HUB14GPH                                           |           | 2001    | 2003 |
 | Sunix              | SHB4200MA                                              |`0409:0058`| 2006    | 2009 |
@@ -69,15 +69,17 @@ First, you need to install library libusb-1.0 (version 1.0.12 or later):
 * Ubuntu: `sudo apt-get install libusb-1.0-0-dev`
 * Redhat: `sudo yum install libusb1-devel`
 * MacOSX: `brew install libusb`, or `sudo port install libusb-devel`
+  Note that Mac OS Sierra may be affected by issue https://github.com/libusb/libusb/issues/303.
+  Until libusb 1.0.22 is released, use `brew install --HEAD libusb` as a workaround.
 * FreeBSD: libusb is included by default
 * Windows: TBD?
 
 To compile, simply run `make` - this will generate `uhubctl` binary.
 
-Alternatively, for macOS you can build an executable with homebrew's custom tap:
+Also, for Mac OS X you can install `uhubctl` with Homebrew custom tap:
 
 ```
-brew tap mvp/uhubctl https://github.com/mvp/uhubctl/
+brew tap mvp/uhubctl https://github.com/mvp/uhubctl
 brew install --HEAD uhubctl
 ```
 
