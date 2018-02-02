@@ -28,6 +28,7 @@ This is list of known compatible USB hubs:
 | Circuitco          | Beagleboard-xM (internal USB hub)                      |`0424:9514`| 2010    |      |
 | CyberPower         | CP-H420P                                               |`0409:0059`| 2004    |      |
 | Cypress            | CY4608 HX2VL development kit                           |`04b4:6570`| 2012    |      |
+| D-Link             | DUB-H4 rev D1 (black edition, old silver not working)  |`05E3:0608`| 2012    |      |
 | D-Link             | DUB-H7 (silver edition only, new black not working)    |`2001:F103`| 2005    | 2010 |
 | Elecom             | U2H-G4S                                                |           | 2006    | 2011 |
 | Hawking Technology | UH214                                                  |           | 2003    | 2008 |
