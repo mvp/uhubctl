@@ -746,14 +746,16 @@ int main(int argc, char *argv[])
                 for (port=1; port <= hubs[i].nports; port++) {
                     if ((1 << (port-1)) & ports) {
                         int port_status = get_port_status(devh, port);
-                        if (k == 0 && !(port_status & USB_PORT_STAT_POWER))
+                        int power_mask = (hubs[i].bcd_usb < 0x300) ? USB_PORT_STAT_POWER
+                                                                   : USB_SS_PORT_STAT_POWER;
+                        if (k == 0 && !(port_status & power_mask))
                             continue;
-                        if (k == 1 && (port_status & USB_PORT_STAT_POWER))
+                        if (k == 1 && (port_status & power_mask))
                             continue;
                         int repeat = 1;
                         if (k == 0)
                             repeat = opt_repeat;
-                        if (!(port_status & ~USB_PORT_STAT_POWER))
+                        if (!(port_status & ~power_mask))
                             repeat = 1;
                         while (repeat-- > 0) {
                             rc = libusb_control_transfer(devh,
