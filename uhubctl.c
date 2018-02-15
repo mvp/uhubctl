@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2017 Vadim Mikhailov
+ * Copyright (c) 2009-2018 Vadim Mikhailov
  *
  * Utility to turn USB port power on/off
  * for USB hubs that support per-port power switching.
@@ -33,6 +33,10 @@
 #include <libusb.h>
 #else
 #include <libusb-1.0/libusb.h>
+#endif
+
+#if defined(__APPLE__) /* snprintf is not available in pure C mode */
+int snprintf(char * __restrict __str, size_t __size, const char * __restrict __format, ...) __printflike(3, 4);
 #endif
 
 #if _POSIX_C_SOURCE >= 199309L
@@ -78,6 +82,7 @@ void sleep_ms(int milliseconds)
 
 /* Partially borrowed from linux/usb/ch11.h */
 
+#pragma pack(push,1)
 struct usb_hub_descriptor {
     unsigned char bDescLength;
     unsigned char bDescriptorType;
@@ -87,6 +92,7 @@ struct usb_hub_descriptor {
     unsigned char bHubContrCurrent;
     unsigned char data[1]; /* use 1 to avoid zero-sized array warning */
 };
+#pragma pack(pop)
 
 /*
  * Hub Status and Hub Change results
@@ -118,6 +124,39 @@ struct usb_port_status {
 /* bits 13 to 15 are reserved */
 
 /*
+ * Additions to wPortStatus bit field from USB 3.0
+ * See USB 3.0 spec Table 10-10
+ */
+#define USB_PORT_STAT_LINK_STATE	0x01e0
+#define USB_SS_PORT_STAT_POWER		0x0200
+#define USB_SS_PORT_STAT_SPEED		0x1c00
+#define USB_PORT_STAT_SPEED_5GBPS	0x0000
+/* Valid only if port is enabled */
+/* Bits that are the same from USB 2.0 */
+#define USB_SS_PORT_STAT_MASK (USB_PORT_STAT_CONNECTION  | \
+                               USB_PORT_STAT_ENABLE      | \
+                               USB_PORT_STAT_OVERCURRENT | \
+                               USB_PORT_STAT_RESET)
+
+/*
+ * Definitions for PORT_LINK_STATE values
+ * (bits 5-8) in wPortStatus
+ */
+#define USB_SS_PORT_LS_U0               0x0000
+#define USB_SS_PORT_LS_U1               0x0020
+#define USB_SS_PORT_LS_U2               0x0040
+#define USB_SS_PORT_LS_U3               0x0060
+#define USB_SS_PORT_LS_SS_DISABLED      0x0080
+#define USB_SS_PORT_LS_RX_DETECT        0x00a0
+#define USB_SS_PORT_LS_SS_INACTIVE      0x00c0
+#define USB_SS_PORT_LS_POLLING          0x00e0
+#define USB_SS_PORT_LS_RECOVERY         0x0100
+#define USB_SS_PORT_LS_HOT_RESET        0x0120
+#define USB_SS_PORT_LS_COMP_MOD         0x0140
+#define USB_SS_PORT_LS_LOOPBACK         0x0160
+
+
+/*
  * wHubCharacteristics (masks)
  * See USB 2.0 spec Table 11-13, offset 3
  */
@@ -141,9 +180,12 @@ static struct libusb_device **usb_devs = NULL;
 
 struct hub_info {
     struct libusb_device *dev;
+    int bcd_usb;
     int nports;
+    int ppps;
     char vendor[16];
     char location[32];
+    char description[256];
 };
 
 /* Array of USB hubs we are going to operate on */
@@ -164,8 +206,6 @@ static int opt_reset  = 0; /* reset hub after operation(s) */
 static const struct option long_options[] = {
     { "loc",      required_argument, NULL, 'l' },
     { "vendor",   required_argument, NULL, 'n' },
-    /* -i is deprecated, keep it only for backwards compatibility: */
-    { "internal", no_argument,       NULL, 'i' },
     { "ports",    required_argument, NULL, 'p' },
     { "action",   required_argument, NULL, 'a' },
     { "delay",    required_argument, NULL, 'd' },
@@ -176,6 +216,7 @@ static const struct option long_options[] = {
     { "help",     no_argument,       NULL, 'h' },
     { 0,          0,                 NULL, 0   },
 };
+
 
 int print_usage()
 {
@@ -206,40 +247,60 @@ int print_usage()
     return 0;
 }
 
+
+/* trim trailing spaces from a string */
+
+static char* rtrim(char* str)
+{
+    int i;
+    for (i = strlen(str)-1; i>=0 && isspace(str[i]); i--) {
+       str[i] = 0;
+    }
+    return str;
+}
+
+
 /*
- * checks if hub is smart hub
- * use min_current above 0 to only consider external hubs
- * (external hubs have non-zero bHubContrCurrent)
- * return value is number of hub ports
- * 0 means hub is not smart
- * -1 means there is access error
+ * get USB hub properties.
+ * most hub_info fields are filled, except for description.
+ * returns 0 for success and error code for failure.
  */
 
-int is_smart_hub(struct libusb_device *dev, int min_current)
+int get_hub_info(struct libusb_device *dev, struct hub_info *info)
 {
     int rc = 0;
     int len = 0;
     struct libusb_device_handle *devh = NULL;
-    unsigned char buf[256] = {0};
+    unsigned char buf[LIBUSB_DT_HUB_NONVAR_SIZE + 2 + 3] = {0};
     struct usb_hub_descriptor *uhd =
                 (struct usb_hub_descriptor *)buf;
-    int minlen = sizeof(struct usb_hub_descriptor) - 1;
+    int minlen = LIBUSB_DT_HUB_NONVAR_SIZE + 2;
     struct libusb_device_descriptor desc;
     rc = libusb_get_device_descriptor(dev, &desc);
+    if (rc)
+        return rc;
     if (desc.bDeviceClass != LIBUSB_CLASS_HUB)
-        return 0;
+        return LIBUSB_ERROR_INVALID_PARAM;
+    int bcd_usb = libusb_le16_to_cpu(desc.bcdUSB);
+    int desc_type = (bcd_usb >= 0x300) ? LIBUSB_DT_SUPERSPEED_HUB
+                                       : LIBUSB_DT_HUB;
     rc = libusb_open(dev, &devh);
     if (rc == 0) {
         len = libusb_control_transfer(devh,
             LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_CLASS
                                | LIBUSB_RECIPIENT_DEVICE, /* hub status */
             LIBUSB_REQUEST_GET_DESCRIPTOR,
-            LIBUSB_DT_HUB << 8,
+            desc_type << 8,
             0,
             buf, sizeof(buf),
             USB_CTRL_GET_TIMEOUT
         );
+
         if (len >= minlen) {
+            info->dev     = dev;
+            info->bcd_usb = bcd_usb;
+            info->nports  = uhd->bNbrPorts;
+            info->ppps    = 0;
             /* Logical Power Switching Mode */
             int lpsm = uhd->wHubCharacteristics[0] & HUB_CHAR_LPSM;
             /* Over-Current Protection Mode */
@@ -249,13 +310,7 @@ int is_smart_hub(struct libusb_device *dev, int min_current)
                 (ocpm == HUB_CHAR_INDV_PORT_OCPM ||
                  ocpm == HUB_CHAR_COMMON_OCPM))
             {
-                rc = uhd->bNbrPorts;
-                /* Internal hubs have zero bHubContrCurrent.
-                 * Ignore them if requested:
-                 */
-                if (min_current > 0 && uhd->bHubContrCurrent < min_current) {
-                    rc = -1;
-                }
+                info->ppps = 1;
             }
         } else {
             rc = len;
@@ -264,6 +319,7 @@ int is_smart_hub(struct libusb_device *dev, int min_current)
     }
     return rc;
 }
+
 
 /*
  * Assuming that devh is opened device handle for USB hub,
@@ -292,22 +348,93 @@ static int get_port_status(struct libusb_device_handle *devh, int port)
     return ust.wPortStatus;
 }
 
+
+/*
+ * Get USB device description as a string.
+ *
+ * It will use following format:
+ *
+ *    "<vid:pid> <vendor> <product> <serial>, <USB x.yz, N ports>"
+ *
+ * vid:pid will be always present, but vendor, product or serial
+ * may be skipped if they are empty or not enough permissions to read them.
+ * <USB x.yz, N ports> will be present only for USB hubs.
+ *
+ * returns 0 for success and error code for failure.
+ * in case of failure description buffer is not altered.
+ */
+
+static int get_device_description(struct libusb_device * dev, char* description, int desc_len)
+{
+    int rc;
+    int id_vendor  = 0;
+    int id_product = 0;
+    char vendor[64]  = "";
+    char product[64] = "";
+    char serial[64]  = "";
+    char ports[64]   = "";
+    struct libusb_device_descriptor desc;
+    struct libusb_device_handle *devh = NULL;
+    rc = libusb_get_device_descriptor(dev, &desc);
+    if (rc)
+        return rc;
+    id_vendor  = libusb_le16_to_cpu(desc.idVendor);
+    id_product = libusb_le16_to_cpu(desc.idProduct);
+    rc = libusb_open(dev, &devh);
+    if (rc == 0) {
+        if (desc.iManufacturer) {
+            libusb_get_string_descriptor_ascii(devh,
+                desc.iManufacturer, (unsigned char*)vendor, sizeof(vendor));
+            rtrim(vendor);
+        }
+        if (desc.iProduct) {
+            libusb_get_string_descriptor_ascii(devh,
+                desc.iProduct, (unsigned char*)product, sizeof(product));
+            rtrim(product);
+        }
+        if (desc.iSerialNumber) {
+            libusb_get_string_descriptor_ascii(devh,
+                desc.iSerialNumber, (unsigned char*)serial, sizeof(serial));
+            rtrim(serial);
+        }
+        if (desc.bDeviceClass == LIBUSB_CLASS_HUB) {
+            struct hub_info info;
+            rc = get_hub_info(dev, &info);
+            if (rc == 0) {
+                snprintf(ports, sizeof(ports), ", USB %x.%02x, %d ports",
+                   info.bcd_usb >> 8, info.bcd_usb & 0xFF, info.nports);
+            }
+        }
+        libusb_close(devh);
+    }
+    snprintf(description, desc_len,
+        "%04x:%04x%s%s%s%s%s%s%s",
+        id_vendor, id_product,
+        vendor[0]  ? " " : "", vendor,
+        product[0] ? " " : "", product,
+        serial[0]  ? " " : "", serial,
+        ports
+    );
+    return 0;
+}
+
+
 /*
  * show status for hub ports
- * nports is number of hub ports
  * portmask is bitmap of ports to display
  * if portmask is 0, show all ports
  */
 
-static int hub_port_status(struct libusb_device * dev, int nports, int portmask)
+static int hub_port_status(struct hub_info * hub, int portmask)
 {
     int port_status;
     struct libusb_device_handle * devh = NULL;
     int rc = 0;
+    struct libusb_device *dev = hub->dev;
     rc = libusb_open(dev, &devh);
     if (rc == 0) {
         int port;
-        for (port = 1; port <= nports; port++) {
+        for (port = 1; port <= hub->nports; port++) {
             if (portmask > 0 && (portmask & (1 << (port-1))) == 0) continue;
 
             port_status = get_port_status(devh, port);
@@ -318,73 +445,64 @@ static int hub_port_status(struct libusb_device * dev, int nports, int portmask)
                 break;
             }
 
-            printf("   Port %d: %04x", port, port_status);
+            printf("  Port %d: %04x", port, port_status);
 
-            int id_vendor  = 0;
-            int id_product = 0;
-            unsigned char vendor[64]  = "";
-            unsigned char product[64] = "";
-            unsigned char serial[64]  = "";
+            char description[256] = "";
             struct libusb_device * udev;
             int i = 0;
             while ((udev = usb_devs[i++]) != NULL) {
                 if (libusb_get_parent(udev)      == dev &&
                     libusb_get_port_number(udev) == port)
                 {
-                    struct libusb_device_descriptor desc;
-                    struct libusb_device_handle *devh = NULL;
-                    rc = libusb_get_device_descriptor(udev, &desc);
-                    if (rc)
-                        continue;
-                    id_vendor  = desc.idVendor;
-                    id_product = desc.idProduct;
-                    rc = libusb_open(udev, &devh);
-                    if (rc)
-                        continue;
-                    if (desc.iManufacturer) {
-                        libusb_get_string_descriptor_ascii(devh,
-                            desc.iManufacturer, vendor, sizeof(vendor));
-                    }
-                    if (desc.iProduct) {
-                        libusb_get_string_descriptor_ascii(devh,
-                            desc.iProduct, product, sizeof(product));
-                    }
-                    if (desc.iSerialNumber) {
-                        libusb_get_string_descriptor_ascii(devh,
-                            desc.iSerialNumber, serial, sizeof(serial));
-                    }
-                    libusb_close(devh);
-                    break;
+                    rc = get_device_description(udev, description, sizeof(description));
+                    if (rc == 0)
+                        break;
                 }
             }
 
-            printf("%s%s%s%s%s%s%s%s%s%s%s ",
-                port_status & USB_PORT_STAT_INDICATOR    ? " indicator" : "",
-                port_status & USB_PORT_STAT_TEST         ? " test"      : "",
-                port_status & USB_PORT_STAT_HIGH_SPEED   ? " highspeed" : "",
-                port_status & USB_PORT_STAT_LOW_SPEED    ? " lowspeed"  : "",
-                port_status & USB_PORT_STAT_POWER        ? " power"     : "",
-                port_status & USB_PORT_STAT_RESET        ? " reset"     : "",
-                port_status & USB_PORT_STAT_OVERCURRENT  ? " oc"        : "",
-                port_status & USB_PORT_STAT_SUSPEND      ? " suspend"   : "",
-                port_status & USB_PORT_STAT_ENABLE       ? " enable"    : "",
-                port_status & USB_PORT_STAT_CONNECTION   ? " connect"   : "",
-                port_status == 0                         ? " off"       : ""
-            );
-            if (port_status & USB_PORT_STAT_CONNECTION) {
-                printf("[%04x:%04x%s%s%s%s%s%s]",
-                    id_vendor, id_product,
-                    vendor[0]  ? " " : "", vendor,
-                    product[0] ? " " : "", product,
-                    serial[0]  ? " " : "", serial
-                );
+            if (hub->bcd_usb < 0x300) {
+                if (port_status & USB_PORT_STAT_INDICATOR)      printf(" indicator");
+                if (port_status & USB_PORT_STAT_TEST)           printf(" test");
+                if (port_status & USB_PORT_STAT_HIGH_SPEED)     printf(" highspeed");
+                if (port_status & USB_PORT_STAT_LOW_SPEED)      printf(" lowspeed");
+                if (port_status & USB_PORT_STAT_POWER)          printf(" power");
+                if (port_status & USB_PORT_STAT_SUSPEND)        printf(" suspend");
+            } else {
+                int link_state = port_status & USB_PORT_STAT_LINK_STATE;
+                if ((port_status & USB_SS_PORT_STAT_SPEED)
+                     == USB_PORT_STAT_SPEED_5GBPS)
+                {
+                    printf(" 5gbps");
+                }
+                if (port_status & USB_SS_PORT_STAT_POWER)       printf(" power");
+                if (link_state == USB_SS_PORT_LS_U0)            printf(" U0");
+                if (link_state == USB_SS_PORT_LS_U1)            printf(" U1");
+                if (link_state == USB_SS_PORT_LS_U2)            printf(" U2");
+                if (link_state == USB_SS_PORT_LS_U3)            printf(" U3");
+                if (link_state == USB_SS_PORT_LS_SS_DISABLED)   printf(" SS.Disabled");
+                if (link_state == USB_SS_PORT_LS_RX_DETECT)     printf(" Rx.Detect");
+                if (link_state == USB_SS_PORT_LS_SS_INACTIVE)   printf(" SS.Inactive");
+                if (link_state == USB_SS_PORT_LS_POLLING)       printf(" Polling");
+                if (link_state == USB_SS_PORT_LS_RECOVERY)      printf(" Recovery");
+                if (link_state == USB_SS_PORT_LS_HOT_RESET)     printf(" HotReset");
+                if (link_state == USB_SS_PORT_LS_COMP_MOD)      printf(" Compliance");
+                if (link_state == USB_SS_PORT_LS_LOOPBACK)      printf(" Loopback");
             }
+            if (port_status & USB_PORT_STAT_RESET)          printf(" reset");
+            if (port_status & USB_PORT_STAT_OVERCURRENT)    printf(" oc");
+            if (port_status & USB_PORT_STAT_ENABLE)         printf(" enable");
+            if (port_status & USB_PORT_STAT_CONNECTION)     printf(" connect");
+            if (port_status == 0)                           printf(" off");
+
+            if (port_status & USB_PORT_STAT_CONNECTION)     printf(" [%s]", description);
+
             printf("\n");
         }
         libusb_close(devh);
     }
     return 0;
 }
+
 
 /*
  *  Find all smart hubs that we are going to work on and fill hubs[] array.
@@ -404,25 +522,32 @@ static int usb_find_hubs()
         rc = libusb_get_device_descriptor(dev, &desc);
         /* only scan for hubs: */
         if (rc == 0 && desc.bDeviceClass != LIBUSB_CLASS_HUB)
-           continue;
-        int nports = is_smart_hub(dev, 0);
-        if (nports < 0) {
+            continue;
+        struct hub_info info;
+        bzero(&info, sizeof(info));
+        rc = get_hub_info(dev, &info);
+        if (rc) {
             perm_ok = 0; /* USB permission issue? */
         }
-        if (nports > 0) { /* smart hub */
+        if (info.ppps) { /* PPPS is supported */
             if (hub_count < MAX_HUBS) {
-                hubs[hub_count].dev    = dev;
-                hubs[hub_count].nports = nports;
+                hubs[hub_count].dev     = dev;
+                hubs[hub_count].nports  = info.nports;
+                hubs[hub_count].bcd_usb = info.bcd_usb;
+                hubs[hub_count].ppps    = info.ppps;
 
-                /* Convert bus and ports array into USB location string */
-                sprintf(
-                    hubs[hub_count].vendor,
+                snprintf(
+                    hubs[hub_count].vendor, sizeof(hubs[hub_count].vendor),
                     "%04x:%04x",
-                    desc.idVendor, desc.idProduct
+                    libusb_le16_to_cpu(desc.idVendor),
+                    libusb_le16_to_cpu(desc.idProduct)
                 );
 
+                get_device_description(dev, hubs[hub_count].description, sizeof(hubs[hub_count].description));
+
+                /* Convert bus and ports array into USB location string */
                 int bus = libusb_get_bus_number(dev);
-                sprintf(hubs[hub_count].location, "%d", bus);
+                snprintf(hubs[hub_count].location, sizeof(hubs[hub_count].location), "%d", bus);
 #if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000102)
                 /*
                  * libusb_get_port_path is deprecated since libusb v1.0.16,
@@ -435,7 +560,7 @@ static int usb_find_hubs()
                 int k;
                 for (k=0; k<pcount; k++) {
                     char s[8];
-                    sprintf(s, "%s%d", k==0 ? "-" : ".", port_numbers[k]);
+                    snprintf(s, sizeof(s), "%s%d", k==0 ? "-" : ".", port_numbers[k]);
                     strcat(hubs[hub_count].location, s);
                 }
 
@@ -455,6 +580,7 @@ static int usb_find_hubs()
     return hub_count;
 }
 
+
 int main(int argc, char *argv[])
 {
     int rc;
@@ -462,7 +588,7 @@ int main(int argc, char *argv[])
     int option_index = 0;
 
     for (;;) {
-        c = getopt_long(argc, argv, "l:n:a:p:d:r:w:hviR",
+        c = getopt_long(argc, argv, "l:n:a:p:d:r:w:hvR",
             long_options, &option_index);
         if (c == -1)
             break;  /* no more options left */
@@ -481,9 +607,6 @@ int main(int argc, char *argv[])
             break;
         case 'n':
             strncpy(opt_vendor, optarg, sizeof(opt_vendor));
-            break;
-        case 'i':
-            /* ignored for backwards compatibility */
             break;
         case 'p':
             if (!strcasecmp(optarg, "all")) { /* all ports is the default */
@@ -592,16 +715,17 @@ int main(int argc, char *argv[])
 
     if (hub_count > 1 && opt_action >= 0) {
         fprintf(stderr,
-            "Warning: changing port state for multiple hubs at once.\n"
+            "Error: changing port state for multiple hubs at once is not supported.\n"
             "Use -l to limit operation to one hub!\n"
         );
+        exit(1);
     }
     int i;
     for (i=0; i<hub_count; i++) {
-        printf("Current status for hub %s, vendor %s, %d ports\n",
-            hubs[i].location, hubs[i].vendor, hubs[i].nports
+        printf("Current status for hub %s [%s]\n",
+            hubs[i].location, hubs[i].description
         );
-        hub_port_status(hubs[i].dev, hubs[i].nports, opt_ports);
+        hub_port_status(&hubs[i], opt_ports);
         if (opt_action == POWER_KEEP) { /* no action, show status */
             continue;
         }
@@ -622,14 +746,16 @@ int main(int argc, char *argv[])
                 for (port=1; port <= hubs[i].nports; port++) {
                     if ((1 << (port-1)) & ports) {
                         int port_status = get_port_status(devh, port);
-                        if (k == 0 && !(port_status & USB_PORT_STAT_POWER))
+                        int power_mask = (hubs[i].bcd_usb < 0x300) ? USB_PORT_STAT_POWER
+                                                                   : USB_SS_PORT_STAT_POWER;
+                        if (k == 0 && !(port_status & power_mask))
                             continue;
-                        if (k == 1 && (port_status & USB_PORT_STAT_POWER))
+                        if (k == 1 && (port_status & power_mask))
                             continue;
                         int repeat = 1;
                         if (k == 0)
                             repeat = opt_repeat;
-                        if (!(port_status & ~USB_PORT_STAT_POWER))
+                        if (!(port_status & ~power_mask))
                             repeat = 1;
                         while (repeat-- > 0) {
                             rc = libusb_control_transfer(devh,
@@ -651,10 +777,10 @@ int main(int argc, char *argv[])
                 printf("Sent power %s request\n",
                     request == LIBUSB_REQUEST_CLEAR_FEATURE ? "off" : "on"
                 );
-                printf("New status for hub %s, vendor %s, %d ports\n",
-                    hubs[i].location, hubs[i].vendor, hubs[i].nports
+                printf("New status for hub %s [%s]\n",
+                    hubs[i].location, hubs[i].description
                 );
-                hub_port_status(hubs[i].dev, hubs[i].nports, opt_ports);
+                hub_port_status(&hubs[i], opt_ports);
 
                 if (k == 1 && opt_reset == 1) {
                     printf("Resetting hub...\n");
