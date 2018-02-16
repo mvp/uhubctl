@@ -56,6 +56,17 @@ WARNING: turning off built-in USB ports may cut off your keyboard or mouse,
 so be careful what ports you are turning off!
 
 
+USB 3.0 duality note
+====================
+If you have compatible USB 3.0 hub connected to USB3 upstream port,
+it will be detected as 2 independent virtual hubs: USB2 and USB3, and your USB devices will be
+connected to USB2 or USB3 virtual hub depending on their capabilities and connection speed.
+To control power for such hubs, you may need to turn off/on power on **both** USB2 and USB3
+virtual hubs for power off/on changes to take effect.
+Unfortunately, while most hubs will cut off data USB connection, some may still not cut off VBUS to port,
+which means connected phone may still continue to charge from port that is powered off by uhubctl.
+
+
 Compiling
 =========
 
@@ -101,6 +112,7 @@ On Linux, you may need to run it with `sudo`, or to configure `udev` USB permiss
 
 If you have more than one smart USB hub connected, you should choose
 specific hub to control using `-l` (location) parameter.
+To find hub locations, simply run uhubctl without any parameters.
 
 
 Copyright
