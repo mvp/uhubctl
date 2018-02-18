@@ -18,8 +18,8 @@ This is list of known compatible USB hubs:
 
 | Manufacturer       | Product                                                | VID:PID   | Release | EOL  |
 |:-------------------|:-------------------------------------------------------|:----------|:--------|:-----|
-| AmazonBasics       | HU3641V1, 4 Port USB3 Hub (some revisions don't work)  |`2109:2811`| 2013    |      |
-| AmazonBasics       | HU3770V1, 7 Port USB3 Hub (some revisions don't work)  |`2109:2811`| 2013    |      |
+| AmazonBasics       | HU3641V1, 4 Port USB3 Hub (see USB3 note below)        |`2109:2811`| 2013    |      |
+| AmazonBasics       | HU3770V1, 7 Port USB3 Hub (see USB3 note below)        |`2109:2811`| 2013    |      |
 | Apple              | Thunderbolt Display 27" (internal USB hub)             |           | 2011    | 2016 |
 | Apple              | USB Keyboard With Numeric Pad (internal USB hub)       |           | 2011    |      |
 | Asus               | Z87-PLUS Motherboard (onboard USB hubs)                |           | 2013    | 2016 |
@@ -118,7 +118,7 @@ To find hub locations, simply run uhubctl without any parameters.
 Copyright
 =========
 
-Copyright (C) 2009-2017 Vadim Mikhailov
+Copyright (C) 2009-2018 Vadim Mikhailov
 
 This file can be distributed under the terms and conditions of the
 GNU General Public License version 2.
