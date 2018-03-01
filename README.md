@@ -38,6 +38,7 @@ This is list of known compatible USB hubs:
 | Maplin             | A08CQ                                                  |`0409:0059`| 2008    | 2011 |
 | Microchip          | EVB-USB2517                                            |           | 2008    |      |
 | Plugable           | USB3-HUB7BC (see USB3 note below)                      |`2109:0813`| 2015    |      |
+| Plugable           | USB3-HUB7-81X (see USB3 note below)                    |`2109:0813`| 2012    |      |
 | Plugable           | USB2-HUB10S                                            |           | 2010    |      |
 | Raspberry Pi       | Model B+, Model 2 B, Model 3 B (port 2 only)           |           | 2011    |      |
 | Rosewill           | RHUB-210                                               |`0409:005A`| 2011    | 2014 |
