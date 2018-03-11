@@ -63,8 +63,10 @@ USB 3.0 duality note
 If you have compatible USB 3.0 hub connected to USB3 upstream port,
 it will be detected as 2 independent virtual hubs: USB2 and USB3, and your USB devices will be
 connected to USB2 or USB3 virtual hub depending on their capabilities and connection speed.
-To control power for such hubs, you may need to turn off/on power on **both** USB2 and USB3
-virtual hubs for power off/on changes to take effect.
+To control power for such hubs, it is necessary to turn off/on power on **both** USB2 and USB3
+virtual hubs for power off/on changes to take effect. `uhubctl` will try to do this automatically
+(unless you disable this behavior with option `-e`).
+
 Unfortunately, while most hubs will cut off data USB connection, some may still not cut off VBUS to port,
 which means connected phone may still continue to charge from port that is powered off by uhubctl.
 
@@ -73,7 +75,7 @@ Compiling
 =========
 
 This utility was tested to compile and work on Linux
-(Ubuntu, Redhat/Fedora/CentOS), FreeBSD and Mac OS X.
+(Ubuntu/Debian, Redhat/Fedora/CentOS, Arch Linux, Gentoo, OpenSUSE, Buildroot), FreeBSD and Mac OS X.
 
 While `uhubctl` compiles on Windows, USB power switching does not work on Windows because `libusb`
 is using `winusb.sys` driver, which according to Microsoft does not support
