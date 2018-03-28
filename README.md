@@ -35,6 +35,7 @@ This is list of known compatible USB hubs:
 | j5create           | JUH470 (see USB3 note below)                           |`05e3:0610`| 2014    |      |
 | Lenovo             | ThinkPad EU Ultra Dockingstation (40A20090EU)          |`17EF:100F`| 2015    |      |
 | Lenovo             | ThinkPad X200 Ultrabase 42X4963                        |`17EF:1005`| 2008    | 2011 |
+| Lindy              | USB serial converter 4 Port                            |`058f:9254`| 2008    |      |
 | Linksys            | USB2HUB4                                               |           | 2004    | 2010 |
 | Maplin             | A08CQ                                                  |`0409:0059`| 2008    | 2011 |
 | Microchip          | EVB-USB2517                                            |           | 2008    |      |
