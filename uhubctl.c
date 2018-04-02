@@ -790,28 +790,28 @@ int main(int argc, char *argv[])
         );
         exit(1);
     }
-    int i;
-    for (i=0; i<hub_count; i++) {
-        if (hubs[i].actionable == 0)
-            continue;
-        printf("Current status for hub %s [%s]\n",
-            hubs[i].location, hubs[i].description
-        );
-        print_port_status(&hubs[i], opt_ports);
-        if (opt_action == POWER_KEEP) { /* no action, show status */
-            continue;
-        }
-        struct libusb_device_handle * devh = NULL;
-        rc = libusb_open(hubs[i].dev, &devh);
-        if (rc == 0) {
-            /* will operate on these ports */
-            int ports = ((1 << hubs[i].nports) - 1) & opt_ports;
-            int k; /* k=0 for power OFF, k=1 for power ON */
-            for (k=0; k<2; k++) { /* up to 2 power actions - off/on */
-                if (k == 0 && opt_action == POWER_ON )
-                    continue;
-                if (k == 1 && opt_action == POWER_OFF)
-                    continue;
+    int k; /* k=0 for power OFF, k=1 for power ON */
+    for (k=0; k<2; k++) { /* up to 2 power actions - off/on */
+        if (k == 0 && opt_action == POWER_ON )
+           continue;
+        if (k == 1 && opt_action == POWER_OFF)
+           continue;
+        int i;
+        for (i=0; i<hub_count; i++) {
+            if (hubs[i].actionable == 0)
+                continue;
+            printf("Current status for hub %s [%s]\n",
+                hubs[i].location, hubs[i].description
+            );
+            print_port_status(&hubs[i], opt_ports);
+            if (opt_action == POWER_KEEP) { /* no action, show status */
+                continue;
+            }
+            struct libusb_device_handle * devh = NULL;
+            rc = libusb_open(hubs[i].dev, &devh);
+            if (rc == 0) {
+                /* will operate on these ports */
+                int ports = ((1 << hubs[i].nports) - 1) & opt_ports;
                 int request = (k == 0) ? LIBUSB_REQUEST_CLEAR_FEATURE
                                        : LIBUSB_REQUEST_SET_FEATURE;
                 int port;
@@ -844,8 +844,6 @@ int main(int argc, char *argv[])
                         }
                     }
                 }
-                if (k==0 && opt_action == POWER_CYCLE)
-                    sleep_ms(opt_delay * 1000);
                 /* USB3 hubs need extra delay to actually turn off: */
                 if (k==0 && hubs[i].bcd_usb >= USB_SS_BCD)
                     sleep_ms(150);
@@ -869,6 +867,8 @@ int main(int argc, char *argv[])
             }
             libusb_close(devh);
         }
+        if (k == 0 && opt_action == POWER_CYCLE)
+            sleep_ms(opt_delay * 1000);
     }
     rc = 0;
 cleanup:
