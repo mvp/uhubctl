@@ -90,8 +90,6 @@ First, you need to install library libusb-1.0 (version 1.0.12 or later):
 * Ubuntu: `sudo apt-get install libusb-1.0-0-dev`
 * Redhat: `sudo yum install libusb1-devel`
 * MacOSX: `brew install libusb`, or `sudo port install libusb-devel`
-  Note that Mac OS Sierra may be affected by issue https://github.com/libusb/libusb/issues/303.
-  Until libusb 1.0.22 is released, use `brew install --HEAD libusb` as a workaround.
 * FreeBSD: libusb is included by default
 * Windows: TBD?
 
