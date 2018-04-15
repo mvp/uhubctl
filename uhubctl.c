@@ -793,9 +793,11 @@ int main(int argc, char *argv[])
     int k; /* k=0 for power OFF, k=1 for power ON */
     for (k=0; k<2; k++) { /* up to 2 power actions - off/on */
         if (k == 0 && opt_action == POWER_ON )
-           continue;
+            continue;
         if (k == 1 && opt_action == POWER_OFF)
-           continue;
+            continue;
+        if (k == 1 && opt_action == POWER_KEEP)
+            continue;
         int i;
         for (i=0; i<hub_count; i++) {
             if (hubs[i].actionable == 0)
