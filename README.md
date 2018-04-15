@@ -39,6 +39,7 @@ This is list of known compatible USB hubs:
 | Linksys            | USB2HUB4                                               |           | 2004    | 2010 |
 | Maplin             | A08CQ                                                  |`0409:0059`| 2008    | 2011 |
 | Microchip          | EVB-USB2517                                            |           | 2008    |      |
+| Moxa               | Uport-407                                              |           | 2017    |      |
 | Plugable           | USB3-HUB7BC (see USB3 note below)                      |`2109:0813`| 2015    |      |
 | Plugable           | USB3-HUB7C (see USB3 note below)                       |`2109:0813`| 2015    |      |
 | Plugable           | USB3-HUB7-81X (see USB3 note below)                    |`2109:0813`| 2012    |      |
