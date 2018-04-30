@@ -224,7 +224,7 @@ static const struct option long_options[] = {
 };
 
 
-int print_usage()
+static int print_usage()
 {
     printf(
         "uhubctl %s: utility to control USB port power for smart hubs.\n"
@@ -261,7 +261,7 @@ static char* rtrim(char* str)
 {
     int i;
     for (i = strlen(str)-1; i>=0 && isspace(str[i]); i--) {
-       str[i] = 0;
+        str[i] = 0;
     }
     return str;
 }
@@ -273,14 +273,13 @@ static char* rtrim(char* str)
  * returns 0 for success and error code for failure.
  */
 
-int get_hub_info(struct libusb_device *dev, struct hub_info *info)
+static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
 {
     int rc = 0;
     int len = 0;
     struct libusb_device_handle *devh = NULL;
     unsigned char buf[LIBUSB_DT_HUB_NONVAR_SIZE + 2 + 3] = {0};
-    struct usb_hub_descriptor *uhd =
-                (struct usb_hub_descriptor *)buf;
+    struct usb_hub_descriptor *uhd = (struct usb_hub_descriptor *)buf;
     int minlen = LIBUSB_DT_HUB_NONVAR_SIZE + 2;
     struct libusb_device_descriptor desc;
     rc = libusb_get_device_descriptor(dev, &desc);
