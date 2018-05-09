@@ -23,6 +23,7 @@ This is list of known compatible USB hubs:
 | Apple              | Thunderbolt Display 27" (internal USB hub)           | 6     | 2.0 |           | 2011    | 2016 |
 | Apple              | USB Keyboard With Numeric Pad (internal USB hub)     | 3     | 2.0 |           | 2011    |      |
 | Asus               | Z87-PLUS Motherboard (onboard USB hub)               | 4     | 3.0 |           | 2013    | 2016 |
+| Anker              | 4-Port USB 3.0 HUB (Model No.: H4928-U3)             | 4     | 3.0 |`2109:0812`| 2014    | 2016 |
 | B&B Electronics    | UHR204                                               | 4     | 2.0 |           | 2013    |      |
 | Belkin             | F5U701-BLK                                           | 7     | 2.0 |           | 2008    | 2012 |
 | Circuitco          | Beagleboard-xM (internal USB hub)                    | 4     | 2.0 |`0424:9514`| 2010    |      |
