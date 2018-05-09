@@ -129,6 +129,24 @@ This address is semi-stable - it will not change if you unplug/replug (or turn o
 USB device into the same physical USB port (this method is also used in Linux kernel).
 
 
+Notable projects using `uhubctl`
+================================
+
+Below is the list of interesting projects using `uhubctl`:
+
+| Project              | Description                                        | Link                  |
+|:---------------------|:---------------------------------------------------|:----------------------|
+| Morse code USB light | Flash a message in Morse code with an USB light    | https://goo.gl/bJYsPe |
+| Webcam USB light     | Turn on/off LED when webcam is turned on/off       | https://goo.gl/9fA1DQ |
+| Cinema Lightbox      | Turn on/off Cinema Lightbox from iOS Home app      | https://goo.gl/fjCvkz |
+| Weather Station      | Reset Weather Station when it freezes              | https://goo.gl/3b1FzC |
+| sysmoQMOD            | Reset cellular modems when necessary               | https://goo.gl/8wvcKA |
+| Smog Sensor          | Raspberry Pi based smog sensor power reset         | https://goo.gl/CFRnEu |
+| Terrible Cluster     | Power on/off Raspberry Pi cluster nodes            | https://goo.gl/XjiXFu |
+| Ideal Music Server   | Turn off unused USB ports to improve audio quality | https://goo.gl/yT3bis |
+
+
+
 Copyright
 =========
 
