@@ -46,6 +46,7 @@ This is list of known compatible USB hubs:
 | Plugable           | USB2-HUB10S                                          | 10    | 2.0 |           | 2010    |      |
 | Raspberry Pi       | Model B+, 2 B, 3 B (port 2 only)                     | 4     | 2.0 |           | 2011    |      |
 | Raspberry Pi       | Model 3 B+                                           | 6     | 2.0 |`0424:2514`| 2018    |      |
+| Renesas            | uPD720202 PCIe USB 3.0 host controller               | 2     | 3.0 |           | 2013    |      |
 | Rosewill           | RHUB-210                                             | 4     | 2.0 |`0409:005A`| 2011    | 2014 |
 | Sanwa Supply       | USB-HUB14GPH                                         | 4     | 1.1 |           | 2001    | 2003 |
 | Sunix              | SHB4200MA                                            | 4     | 2.0 |`0409:0058`| 2006    | 2009 |
