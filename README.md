@@ -33,7 +33,7 @@ This is list of known compatible USB hubs:
 | D-Link             | DUB-H7 rev D1 (black edition)                        | 7     | 2.0 |`05E3:0608`| 2012    |      |
 | Elecom             | U2H-G4S                                              | 4     | 2.0 |           | 2006    | 2011 |
 | Hawking Technology | UH214                                                | 4     | 2.0 |           | 2003    | 2008 |
-| j5create           | JUH470                                               | 3     | 3.0 |`05E3:0610`| 2014    |      |
+| j5create           | JUH470 (works only in USB2 mode)                     | 3     | 3.0 |`05E3:0610`| 2014    |      |
 | Lenovo             | ThinkPad EU Ultra Dockingstation (40A20090EU)        | 6     | 2.0 |`17EF:100F`| 2015    |      |
 | Lenovo             | ThinkPad X200 Ultrabase 42X4963                      | 3     | 2.0 |`17EF:1005`| 2008    | 2011 |
 | Lindy              | USB serial converter 4 port                          | 4     | 1.1 |`058F:9254`| 2008    |      |
