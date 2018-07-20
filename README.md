@@ -136,6 +136,7 @@ Notable projects using uhubctl
 | [Morse code USB light](https://goo.gl/bJYsPe) | Flash a message in Morse code with USB light       |
 | [Webcam USB light](https://goo.gl/9fA1DQ)     | Turn on/off LED when webcam is turned on/off       |
 | [Cinema Lightbox](https://goo.gl/fjCvkz)      | Turn on/off Cinema Lightbox from iOS Home app      |
+| [Build Status Light](https://goo.gl/3GA82o)   | Create a build status light in under 10 minutes    |
 | [Weather Station](https://goo.gl/3b1FzC)      | Reset Weather Station when it freezes              |
 | [sysmoQMOD](https://goo.gl/8wvcKA)            | Reset cellular modems when necessary               |
 | [Smog Sensor](https://goo.gl/CFRnEu)          | Raspberry Pi based smog sensor power reset         |
