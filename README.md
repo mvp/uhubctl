@@ -133,17 +133,18 @@ USB device into the same physical USB port (this method is also used in Linux ke
 
 Notable projects using uhubctl
 ==============================
-| Project                                       | Description                                        |
-|:----------------------------------------------|:---------------------------------------------------|
-| [Morse code USB light](https://goo.gl/bJYsPe) | Flash a message in Morse code with USB light       |
-| [Webcam USB light](https://goo.gl/9fA1DQ)     | Turn on/off LED when webcam is turned on/off       |
-| [Cinema Lightbox](https://goo.gl/fjCvkz)      | Turn on/off Cinema Lightbox from iOS Home app      |
-| [Build Status Light](https://goo.gl/3GA82o)   | Create a build status light in under 10 minutes    |
-| [Weather Station](https://goo.gl/3b1FzC)      | Reset Weather Station when it freezes              |
-| [sysmoQMOD](https://goo.gl/8wvcKA)            | Reset cellular modems when necessary               |
-| [Smog Sensor](https://goo.gl/CFRnEu)          | Raspberry Pi based smog sensor power reset         |
-| [Terrible Cluster](https://goo.gl/XjiXFu)     | Power on/off Raspberry Pi cluster nodes as needed  |
-| [Ideal Music Server](https://goo.gl/nSGy3p)   | Turn off unused USB ports to improve audio quality |
+| Project                                                  | Description                                        |
+|:---------------------------------------------------------|:---------------------------------------------------|
+| [Morse code USB light](https://goo.gl/bJYsPe)            | Flash a message in Morse code with USB light       |
+| [Webcam USB light](https://goo.gl/9fA1DQ)                | Turn on/off LED when webcam is turned on/off       |
+| [Cinema Lightbox](https://goo.gl/fjCvkz)                 | Turn on/off Cinema Lightbox from iOS Home app      |
+| [Build Status Light](https://goo.gl/3GA82o)              | Create a build status light in under 10 minutes    |
+| [Weather Station](https://goo.gl/3b1FzC)                 | Reset Weather Station when it freezes              |
+| [sysmoQMOD](https://goo.gl/8wvcKA)                       | Reset cellular modems when necessary               |
+| [Smog Sensor](https://goo.gl/CFRnEu)                     | Raspberry Pi based smog sensor power reset         |
+| [Terrible Cluster](https://goo.gl/XjiXFu)                | Power on/off Raspberry Pi cluster nodes as needed  |
+| [Ideal Music Server](https://goo.gl/nSGy3p)              | Turn off unused USB ports to improve audio quality |
+| [USB drives with no phantom load](https://goo.gl/qfrmGK) | Power USB drives only when needed to save power    |
 
 
 Copyright
