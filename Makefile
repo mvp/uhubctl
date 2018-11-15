@@ -37,7 +37,7 @@ endif
 PROGRAM = uhubctl
 
 $(PROGRAM): $(PROGRAM).c
-	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
 
 install:
 	$(INSTALL_DIR) $(DESTDIR)$(sbindir)
