@@ -5,7 +5,7 @@ uhubctl
 Smart hub is defined as one that implements per-port power switching.
 
 Original idea for this code was inspired by hub-ctrl.c by Niibe Yutaka:
-http://www.gniibe.org/development/ac-power-control-by-USB-hub
+https://www.gniibe.org/development/ac-power-control-by-USB-hub
 
 
 Compatible USB hubs
