@@ -60,7 +60,7 @@ void sleep_ms(int milliseconds)
 }
 
 /* Max number of hub ports supported.
- * This is somewhat artifically limited by "-p" option parser.
+ * This is somewhat artificially limited by "-p" option parser.
  * If "-p" parser is improved, we can support up to 32 ports.
  * However, biggest number of ports on smart hub I've seen was 8.
  * I've also observed onboard USB hub with whopping 14 ports,
@@ -578,7 +578,7 @@ static int usb_find_hubs()
                 info.actionable = 1;
                 if (strlen(opt_location)>0) {
                     if (strcasecmp(opt_location, info.location)) {
-                       info.actionable = 0;
+                        info.actionable = 0;
                     }
                 }
                 if (strlen(opt_vendor)>0) {
@@ -820,7 +820,7 @@ int main(int argc, char *argv[])
                     if ((1 << (port-1)) & ports) {
                         int port_status = get_port_status(devh, port);
                         int power_mask = hubs[i].bcd_usb < USB_SS_BCD ? USB_PORT_STAT_POWER
-                                                                          : USB_SS_PORT_STAT_POWER;
+                                                                      : USB_SS_PORT_STAT_POWER;
                         if (k == 0 && !(port_status & power_mask))
                             continue;
                         if (k == 1 && (port_status & power_mask))

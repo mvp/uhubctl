@@ -87,7 +87,7 @@ Compiling
 =========
 
 This utility was tested to compile and work on Linux
-(Ubuntu/Debian, Redhat/Fedora/CentOS, Arch Linux, Gentoo, OpenSUSE, Buildroot), FreeBSD and Mac OS X.
+(Ubuntu/Debian, Redhat/Fedora/CentOS, Arch Linux, Gentoo, openSUSE, Buildroot), FreeBSD and Mac OS X.
 
 While `uhubctl` compiles on Windows, USB power switching does not work on Windows because `libusb`
 is using `winusb.sys` driver, which according to Microsoft does not support
