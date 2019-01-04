@@ -153,7 +153,7 @@ Notable projects using uhubctl
 Copyright
 =========
 
-Copyright (C) 2009-2018 Vadim Mikhailov
+Copyright (C) 2009-2019 Vadim Mikhailov
 
 This file can be distributed under the terms and conditions of the
 GNU General Public License version 2.
