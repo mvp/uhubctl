@@ -59,14 +59,8 @@ void sleep_ms(int milliseconds)
 #endif
 }
 
-/* Max number of hub ports supported.
- * This is somewhat artificially limited by "-p" option parser.
- * If "-p" parser is improved, we can support up to 32 ports.
- * However, biggest number of ports on smart hub I've seen was 8.
- * I've also observed onboard USB hub with whopping 14 ports,
- * but that hub did not support per-port power switching.
- */
-#define MAX_HUB_PORTS            9
+/* Max number of hub ports supported */
+#define MAX_HUB_PORTS            14
 #define ALL_HUB_PORTS            ((1 << MAX_HUB_PORTS) - 1) /* bitmask */
 
 #define USB_CTRL_GET_TIMEOUT     5000
@@ -264,6 +258,59 @@ static char* rtrim(char* str)
         str[i] = 0;
     }
     return str;
+}
+
+/*
+ * Convert port list into bitmap.
+ * Following port list specifications are equivalent:
+ *   1,3,4,5,11,12,13
+ *   1,3-5,11-13
+ * Returns: bitmap of specified ports, max port is MAX_HUB_PORTS.
+ */
+
+static int ports2bitmap(char* const portlist)
+{
+    int ports = 0;
+    char* position = portlist;
+    char* comma;
+    char* dash;
+    int len;
+    int i;
+    while (position) {
+        char buf[8] = {0};
+        comma = strchr(position, ',');
+        len = sizeof(buf) - 1;
+        if (comma) {
+            if (len > comma - position)
+                len = comma - position;
+            strncpy(buf, position, len);
+            position = comma + 1;
+        } else {
+            strncpy(buf, position, len);
+            position = NULL;
+        }
+        /* Check if we have port range, e.g.: a-b */
+        int a=0, b=0;
+        a = atoi(buf);
+        dash = strchr(buf, '-');
+        if (dash) {
+            b = atoi(dash+1);
+        } else {
+            b = a;
+        }
+        if (a > b) {
+            fprintf(stderr, "Bad port spec %d-%d, first port must be less than last\n", a, b);
+            exit(1);
+        }
+        if (a <= 0 || a > MAX_HUB_PORTS || b <= 0 || b > MAX_HUB_PORTS) {
+            fprintf(stderr, "Bad port spec %d-%d, port numbers must be from 1 to %d\n", a, b, MAX_HUB_PORTS);
+            exit(1);
+        }
+        for (i=a; i<=b; i++) {
+            ports |= (1 << (i-1));
+        }
+    }
+    return ports;
 }
 
 
@@ -694,16 +741,7 @@ int main(int argc, char *argv[])
                 break;
             }
             if (strlen(optarg)) {
-                /* parse port list */
-                opt_ports = 0;
-                size_t i;
-                for (i=0; i<strlen(optarg); i++) {
-                    if (!isdigit(optarg[i]) || optarg[i] == '0') {
-                        printf("%s must be list of ports 1 to %d\n", optarg, MAX_HUB_PORTS);
-                    }
-                    int d = optarg[i]-'1';
-                    opt_ports |= (1 << d);
-                }
+                opt_ports = ports2bitmap(optarg);
             }
             break;
         case 'a':
