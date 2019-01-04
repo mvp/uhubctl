@@ -505,7 +505,7 @@ static int print_port_status(struct hub_info * hub, int portmask)
                     if (port_status & USB_PORT_STAT_SUSPEND)      printf(" suspend");
                 }
             } else {
-                if (port_status == USB_SS_PORT_LS_SS_DISABLED) {
+                if (!(port_status & USB_SS_PORT_STAT_POWER)) {
                     printf(" off");
                 } else {
                     int link_state = port_status & USB_PORT_STAT_LINK_STATE;
@@ -591,54 +591,69 @@ static int usb_find_hubs()
             }
         }
     }
+    if (!opt_exact) {
+        /* Handle USB2/3 duality: */
+        for (i=0; i<hub_count; i++) {
+            /* Check only actionable hubs: */
+            if (hubs[i].actionable != 1)
+                continue;
+            int match = -1;
+            for (j=0; j<hub_count; j++) {
+                if (i==j)
+                    continue;
+
+                /* Find hub which is USB2/3 dual to the hub above.
+                 * This is quite reliable and predictable on Linux
+                 * but not on Mac, where we may match wrong hub :(
+                 * It will work reliably on Mac if there is
+                 * only one compatible USB3 hub is connected.
+                 * Unfortunately, libusb does not provide any way
+                 * to detect USB2/3 dual hubs.
+                 * TODO: discover better way to find dual hub.
+                 */
+
+                /* Hub and its dual must be different types: one USB2, another USB3: */
+                if ((hubs[i].bcd_usb < USB_SS_BCD) ==
+                    (hubs[j].bcd_usb < USB_SS_BCD))
+                    continue;
+
+                /* But they must have the same vendor: */
+                if (strncasecmp(hubs[i].vendor, hubs[j].vendor, 4))
+                    continue;
+
+                /* And the same number of ports: */
+                if (hubs[i].nports != hubs[j].nports)
+                    continue;
+
+                /* Provisionally we choose this one as dual: */
+                if (match < 0 && !hubs[j].actionable)
+                    match = j;
+
+                /* But if there is exact port path match,
+                 * we prefer it (true for Linux but not Mac):
+                 */
+                char *p1 = strchr(hubs[i].location, '-');
+                char *p2 = strchr(hubs[j].location, '-');
+                if (p1 && p2 && strcasecmp(p1, p2)==0) {
+                    match = j;
+                    break;
+                }
+            }
+            if (match >= 0) {
+                if (!hubs[match].actionable) {
+                    /* Use 2 to signify that this is derived dual device */
+                    hubs[match].actionable = 2;
+                }
+            }
+        }
+    }
     hub_phys_count = 0;
     for (i=0; i<hub_count; i++) {
-        /* Check only actionable USB3 hubs: */
         if (!hubs[i].actionable)
             continue;
         if (hubs[i].bcd_usb < USB_SS_BCD || opt_exact) {
             hub_phys_count++;
         }
-        if (opt_exact)
-            continue;
-        int match = -1;
-        for (j=0; j<hub_count; j++) {
-            if (i==j)
-                continue;
-
-            /* Find hub which is USB2/3 dual to the hub above.
-             * This is quite reliable and predictable on Linux
-             * but not on Mac, where we may match wrong hub :(
-             * It will work reliably on Mac if there is
-             * only one compatible USB3 hub is connected.
-             * TODO: discover better way to find dual hub.
-             */
-
-            /* Hub and its dual must be different types: one USB2, another USB3: */
-            if ((hubs[i].bcd_usb < USB_SS_BCD) ==
-                (hubs[j].bcd_usb < USB_SS_BCD))
-                continue;
-
-            /* But they must have the same vendor: */
-            if (strncasecmp(hubs[i].vendor, hubs[j].vendor, 4))
-                continue;
-
-            /* Provisionally we choose this one as dual: */
-            if (match < 0 && !hubs[j].actionable)
-                match = j;
-
-            /* But if there is exact port path match,
-             * we prefer it (true for Linux but not Mac):
-             */
-            char *p1 = strchr(hubs[i].location, '-');
-            char *p2 = strchr(hubs[j].location, '-');
-            if (p1 && p2 && strcasecmp(p1, p2)==0) {
-                match = j;
-                break;
-            }
-        }
-        if (match >= 0)
-            hubs[match].actionable = 1;
     }
     if (perm_ok == 0 && hub_phys_count == 0) {
         return LIBUSB_ERROR_ACCESS;
