@@ -16,48 +16,48 @@ Some of them are no longer manufactured and can be hard to find.
 
 This is list of known compatible USB hubs:
 
-| Manufacturer       | Product                                              | Ports | USB | VID:PID   | Release | EOL  |
-|:-------------------|:-----------------------------------------------------|:------|:----|:----------|:--------|:-----|
-| AmazonBasics       | HU3641V1 ([RPi issue](https://goo.gl/CLt46M))        | 4     | 3.0 |`2109:2811`| 2013    |      |
-| AmazonBasics       | HU3770V1 ([RPi issue](https://goo.gl/CLt46M))        | 7     | 3.0 |`2109:2811`| 2013    |      |
-| Apple              | Thunderbolt Display 27" (internal USB hub)           | 6     | 2.0 |           | 2011    | 2016 |
-| Apple              | USB Keyboard With Numeric Pad (internal USB hub)     | 3     | 2.0 |           | 2011    |      |
-| Asus               | Z87-PLUS Motherboard (onboard USB hub)               | 4     | 3.0 |           | 2013    | 2016 |
-| B+B SmartWorx      | UHR204                                               | 4     | 2.0 |`0856:DB00`| 2013    |      |
-| B+B SmartWorx      | USH304                                               | 4     | 3.0 |`04B4:6506`| 2017    |      |
-| Belkin             | F5U701-BLK                                           | 7     | 2.0 |           | 2008    | 2012 |
-| Circuitco          | Beagleboard-xM (internal USB hub)                    | 4     | 2.0 |`0424:9514`| 2010    |      |
-| Club3D             | CSV-3242HD Dual Display Docking Station              | 4     | 3.0 |`2109:2811`| 2015    |      |
-| CyberPower         | CP-H420P                                             | 4     | 2.0 |`0409:0059`| 2004    |      |
-| Cypress            | CY4608 HX2VL development kit                         | 4     | 2.0 |`04B4:6570`| 2012    |      |
-| D-Link             | DUB-H4 rev D1 (black edition)                        | 4     | 2.0 |`05E3:0608`| 2012    |      |
-| D-Link             | DUB-H7 rev A  (silver edition)                       | 7     | 2.0 |`2001:F103`| 2005    | 2010 |
-| D-Link             | DUB-H7 rev D1 (black edition)                        | 7     | 2.0 |`05E3:0608`| 2012    |      |
-| Elecom             | U2H-G4S                                              | 4     | 2.0 |           | 2006    | 2011 |
-| Hawking Technology | UH214                                                | 4     | 2.0 |           | 2003    | 2008 |
-| IOI                | U3H415E1                                             | 4     | 3.0 |           | 2012    |      |
-| j5create           | JUH470 (works only in USB2 mode)                     | 3     | 3.0 |`05E3:0610`| 2014    |      |
-| Lenovo             | ThinkPad EU Ultra Dockingstation (40A20090EU)        | 6     | 2.0 |`17EF:100F`| 2015    |      |
-| Lenovo             | ThinkPad X200 Ultrabase 42X4963                      | 3     | 2.0 |`17EF:1005`| 2008    | 2011 |
-| Lindy              | USB serial converter 4 port                          | 4     | 1.1 |`058F:9254`| 2008    |      |
-| Linksys            | USB2HUB4                                             | 4     | 2.0 |           | 2004    | 2010 |
-| Maplin             | A08CQ                                                | 7     | 2.0 |`0409:0059`| 2008    | 2011 |
-| Microchip          | EVB-USB2517                                          | 7     | 2.0 |           | 2008    |      |
-| Moxa               | Uport-407                                            | 4     | 2.0 |           | 2017    |      |
-| Plugable           | USB3-HUB7BC                                          | 7     | 3.0 |`2109:0813`| 2015    |      |
-| Plugable           | USB3-HUB7C                                           | 7     | 3.0 |`2109:0813`| 2015    |      |
-| Plugable           | USB3-HUB7-81X                                        | 7     | 3.0 |`2109:0813`| 2012    |      |
-| Plugable           | USB2-HUB10S                                          | 10    | 2.0 |           | 2010    |      |
-| Raspberry Pi       | Model B+, 2 B, 3 B (port 2 only)                     | 4     | 2.0 |           | 2011    |      |
-| Raspberry Pi       | Model 3 B+                                           | 6     | 2.0 |`0424:2514`| 2018    |      |
-| Renesas            | uPD720202 PCIe USB 3.0 host controller               | 2     | 3.0 |           | 2013    |      |
-| Rosewill           | RHUB-210                                             | 4     | 2.0 |`0409:005A`| 2011    | 2014 |
-| Sanwa Supply       | USB-HUB14GPH                                         | 4     | 1.1 |           | 2001    | 2003 |
-| StarTech           | ST4200USBM                                           | 4     | 2.0 |`0409:005A`| 2004    |      |
-| Sunix              | SHB4200MA                                            | 4     | 2.0 |`0409:0058`| 2006    | 2009 |
-| Targus             | PAUH212U                                             | 7     | 2.0 |           | 2004    | 2009 |
-| TP-Link            | UH700                                                | 7     | 3.0 |`0bda:5411`| 2014    |      |
-| Transcend          | TS-HUB3K                                             | 4     | 3.1 |`8564:4100`| 2012    |      |
+| Manufacturer       | Product                                                                   | Ports | USB | VID:PID   | Release | EOL  |
+|:-------------------|:--------------------------------------------------------------------------|:------|:----|:----------|:--------|:-----|
+| AmazonBasics       | HU3641V1 ([RPi issue](https://goo.gl/CLt46M))                             | 4     | 3.0 |`2109:2811`| 2013    |      |
+| AmazonBasics       | HU3770V1 ([RPi issue](https://goo.gl/CLt46M))                             | 7     | 3.0 |`2109:2811`| 2013    |      |
+| Apple              | Thunderbolt Display 27" (internal USB hub)                                | 6     | 2.0 |           | 2011    | 2016 |
+| Apple              | USB Keyboard With Numeric Pad (internal USB hub)                          | 3     | 2.0 |           | 2011    |      |
+| Asus               | Z87-PLUS Motherboard (onboard USB hub)                                    | 4     | 3.0 |           | 2013    | 2016 |
+| B+B SmartWorx      | UHR204                                                                    | 4     | 2.0 |`0856:DB00`| 2013    |      |
+| B+B SmartWorx      | USH304                                                                    | 4     | 3.0 |`04B4:6506`| 2017    |      |
+| Belkin             | F5U701-BLK                                                                | 7     | 2.0 |           | 2008    | 2012 |
+| Circuitco          | Beagleboard-xM (internal USB hub)                                         | 4     | 2.0 |`0424:9514`| 2010    |      |
+| Club3D             | CSV-3242HD Dual Display Docking Station                                   | 4     | 3.0 |`2109:2811`| 2015    |      |
+| CyberPower         | CP-H420P                                                                  | 4     | 2.0 |`0409:0059`| 2004    |      |
+| Cypress            | CY4608 HX2VL development kit                                              | 4     | 2.0 |`04B4:6570`| 2012    |      |
+| D-Link             | DUB-H4 rev D1 (black edition)                                             | 4     | 2.0 |`05E3:0608`| 2012    |      |
+| D-Link             | DUB-H7 rev A  (silver edition)                                            | 7     | 2.0 |`2001:F103`| 2005    | 2010 |
+| D-Link             | DUB-H7 rev D1 (black edition)                                             | 7     | 2.0 |`05E3:0608`| 2012    |      |
+| Elecom             | U2H-G4S                                                                   | 4     | 2.0 |           | 2006    | 2011 |
+| Hawking Technology | UH214                                                                     | 4     | 2.0 |           | 2003    | 2008 |
+| IOI                | U3H415E1                                                                  | 4     | 3.0 |           | 2012    |      |
+| j5create           | JUH470 (works only in USB2 mode)                                          | 3     | 3.0 |`05E3:0610`| 2014    |      |
+| Lenovo             | ThinkPad EU Ultra Dockingstation (40A20090EU)                             | 6     | 2.0 |`17EF:100F`| 2015    |      |
+| Lenovo             | ThinkPad X200 Ultrabase 42X4963                                           | 3     | 2.0 |`17EF:1005`| 2008    | 2011 |
+| Lindy              | USB serial converter 4 port                                               | 4     | 1.1 |`058F:9254`| 2008    |      |
+| Linksys            | USB2HUB4                                                                  | 4     | 2.0 |           | 2004    | 2010 |
+| Maplin             | A08CQ                                                                     | 7     | 2.0 |`0409:0059`| 2008    | 2011 |
+| Microchip          | EVB-USB2517                                                               | 7     | 2.0 |           | 2008    |      |
+| Moxa               | Uport-407                                                                 | 4     | 2.0 |           | 2017    |      |
+| Plugable           | USB3-HUB7BC                                                               | 7     | 3.0 |`2109:0813`| 2015    |      |
+| Plugable           | USB3-HUB7C                                                                | 7     | 3.0 |`2109:0813`| 2015    |      |
+| Plugable           | USB3-HUB7-81X                                                             | 7     | 3.0 |`2109:0813`| 2012    |      |
+| Plugable           | USB2-HUB10S                                                               | 10    | 2.0 |           | 2010    |      |
+| Raspberry Pi       | Model B+, 2 B, 3 B (port 2 only)                                          | 4     | 2.0 |           | 2011    |      |
+| Raspberry Pi       | Model 3 B+                                                                | 6     | 2.0 |`0424:2514`| 2018    |      |
+| Renesas            | uPD720202 PCIe USB 3.0 host controller                                    | 2     | 3.0 |           | 2013    |      |
+| Rosewill           | RHUB-210                                                                  | 4     | 2.0 |`0409:005A`| 2011    | 2014 |
+| Sanwa Supply       | USB-HUB14GPH                                                              | 4     | 1.1 |           | 2001    | 2003 |
+| StarTech           | ST4200USBM                                                                | 4     | 2.0 |`0409:005A`| 2004    |      |
+| Sunix              | SHB4200MA                                                                 | 4     | 2.0 |`0409:0058`| 2006    | 2009 |
+| Targus             | PAUH212U                                                                  | 7     | 2.0 |           | 2004    | 2009 |
+| TP-Link            | UH700 ([inconsistent support](https://github.com/mvp/uhubctl/issues/133)) | 7     | 3.0 |`0bda:5411`| 2014    |      |
+| Transcend          | TS-HUB3K                                                                  | 4     | 3.1 |`8564:4100`| 2012    |      |
 
 This table is by no means complete.
 If your hub works with `uhubctl`, but is not listed above, please report it
