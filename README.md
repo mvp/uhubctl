@@ -56,7 +56,6 @@ This is list of known compatible USB hubs:
 | StarTech           | ST4200USBM                                           | 4     | 2.0 |`0409:005A`| 2004    |      |
 | Sunix              | SHB4200MA                                            | 4     | 2.0 |`0409:0058`| 2006    | 2009 |
 | Targus             | PAUH212U                                             | 7     | 2.0 |           | 2004    | 2009 |
-| Transcend          | TS-HUB3K                                             | 4     | 3.1 |`8564:4100`| 2012    |      |
 
 This table is by no means complete.
 If your hub works with `uhubctl`, but is not listed above, please report it
