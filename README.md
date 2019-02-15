@@ -149,6 +149,7 @@ Notable projects using uhubctl
 | [Ideal Music Server](https://goo.gl/nSGy3p)              | Turn off unused USB ports to improve audio quality |
 | [USB drives with no phantom load](https://goo.gl/qfrmGK) | Power USB drives only when needed to save power    |
 | [USB drive data recovery](https://goo.gl/4MddLr)         | Recover data from failing USB hard drive           |
+| [Control power to 3D printer](https://git.io/fh5Tr)      | OctoPrint web plugin for USB power control         |
 
 
 Copyright
