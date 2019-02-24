@@ -672,7 +672,19 @@ static int usb_find_hubs()
                 if (hubs[i].nports != hubs[j].nports)
                     continue;
 
-                /* Provisionally we choose this one as dual: */
+                /* If description is the same, provisionally we choose this one as dual.
+                 * If description contained serial number, this will be most reliable matching.
+                 */
+                if (strlen(hubs[i].description) == strlen(hubs[j].description)) {
+                    /* strlen("vvvv:pppp ") + strlen(", USB x.yz, N ports") = 10+19 = 29 */
+                    if (strlen(hubs[i].description) >= 29) {
+                        if (strncmp(hubs[i].description+10, hubs[j].description+10, strlen(hubs[i].description)-29) == 0) {
+                            match = j;
+                        }
+                    }
+                }
+
+                /* Running out of options - provisionally we choose this one as dual: */
                 if (match < 0 && !hubs[j].actionable)
                     match = j;
 
