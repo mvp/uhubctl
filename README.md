@@ -34,6 +34,7 @@ This is list of known compatible USB hubs:
 | D-Link             | DUB-H7 rev A  (silver edition)                       | 7     | 2.0 |`2001:F103`| 2005    | 2010 |
 | D-Link             | DUB-H7 rev D1 (black edition)                        | 7     | 2.0 |`05E3:0608`| 2012    |      |
 | Elecom             | U2H-G4S                                              | 4     | 2.0 |           | 2006    | 2011 |
+| GlobalScale        | ESPRESSObin SBUD102 V5                               | 1     | 3.0 |`1D6B:0003`| 2017    |      |
 | Hawking Technology | UH214                                                | 4     | 2.0 |           | 2003    | 2008 |
 | IOI                | U3H415E1                                             | 4     | 3.0 |           | 2012    |      |
 | j5create           | JUH470 (works only in USB2 mode)                     | 3     | 3.0 |`05E3:0610`| 2014    |      |
