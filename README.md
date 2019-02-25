@@ -124,8 +124,6 @@ on port 2 (`-p 2`). Supported actions are `off`/`on`/`cycle` (or `0`/`1`/`2`).
 `cycle` means turn power off, wait some delay (configurable with `-d`) and turn it back on.
 Ports can be comma separated list, and may use `-` for ranges e.g. `2`, or `2,4`, or `2-5`, or `1-2,5-8`.
 
-On Linux, you may need to run it with `sudo`, or to configure `udev` USB permissions.
-
 If you have more than one smart USB hub connected, you should choose
 specific hub to control using `-l` (location) parameter.
 To find hub locations, simply run `uhubctl` without any parameters.
@@ -133,6 +131,29 @@ Hub locations look like `b-x.y.z`, where `b` is USB bus number, and `x`, `y`, `z
 are port numbers for all hubs in chain, starting from root hub for a given USB bus.
 This address is semi-stable - it will not change if you unplug/replug (or turn off/on)
 USB device into the same physical USB port (this method is also used in Linux kernel).
+
+
+Linux USB permissions
+=====================
+
+On Linux, you should configure `udev` USB permissions (otherwise you will have to run it as root using `sudo uhubctl`).
+To fix USB permissions, first run `sudo uhubctl` and note all `vid:pid` for hubs you need to control.
+Then, add one or more udev rules like below to file `/etc/udev/rules.d/52-usb.rules` (replace with your vendor id):
+
+    SUBSYSTEM=="usb", ATTR{idVendor}=="2001", MODE="0666"
+
+If you don't like wide open mode `0666`, you can restrict access by group like this:
+
+    SUBSYSTEM=="usb", ATTR{idVendor}=="2001", MODE="0664", GROUP="dialout"
+
+and then add permitted users to `dialout` group:
+
+    sudo usermod -a -G dialout $USER
+
+For your `udev` rule changes to take effect, reboot or run:
+
+    sudo udevadm trigger --attr-match=subsystem=usb
+
 
 
 Notable projects using uhubctl
