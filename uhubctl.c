@@ -35,8 +35,12 @@
 #include <libusb-1.0/libusb.h>
 #endif
 
-#if defined(__APPLE__) /* snprintf is not available in pure C mode */
+#if defined(__APPLE__) || defined(__FreeBSD__) /* snprintf is not available in pure C mode */
 int snprintf(char * __restrict __str, size_t __size, const char * __restrict __format, ...) __printflike(3, 4);
+#endif
+
+#if !defined(LIBUSB_API_VERSION) || (LIBUSB_API_VERSION <= 0x01000103)
+#define LIBUSB_DT_SUPERSPEED_HUB 0x2a
 #endif
 
 #if _POSIX_C_SOURCE >= 199309L
@@ -315,6 +319,25 @@ static int ports2bitmap(char* const portlist)
 
 
 /*
+ * Compatibility wrapper around libusb_get_port_numbers()
+ */
+
+static int get_port_numbers(libusb_device *dev, uint8_t *buf, uint8_t bufsize)
+{
+    int pcount;
+#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000102)
+    /*
+     * libusb_get_port_path is deprecated since libusb v1.0.16,
+     * therefore use libusb_get_port_numbers when supported
+     */
+    pcount = libusb_get_port_numbers(dev, buf, bufsize);
+#else
+    pcount = libusb_get_port_path(NULL, dev, buf, bufsize);
+#endif
+    return pcount;
+}
+
+/*
  * get USB hub properties.
  * most hub_info fields are filled, except for description.
  * returns 0 for success and error code for failure.
@@ -364,15 +387,7 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
             /* Convert bus and ports array into USB location string */
             int bus = libusb_get_bus_number(dev);
             snprintf(info->location, sizeof(info->location), "%d", bus);
-#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000102)
-            /*
-             * libusb_get_port_path is deprecated since libusb v1.0.16,
-             * therefore use libusb_get_port_numbers when supported
-             */
-            int pcount = libusb_get_port_numbers(dev, port_numbers, MAX_HUB_CHAIN);
-#else
-            int pcount = libusb_get_port_path(NULL, dev, port_numbers, MAX_HUB_CHAIN);
-#endif
+            int pcount = get_port_numbers(dev, port_numbers, MAX_HUB_CHAIN);
             int k;
             for (k=0; k<pcount; k++) {
                 char s[8];
@@ -510,9 +525,17 @@ static int print_port_status(struct hub_info * hub, int portmask)
     int port_status;
     struct libusb_device_handle * devh = NULL;
     int rc = 0;
+    int hub_bus;
+    int dev_bus;
+    unsigned char hub_pn[MAX_HUB_CHAIN];
+    unsigned char dev_pn[MAX_HUB_CHAIN];
+    int hub_plen;
+    int dev_plen;
     struct libusb_device *dev = hub->dev;
     rc = libusb_open(dev, &devh);
     if (rc == 0) {
+        hub_bus = libusb_get_bus_number(dev);
+        hub_plen = get_port_numbers(dev, hub_pn, sizeof(hub_pn));
         int port;
         for (port = 1; port <= hub->nports; port++) {
             if (portmask > 0 && (portmask & (1 << (port-1))) == 0) continue;
@@ -531,7 +554,12 @@ static int print_port_status(struct hub_info * hub, int portmask)
             struct libusb_device * udev;
             int i = 0;
             while ((udev = usb_devs[i++]) != NULL) {
-                if (libusb_get_parent(udev)      == dev &&
+                dev_bus = libusb_get_bus_number(udev);
+                /* only match devices on the same bus: */
+                if (dev_bus != hub_bus) continue;
+                dev_plen = get_port_numbers(udev, dev_pn, sizeof(dev_pn));
+                if ((dev_plen == hub_plen + 1) &&
+                    (memcmp(hub_pn, dev_pn, hub_plen) == 0) &&
                     libusb_get_port_number(udev) == port)
                 {
                     rc = get_device_description(udev, description, sizeof(description));
