@@ -104,6 +104,7 @@ First, you need to install library libusb-1.0 (version 1.0.12 or later):
 * Windows: TBD?
 
 To compile, simply run `make` - this will generate `uhubctl` binary.
+Note that on some OS (e.g. FreeBSD) you may need to use `gmake` to build.
 
 Also, for Mac OS X you can install `uhubctl` with Homebrew custom tap:
 
