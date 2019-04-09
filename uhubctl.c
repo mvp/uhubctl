@@ -962,7 +962,7 @@ int main(int argc, char *argv[])
             libusb_close(devh);
         }
         if (k == 0 && opt_action == POWER_CYCLE)
-            sleep_ms(opt_delay * 1000);
+            sleep_ms(opt_delay);
     }
     rc = 0;
 cleanup:
