@@ -11,6 +11,7 @@
 
 #define _XOPEN_SOURCE 500
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -201,6 +202,7 @@ static char opt_location[32] = "";     /* Hub location a-b.c.d */
 static int opt_ports  = ALL_HUB_PORTS; /* Bitmask of ports to operate on */
 static int opt_action = POWER_KEEP;
 static int opt_delay  = 2;
+static bool opt_delay_as_ms = false;
 static int opt_repeat = 1;
 static int opt_wait   = 20; /* wait before repeating in ms */
 static int opt_exact  = 0;  /* exact location match - disable USB3 duality handling */
@@ -234,7 +236,7 @@ static int print_usage()
         "--ports,    -p - ports to operate on    [all hub ports].\n"
         "--loc,      -l - limit hub by location  [all smart hubs].\n"
         "--vendor,   -n - limit hub by vendor id [%s] (partial ok).\n"
-        "--delay,    -d - delay for cycle action [%d sec].\n"
+        "--delay,    -d - delay for cycle action [%d sec]. Use floats for milliseconds.\n"
         "--repeat,   -r - repeat power off count [%d] (some devices need it to turn off).\n"
         "--exact,    -e - exact location (no USB3 duality handling).\n"
         "--reset,    -R - reset hub after each power-on action, causing all devices to reassociate.\n"
@@ -795,9 +797,18 @@ int main(int argc, char *argv[])
                 opt_action = POWER_CYCLE;
             }
             break;
-        case 'd':
-            opt_delay = atoi(optarg);
-            break;
+        case 'd': {
+			double delay = .0;
+
+			if (sscanf(optarg,"%lf", &delay)) {
+				opt_delay = (int) (delay * 1000.);
+				opt_delay_as_ms = true;
+			} else {
+				opt_delay = atoi(optarg);
+				opt_delay_as_ms = false;
+			}
+		}
+			break;
         case 'r':
             opt_repeat = atoi(optarg);
             break;
@@ -961,8 +972,13 @@ int main(int argc, char *argv[])
             }
             libusb_close(devh);
         }
-        if (k == 0 && opt_action == POWER_CYCLE)
-            sleep_ms(opt_delay);
+        if (k == 0 && opt_action == POWER_CYCLE) {
+			if (opt_delay_as_ms) {
+				sleep_ms(opt_delay);
+			} else {
+				sleep_ms(opt_delay * 1000);
+			}
+		}
     }
     rc = 0;
 cleanup:
