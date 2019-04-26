@@ -14,7 +14,9 @@ RM		:= rm -rf
 CC ?= gcc
 CFLAGS ?= -g -O0
 CFLAGS += -Wall -Wextra -std=c99 -pedantic
-GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always --tags)
+GIT_VERSION := \
+    $(shell git describe --abbrev=4 --dirty --always --tags || \
+        (echo 'Using fallback version "DEV"!' 1>&2 && echo 'DEV'))
 CFLAGS += -DPROGRAM_VERSION=\"$(GIT_VERSION)\"
 
 ifeq ($(UNAME_S),Linux)
