@@ -15,6 +15,9 @@ CC ?= gcc
 CFLAGS ?= -g -O0
 CFLAGS += -Wall -Wextra -std=c99 -pedantic
 GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always --tags)
+ifeq ($(GIT_VERSION),)
+    GIT_VERSION := $(shell cat VERSION)
+endif
 CFLAGS += -DPROGRAM_VERSION=\"$(GIT_VERSION)\"
 
 ifeq ($(UNAME_S),Linux)
