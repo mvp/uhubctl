@@ -186,6 +186,7 @@ struct hub_info {
     int actionable; /* true if this hub is subject to action */
     char vendor[16];
     char location[32];
+    int level;
     char description[256];
 };
 
@@ -198,6 +199,7 @@ static int hub_phys_count = 0;
 /* default options */
 static char opt_vendor[16]   = "";
 static char opt_location[32] = "";     /* Hub location a-b.c.d */
+static int opt_level = -1;
 static int opt_ports  = ALL_HUB_PORTS; /* Bitmask of ports to operate on */
 static int opt_action = POWER_KEEP;
 static double opt_delay = 2;
@@ -209,6 +211,7 @@ static int opt_reset  = 0;  /* reset hub after operation(s) */
 static const struct option long_options[] = {
     { "loc",      required_argument, NULL, 'l' },
     { "vendor",   required_argument, NULL, 'n' },
+    { "level",    required_argument, NULL, 'L' },
     { "ports",    required_argument, NULL, 'p' },
     { "action",   required_argument, NULL, 'a' },
     { "delay",    required_argument, NULL, 'd' },
@@ -233,6 +236,7 @@ static int print_usage()
         "--action,   -a - action to off/on/cycle (0/1/2) for affected ports.\n"
         "--ports,    -p - ports to operate on    [all hub ports].\n"
         "--loc,      -l - limit hub by location  [all smart hubs].\n"
+        "--level     -L - limit hub by level     [all smart hubs].\n"
         "--vendor,   -n - limit hub by vendor id [%s] (partial ok).\n"
         "--delay,    -d - delay for cycle action [%g sec].\n"
         "--repeat,   -r - repeat power off count [%d] (some devices need it to turn off).\n"
@@ -388,6 +392,7 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
             int bus = libusb_get_bus_number(dev);
             snprintf(info->location, sizeof(info->location), "%d", bus);
             int pcount = get_port_numbers(dev, port_numbers, MAX_HUB_CHAIN);
+            info->level = pcount + 1;
             int k;
             for (k=0; k<pcount; k++) {
                 char s[8];
@@ -656,6 +661,11 @@ static int usb_find_hubs()
                         info.actionable = 0;
                     }
                 }
+                if (opt_level != -1){
+                    if (opt_level != info.level){
+                        info.actionable = 0;
+                    }
+                }
                 if (strlen(opt_vendor)>0) {
                     if (strncasecmp(opt_vendor, info.vendor, strlen(opt_vendor))) {
                         info.actionable = 0;
@@ -756,7 +766,7 @@ int main(int argc, char *argv[])
     int option_index = 0;
 
     for (;;) {
-        c = getopt_long(argc, argv, "l:n:a:p:d:r:w:hveR",
+        c = getopt_long(argc, argv, "l:L:n:a:p:d:r:w:hveR",
             long_options, &option_index);
         if (c == -1)
             break;  /* no more options left */
@@ -772,6 +782,9 @@ int main(int argc, char *argv[])
             break;
         case 'l':
             strncpy(opt_location, optarg, sizeof(opt_location));
+            break;
+        case 'L':
+            opt_level = atoi(optarg);
             break;
         case 'n':
             strncpy(opt_vendor, optarg, sizeof(opt_vendor));
