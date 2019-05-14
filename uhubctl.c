@@ -710,6 +710,9 @@ static int usb_find_hubs()
                 if (hubs[i].nports != hubs[j].nports)
                     continue;
 
+                if (hubs[i].level != hubs[j].level)
+                    continue;
+
                 /* If description is the same, provisionally we choose this one as dual.
                  * If description contained serial number, this will be most reliable matching.
                  */
