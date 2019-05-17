@@ -199,7 +199,7 @@ static int hub_phys_count = 0;
 /* default options */
 static char opt_vendor[16]   = "";
 static char opt_location[32] = "";     /* Hub location a-b.c.d */
-static int opt_level = -1;
+static int opt_level = 0;              /* Hub location level (e.g., a-b is level 2, a-b.c is level 3)*/
 static int opt_ports  = ALL_HUB_PORTS; /* Bitmask of ports to operate on */
 static int opt_action = POWER_KEEP;
 static double opt_delay = 2;
@@ -661,7 +661,7 @@ static int usb_find_hubs()
                         info.actionable = 0;
                     }
                 }
-                if (opt_level != -1) {
+                if (opt_level != 0) {
                     if (opt_level != info.level) {
                         info.actionable = 0;
                     }
