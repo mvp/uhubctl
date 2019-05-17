@@ -661,8 +661,8 @@ static int usb_find_hubs()
                         info.actionable = 0;
                     }
                 }
-                if (opt_level != -1){
-                    if (opt_level != info.level){
+                if (opt_level != -1) {
+                    if (opt_level != info.level) {
                         info.actionable = 0;
                     }
                 }
