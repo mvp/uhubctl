@@ -236,7 +236,7 @@ static int print_usage()
         "--action,   -a - action to off/on/cycle (0/1/2) for affected ports.\n"
         "--ports,    -p - ports to operate on    [all hub ports].\n"
         "--loc,      -l - limit hub by location  [all smart hubs].\n"
-        "--level     -L - limit hub by location level (e.g. a.b-c is level 3) \n"
+        "--level     -L - limit hub by location level (e.g. a-b.c is level 3).\n"
         "--vendor,   -n - limit hub by vendor id [%s] (partial ok).\n"
         "--delay,    -d - delay for cycle action [%g sec].\n"
         "--repeat,   -r - repeat power off count [%d] (some devices need it to turn off).\n"
@@ -656,17 +656,17 @@ static int usb_find_hubs()
         if (info.ppps) { /* PPPS is supported */
             if (hub_count < MAX_HUBS) {
                 info.actionable = 1;
-                if (strlen(opt_location)>0) {
+                if (strlen(opt_location) > 0) {
                     if (strcasecmp(opt_location, info.location)) {
                         info.actionable = 0;
                     }
                 }
-                if (opt_level != 0) {
+                if (opt_level > 0) {
                     if (opt_level != info.level) {
                         info.actionable = 0;
                     }
                 }
-                if (strlen(opt_vendor)>0) {
+                if (strlen(opt_vendor) > 0) {
                     if (strncasecmp(opt_vendor, info.vendor, strlen(opt_vendor))) {
                         info.actionable = 0;
                     }
