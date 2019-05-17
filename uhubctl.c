@@ -236,7 +236,7 @@ static int print_usage()
         "--action,   -a - action to off/on/cycle (0/1/2) for affected ports.\n"
         "--ports,    -p - ports to operate on    [all hub ports].\n"
         "--loc,      -l - limit hub by location  [all smart hubs].\n"
-        "--level     -L - limit hub by level     [all smart hubs].\n"
+        "--level     -L - limit hub by location level [%d] (e.g. a.b-c is level 3) \n"
         "--vendor,   -n - limit hub by vendor id [%s] (partial ok).\n"
         "--delay,    -d - delay for cycle action [%g sec].\n"
         "--repeat,   -r - repeat power off count [%d] (some devices need it to turn off).\n"
