@@ -178,16 +178,24 @@ struct usb_port_status {
 /* List of all USB devices enumerated by libusb */
 static struct libusb_device **usb_devs = NULL;
 
+struct descriptor_strings {
+    char vendor[64];
+    char product[64];
+    char serial[64];
+    char description[256];
+};
+
 struct hub_info {
     struct libusb_device *dev;
     int bcd_usb;
     int nports;
     int ppps;
     int actionable; /* true if this hub is subject to action */
+    char container_id[33]; /* container ID as hex string */
     char vendor[16];
     char location[32];
     int level;
-    char description[256];
+    struct descriptor_strings ds;
 };
 
 /* Array of all enumerated USB hubs */
@@ -415,6 +423,28 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
         } else {
             rc = len;
         }
+        /* Get container_id: */
+        bzero(info->container_id, sizeof(info->container_id));
+        struct libusb_bos_descriptor *bos;
+        rc = libusb_get_bos_descriptor(devh, &bos);
+        if (rc == 0) {
+            int cap;
+            for (cap=0; cap < bos->bNumDeviceCaps; cap++) {
+                if (bos->dev_capability[cap]->bDevCapabilityType == LIBUSB_BT_CONTAINER_ID) {
+                    struct libusb_container_id_descriptor *container_id;
+                    rc = libusb_get_container_id_descriptor(NULL, bos->dev_capability[cap], &container_id);
+                    if (rc == 0) {
+                        int i;
+                        for (i=0; i<16; i++) {
+                            sprintf(info->container_id+i*2, "%02x", container_id->ContainerID[i]);
+                        }
+                        info->container_id[i*2] = 0;
+                        libusb_free_container_id_descriptor(container_id);
+                    }
+                }
+            }
+            libusb_free_bos_descriptor(bos);
+        }
         libusb_close(devh);
     }
     return rc;
@@ -450,9 +480,9 @@ static int get_port_status(struct libusb_device_handle *devh, int port)
 
 
 /*
- * Get USB device description as a string.
+ * Get USB device descriptor strings and summary description.
  *
- * It will use following format:
+ * Summary will use following format:
  *
  *    "<vid:pid> <vendor> <product> <serial>, <USB x.yz, N ports>"
  *
@@ -460,42 +490,40 @@ static int get_port_status(struct libusb_device_handle *devh, int port)
  * may be skipped if they are empty or not enough permissions to read them.
  * <USB x.yz, N ports> will be present only for USB hubs.
  *
- * returns 0 for success and error code for failure.
- * in case of failure description buffer is not altered.
+ * Returns 0 for success and error code for failure.
+ * In case of failure return buffer is not altered.
  */
 
-static int get_device_description(struct libusb_device * dev, char* description, int desc_len)
+static int get_device_description(struct libusb_device * dev, struct descriptor_strings * ds)
 {
     int rc;
     int id_vendor  = 0;
     int id_product = 0;
-    char vendor[64]  = "";
-    char product[64] = "";
-    char serial[64]  = "";
     char ports[64]   = "";
     struct libusb_device_descriptor desc;
     struct libusb_device_handle *devh = NULL;
     rc = libusb_get_device_descriptor(dev, &desc);
     if (rc)
         return rc;
+    bzero(ds, sizeof(*ds));
     id_vendor  = libusb_le16_to_cpu(desc.idVendor);
     id_product = libusb_le16_to_cpu(desc.idProduct);
     rc = libusb_open(dev, &devh);
     if (rc == 0) {
         if (desc.iManufacturer) {
             libusb_get_string_descriptor_ascii(devh,
-                desc.iManufacturer, (unsigned char*)vendor, sizeof(vendor));
-            rtrim(vendor);
+                desc.iManufacturer, (unsigned char*)ds->vendor, sizeof(ds->vendor));
+            rtrim(ds->vendor);
         }
         if (desc.iProduct) {
             libusb_get_string_descriptor_ascii(devh,
-                desc.iProduct, (unsigned char*)product, sizeof(product));
-            rtrim(product);
+                desc.iProduct, (unsigned char*)ds->product, sizeof(ds->product));
+            rtrim(ds->product);
         }
         if (desc.iSerialNumber) {
             libusb_get_string_descriptor_ascii(devh,
-                desc.iSerialNumber, (unsigned char*)serial, sizeof(serial));
-            rtrim(serial);
+                desc.iSerialNumber, (unsigned char*)ds->serial, sizeof(ds->serial));
+            rtrim(ds->serial);
         }
         if (desc.bDeviceClass == LIBUSB_CLASS_HUB) {
             struct hub_info info;
@@ -507,12 +535,12 @@ static int get_device_description(struct libusb_device * dev, char* description,
         }
         libusb_close(devh);
     }
-    snprintf(description, desc_len,
+    snprintf(ds->description, sizeof(ds->description),
         "%04x:%04x%s%s%s%s%s%s%s",
         id_vendor, id_product,
-        vendor[0]  ? " " : "", vendor,
-        product[0] ? " " : "", product,
-        serial[0]  ? " " : "", serial,
+        ds->vendor[0]  ? " " : "", ds->vendor,
+        ds->product[0] ? " " : "", ds->product,
+        ds->serial[0]  ? " " : "", ds->serial,
         ports
     );
     return 0;
@@ -555,7 +583,8 @@ static int print_port_status(struct hub_info * hub, int portmask)
 
             printf("  Port %d: %04x", port, port_status);
 
-            char description[256] = "";
+            struct descriptor_strings ds;
+            bzero(&ds, sizeof(ds));
             struct libusb_device * udev;
             int i = 0;
             while ((udev = usb_devs[i++]) != NULL) {
@@ -567,7 +596,7 @@ static int print_port_status(struct hub_info * hub, int portmask)
                     (memcmp(hub_pn, dev_pn, hub_plen) == 0) &&
                     libusb_get_port_number(udev) == port)
                 {
-                    rc = get_device_description(udev, description, sizeof(description));
+                    rc = get_device_description(udev, &ds);
                     if (rc == 0)
                         break;
                 }
@@ -614,7 +643,7 @@ static int print_port_status(struct hub_info * hub, int portmask)
             if (port_status & USB_PORT_STAT_ENABLE)      printf(" enable");
             if (port_status & USB_PORT_STAT_CONNECTION)  printf(" connect");
 
-            if (port_status & USB_PORT_STAT_CONNECTION)  printf(" [%s]", description);
+            if (port_status & USB_PORT_STAT_CONNECTION)  printf(" [%s]", ds.description);
 
             printf("\n");
         }
@@ -652,7 +681,7 @@ static int usb_find_hubs()
         if (rc) {
             perm_ok = 0; /* USB permission issue? */
         }
-        get_device_description(dev, info.description, sizeof(info.description));
+        get_device_description(dev, &info.ds);
         if (info.ppps) { /* PPPS is supported */
             if (hub_count < MAX_HUBS) {
                 info.actionable = 1;
@@ -682,31 +711,42 @@ static int usb_find_hubs()
             /* Check only actionable hubs: */
             if (hubs[i].actionable != 1)
                 continue;
+            /* Must have non empty container ID: */
+            if (strlen(hubs[i].container_id) == 0)
+                continue;
             int match = -1;
             for (j=0; j<hub_count; j++) {
                 if (i==j)
                     continue;
 
-                /* Find hub which is USB2/3 dual to the hub above.
-                 * This is quite reliable and predictable on Linux
-                 * but not on Mac, where we may match wrong hub :(
-                 * It will work reliably on Mac if there is
-                 * only one compatible USB3 hub is connected.
-                 * Unfortunately, libusb does not provide any way
-                 * to detect USB2/3 dual hubs.
-                 * TODO: discover better way to find dual hub.
-                 */
+                /* Find hub which is USB2/3 dual to the hub above */
 
                 /* Hub and its dual must be different types: one USB2, another USB3: */
                 if ((hubs[i].bcd_usb < USB_SS_BCD) ==
                     (hubs[j].bcd_usb < USB_SS_BCD))
                     continue;
 
-                /* But they must have the same vendor: */
-                if (strncasecmp(hubs[i].vendor, hubs[j].vendor, 4))
+                /* Must have non empty container ID: */
+                if (strlen(hubs[j].container_id) == 0)
                     continue;
 
-                /* And the same number of ports: */
+                /* Per USB 3.0 spec chapter 11.2, container IDs must match: */
+                if (strcmp(hubs[i].container_id, hubs[j].container_id) != 0)
+                    continue;
+
+                /* At this point, it should be enough to claim a match.
+                 * However, some devices use hardcoded non-unique container ID.
+                 * We should do few more checks below if multiple such devices are present.
+                 */
+
+                /* If serial number is present, it must match: */
+                if ((strlen(hubs[i].ds.serial) > 0 || strlen(hubs[j].ds.serial) > 0) &&
+                    strcmp(hubs[i].ds.serial, hubs[j].ds.serial) != 0)
+                {
+                    continue;
+                }
+
+                /* Hubs should have the same number of ports: */
                 if (hubs[i].nports != hubs[j].nports)
                     continue;
 
@@ -714,31 +754,8 @@ static int usb_find_hubs()
                 if (hubs[i].level != hubs[j].level)
                     continue;
 
-                /* If description is the same, provisionally we choose this one as dual.
-                 * If description contained serial number, this will be most reliable matching.
-                 */
-                if (strlen(hubs[i].description) == strlen(hubs[j].description)) {
-                    /* strlen("vvvv:pppp ") + strlen(", USB x.yz, N ports") = 10+19 = 29 */
-                    if (strlen(hubs[i].description) >= 29) {
-                        if (strncmp(hubs[i].description+10, hubs[j].description+10, strlen(hubs[i].description)-29) == 0) {
-                            match = j;
-                        }
-                    }
-                }
-
-                /* Running out of options - provisionally we choose this one as dual: */
-                if (match < 0 && !hubs[j].actionable)
-                    match = j;
-
-                /* But if there is exact port path match,
-                 * we prefer it (true for Linux but not Mac):
-                 */
-                char *p1 = strchr(hubs[i].location, '-');
-                char *p2 = strchr(hubs[j].location, '-');
-                if (p1 && p2 && strcasecmp(p1, p2)==0) {
-                    match = j;
-                    break;
-                }
+                /* Finally, we claim a match: */
+                match = j;
             }
             if (match >= 0) {
                 if (!hubs[match].actionable) {
@@ -912,7 +929,7 @@ int main(int argc, char *argv[])
             if (hubs[i].actionable == 0)
                 continue;
             printf("Current status for hub %s [%s]\n",
-                hubs[i].location, hubs[i].description
+                hubs[i].location, hubs[i].ds.description
             );
             print_port_status(&hubs[i], opt_ports);
             if (opt_action == POWER_KEEP) { /* no action, show status */
@@ -962,7 +979,7 @@ int main(int argc, char *argv[])
                     request == LIBUSB_REQUEST_CLEAR_FEATURE ? "off" : "on"
                 );
                 printf("New status for hub %s [%s]\n",
-                    hubs[i].location, hubs[i].description
+                    hubs[i].location, hubs[i].ds.description
                 );
                 print_port_status(&hubs[i], opt_ports);
 
