@@ -756,6 +756,7 @@ static int usb_find_hubs()
 
                 /* Finally, we claim a match: */
                 match = j;
+                break;
             }
             if (match >= 0) {
                 if (!hubs[match].actionable) {
