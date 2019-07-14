@@ -159,6 +159,103 @@ For your `udev` rule changes to take effect, reboot or run:
 
 
 
+FAQ
+===
+
+#### _What is USB per-port power switching?_
+
+According to USB 2.0 specification, USB hubs can advertise no power switching,
+ganged (all ports at once) power switching or per-port (individual) power switching.
+Note that `uhubctl` will only detect USB hubs which support per-port power switching.
+You can find what kind of power switching your hardware supports by using `sudo lsusb -v`:
+
+No power switching:
+
+    wHubCharacteristic 0x000a
+      No power switching (usb 1.0)
+      Per-port overcurrent protection
+
+Ganged power switching:
+
+    wHubCharacteristic 0x0008
+      Ganged power switching
+      Per-port overcurrent protection
+
+Per-port power switching:
+
+    wHubCharacteristic 0x0009
+      Per-port power switching
+      Per-port overcurrent protection
+
+
+#### _How do I check if my USB hub is supported by `uhubctl`?_
+
+1. Run `sudo uhubctl`. If your hub is not listed, it is not supported.
+   Alternatively, you can run `sudo lsusb -v` and check for
+   `Per-port power switching` -  if you cannot see such line in lsusb output,
+   hub is not supported.
+2. Check for VBUS (voltage) off support: plug a phone, USB light
+    or USB fan into USB port of your hub.
+   Try using `uhubctl` to turn power off on that port, and check
+   that phone stops charging, USB light stops shining or USB fan stops spinning.
+   If VBUS doesn't turn off, your hub manufacturer did not include circuitry
+   to actually cut power off. Such hub would still work
+   to cut off USB data connection, but it cannot turn off power,
+   and we do not consider this supported device.
+3. If tests above were successful, please report your hub
+   by opening new issue at https://github.com/mvp/uhubctl/issues,
+   so we can add it to list of supported devices.
+
+
+#### _USB devices are not removed after port power down on Linux_
+
+After powering down USB port, udev does not get any event, so it keeps the device files around.
+However, trying to access the device files will lead to an IO error.
+
+This is Linux kernel issue. It may be eventually fixed in kernel, see more discussion [here](https://bit.ly/2JzczjZ).
+Basically what happens here is that kernel USB driver knows about power off,
+but doesn't send notification about it to udev.
+
+You can find workaround for this in article https://goo.gl/qfrmGK.
+
+
+#### _Power comes back on after few seconds on Linux_
+
+Some device drivers in kernel are surprised by USB device being turned off and automatically try to power it back on.
+
+You can use option `-r N` where N is some number from 10 to 1000 to fix this -
+`uhubctl` will try to turn power off many times in quick succession, and it should suppress that.
+This may be eventually fixed in kernel, see more discussion [here](https://bit.ly/2JzczjZ).
+
+
+#### _Multiple 4-port hubs are detected, but I only have one 7-port hub connected_
+
+Many hub manufacturers build their USB hubs using basic 4 port USB chips.
+E.g. to make 7 port hub, they daisy-chain two 4 port hubs - 1 port is lost to daisy-chaining,
+so it makes it 4+4-1=7 port hub. Simularly, 10 port hub could be built as 3 4-port hubs
+daisy-chained together, which gives 4+4+4-2=10 usable ports.
+
+Note that you should never try to change power state for ports used to daisy-chain internal hubs together.
+Doing so will confuse internal hub circuitry and will cause unpredictable behavior.
+
+
+#### _Raspberry Pi turns power off on all ports, not just the one I specified_
+
+This is limitation of Raspberry Pi hardware design.
+For reference, Raspberry Pi models have following internal USB topology:
+
+* B+/2B/3B: one USB hub `1-1`, with port `1` for Ethernet+wifi, and ports `2-5` ganged, controlled by port `2`.
+  (Trying to control ports 3,4,5 won't do anything).
+* 3B+: 2 hubs - main hub `1-1`, all 4 ports ganged, all controlled by port `2`.
+   Second hub `1-1.1` (daisy-chained to main): 3 independently controlled ports, `1` is used for Ethernet+wifi,
+   and ports `2,3` are available with proper per-port power switching.
+   In other words, 2 out of total 4 ports wired outside do support independent power switching on 3B+.
+
+As a workaround, you can buy any external USB hub from supported list,
+attach it to any USB port of Raspberry Pi, and control power on its ports independently.
+
+
+
 Notable projects using uhubctl
 ==============================
 | Project                                                  | Description                                        |
