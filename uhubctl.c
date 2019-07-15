@@ -739,8 +739,8 @@ static int usb_find_hubs()
                  * We should do few more checks below if multiple such devices are present.
                  */
 
-                /* If serial number is present, it must match: */
-                if ((strlen(hubs[i].ds.serial) > 0 || strlen(hubs[j].ds.serial) > 0) &&
+                /* If serial numbers are both present, they must match: */
+                if ((strlen(hubs[i].ds.serial) > 0 && strlen(hubs[j].ds.serial) > 0) &&
                     strcmp(hubs[i].ds.serial, hubs[j].ds.serial) != 0)
                 {
                     continue;
