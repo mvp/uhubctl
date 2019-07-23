@@ -216,7 +216,7 @@ This is Linux kernel issue. It may be eventually fixed in kernel, see more discu
 Basically what happens here is that kernel USB driver knows about power off,
 but doesn't send notification about it to udev.
 
-You can find workaround for this in article https://goo.gl/qfrmGK.
+You can find workaround for this issue in [this article](https://goo.gl/qfrmGK).
 
 
 #### _Power comes back on after few seconds on Linux_
@@ -258,21 +258,22 @@ attach it to any USB port of Raspberry Pi, and control power on its ports indepe
 
 Notable projects using uhubctl
 ==============================
-| Project                                                  | Description                                        |
-|:---------------------------------------------------------|:---------------------------------------------------|
-| [Morse code USB light](https://goo.gl/bJYsPe)            | Flash a message in Morse code with USB light       |
-| [Webcam USB light](https://goo.gl/9fA1DQ)                | Turn on/off LED when webcam is turned on/off       |
-| [Cinema Lightbox](https://goo.gl/fjCvkz)                 | Turn on/off Cinema Lightbox from iOS Home app      |
-| [Build Status Light](https://goo.gl/3GA82o)              | Create a build status light in under 10 minutes    |
-| [Weather Station](https://goo.gl/3b1FzC)                 | Reset Weather Station when it freezes              |
-| [sysmoQMOD](https://goo.gl/8wvcKA)                       | Reset cellular modems when necessary               |
-| [Smog Sensor](https://bit.ly/2EMwgCk)                    | Raspberry Pi based smog sensor power reset         |
-| [Terrible Cluster](https://goo.gl/XjiXFu)                | Power on/off Raspberry Pi cluster nodes as needed  |
-| [Ideal Music Server](https://bit.ly/2UJq6Z9)             | Turn off unused USB ports to improve audio quality |
-| [USB drives with no phantom load](https://goo.gl/qfrmGK) | Power USB drives only when needed to save power    |
-| [USB drive data recovery](https://goo.gl/4MddLr)         | Recover data from failing USB hard drive           |
-| [Control power to 3D printer](https://git.io/fh5Tr)      | OctoPrint web plugin for USB power control         |
-| [USB fan for Raspberry Pi](https://bit.ly/2TRV6sM)       | Control USB fan to avoid Raspberry Pi overheating  |
+| Project                                                  | Description                                           |
+|:---------------------------------------------------------|:------------------------------------------------------|
+| [Morse code USB light](https://git.io/fj1F4)             | Flash a message in Morse code with USB light          |
+| [Webcam USB light](https://git.io/fj1FB)                 | Turn on/off LED when webcam is turned on/off          |
+| [Cinema Lightbox](https://goo.gl/fjCvkz)                 | Turn on/off Cinema Lightbox from iOS Home app         |
+| [Build Status Light](https://goo.gl/3GA82o)              | Create a build status light in under 10 minutes       |
+| [Buildenlights](https://git.io/fj1FC)                    | GitLab/GitHub project build status as green/red light |
+| [Weather Station](https://goo.gl/3b1FzC)                 | Reset Weather Station when it freezes                 |
+| [sysmoQMOD](https://goo.gl/8wvcKA)                       | Reset cellular modems when necessary                  |
+| [Smog Sensor](https://bit.ly/2EMwgCk)                    | Raspberry Pi based smog sensor power reset            |
+| [Terrible Cluster](https://goo.gl/XjiXFu)                | Power on/off Raspberry Pi cluster nodes as needed     |
+| [Ideal Music Server](https://bit.ly/2UJq6Z9)             | Turn off unused USB ports to improve audio quality    |
+| [USB drives with no phantom load](https://goo.gl/qfrmGK) | Power USB drives only when needed to save power       |
+| [USB drive data recovery](https://goo.gl/4MddLr)         | Recover data from failing USB hard drive              |
+| [Control power to 3D printer](https://git.io/fh5Tr)      | OctoPrint web plugin for USB power control            |
+| [USB fan for Raspberry Pi](https://bit.ly/2TRV6sM)       | Control USB fan to avoid Raspberry Pi overheating     |
 
 
 Copyright
