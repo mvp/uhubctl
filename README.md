@@ -250,6 +250,12 @@ For reference, Raspberry Pi models have following internal USB topology:
    Second hub `1-1.1` (daisy-chained to main): 3 independently controlled ports, `1` is used for Ethernet+wifi,
    and ports `2,3` are available with proper per-port power switching.
    In other words, 2 out of total 4 ports wired outside do support independent power switching on 3B+.
+* 4B: Hardware supports power switching, but current firmware is reporting broken USB descriptors.
+      For more details see Raspberry Pi issue https://github.com/raspberrypi/linux/issues/3079.
+      USB3 hub `2`, 4 ports, per-port power switching. BOS `ContainerID` not reported (required for USB3).
+      USB2 hub `1`, 1 port, no usable ports, connects hub `1-1` below.
+      USB2 hub `1-1`, 4 ports, dual to USB3 hub above. Hub descriptor incorrectly reports ganged power switching.
+      USB2 hub `3`, 1 port, OTG controller, incorrectly reports ganged power switching.
 
 As a workaround, you can buy any external USB hub from supported list,
 attach it to any USB port of Raspberry Pi, and control power on its ports independently.
