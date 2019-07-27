@@ -91,7 +91,7 @@ Compiling
 =========
 
 This utility was tested to compile and work on Linux
-(Ubuntu/Debian, Redhat/Fedora/CentOS, Arch Linux, Gentoo, openSUSE, Buildroot), FreeBSD and Mac OS X.
+(Ubuntu/Debian, Redhat/Fedora/CentOS, Arch Linux, Gentoo, openSUSE, Buildroot), FreeBSD, NetBSD and Mac OS X.
 
 While `uhubctl` compiles on Windows, USB power switching does not work on Windows because `libusb`
 is using `winusb.sys` driver, which according to Microsoft does not support
@@ -104,10 +104,11 @@ First, you need to install library libusb-1.0 (version 1.0.12 or later):
 * Redhat: `sudo yum install libusb1-devel`
 * MacOSX: `brew install libusb`, or `sudo port install libusb-devel`
 * FreeBSD: libusb is included by default
+* NetBSD: `sudo pkgin install libusb1 gmake pkg-config`
 * Windows: TBD?
 
 To compile, simply run `make` - this will generate `uhubctl` binary.
-Note that on some OS (e.g. FreeBSD) you may need to use `gmake` to build.
+Note that on some OS (e.g. FreeBSD/NetBSD) you need to use `gmake` instead to build.
 
 Also, for Mac OS X you can install `uhubctl` with Homebrew custom tap:
 
