@@ -218,8 +218,14 @@ This is Linux kernel issue. It may be eventually fixed in kernel, see more discu
 Basically what happens here is that kernel USB driver knows about power off,
 but doesn't send notification about it to udev.
 
-You can find workaround for this issue in [this article](https://goo.gl/qfrmGK).
+You can use this workaround for this issue:
 
+    sudo uhubctl -a off -l ${location} -p ${port}
+    sudo udevadm trigger --action=remove /sys/bus/usb/devices/${location}.${port}/
+
+Device file will be removed by udev, but USB device will be still visible in `lsusb`.
+Note that path `/sys/bus/usb/devices/${location}.${port}` will only exist if device was detected on that port.
+When you turn power back on, device should re-enumerate properly (no need to call `udevadm` again).
 
 #### _Power comes back on after few seconds on Linux_
 
