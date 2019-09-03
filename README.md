@@ -108,6 +108,10 @@ First, you need to install library libusb-1.0 (version 1.0.12 or later):
 * NetBSD: `sudo pkgin install libusb1 gmake pkg-config`
 * Windows: TBD?
 
+To fetch uhubctl source:
+
+    git clone https://github.com/mvp/uhubctl
+
 To compile, simply run `make` - this will generate `uhubctl` binary.
 Note that on some OS (e.g. FreeBSD/NetBSD) you need to use `gmake` instead to build.
 
