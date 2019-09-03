@@ -217,7 +217,7 @@ static int opt_exact  = 0;  /* exact location match - disable USB3 duality handl
 static int opt_reset  = 0;  /* reset hub after operation(s) */
 
 static const struct option long_options[] = {
-    { "loc",      required_argument, NULL, 'l' },
+    { "location", required_argument, NULL, 'l' },
     { "vendor",   required_argument, NULL, 'n' },
     { "level",    required_argument, NULL, 'L' },
     { "ports",    required_argument, NULL, 'p' },
@@ -243,7 +243,7 @@ static int print_usage()
         "Options [defaults in brackets]:\n"
         "--action,   -a - action to off/on/cycle (0/1/2) for affected ports.\n"
         "--ports,    -p - ports to operate on    [all hub ports].\n"
-        "--loc,      -l - limit hub by location  [all smart hubs].\n"
+        "--location, -l - limit hub by location  [all smart hubs].\n"
         "--level     -L - limit hub by location level (e.g. a-b.c is level 3).\n"
         "--vendor,   -n - limit hub by vendor id [%s] (partial ok).\n"
         "--delay,    -d - delay for cycle action [%g sec].\n"
