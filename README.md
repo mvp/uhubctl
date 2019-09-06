@@ -103,6 +103,7 @@ First, you need to install library libusb-1.0 (version 1.0.12 or later):
 
 * Ubuntu: `sudo apt-get install libusb-1.0-0-dev`
 * Redhat: `sudo yum install libusb1-devel`
+* NixOS: `nix-env -iA nixos.uhubctl`
 * MacOSX: `brew install libusb`, or `sudo port install libusb-devel`
 * FreeBSD: libusb is included by default
 * NetBSD: `sudo pkgin install libusb1 gmake pkg-config`
