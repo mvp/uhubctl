@@ -21,7 +21,7 @@ endif
 CFLAGS += -DPROGRAM_VERSION=\"$(GIT_VERSION)\"
 
 ifeq ($(UNAME_S),Linux)
-	LDFLAGS += -Wl,-z,relro -lusb-1.0
+	LDFLAGS += -Wl,-zrelro,-znow -lusb-1.0
 endif
 
 ifeq ($(UNAME_S),Darwin)
