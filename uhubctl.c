@@ -429,7 +429,11 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
         rc = libusb_get_bos_descriptor(devh, &bos);
         if (rc == 0) {
             int cap;
+#ifdef __FreeBSD__
+            for (cap=0; cap < bos->bNumDeviceCapabilities; cap++) {
+#else
             for (cap=0; cap < bos->bNumDeviceCaps; cap++) {
+#endif
                 if (bos->dev_capability[cap]->bDevCapabilityType == LIBUSB_BT_CONTAINER_ID) {
                     struct libusb_container_id_descriptor *container_id;
                     rc = libusb_get_container_id_descriptor(NULL, bos->dev_capability[cap], &container_id);
