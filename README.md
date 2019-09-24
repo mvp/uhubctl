@@ -40,7 +40,8 @@ This is list of known compatible USB hubs:
 | Hawking Technology | UH214                                                | 4     | 2.0 |           | 2003    | 2008 |
 | IOI                | U3H415E1                                             | 4     | 3.0 |           | 2012    |      |
 | j5create           | JUH470 (works only in USB2 mode)                     | 3     | 3.0 |`05E3:0610`| 2014    |      |
-| Lenovo             | ThinkPad EU Ultra Dockingstation (40A20090EU)        | 6     | 2.0 |`17EF:100F`| 2015    |      |
+| Lenovo             | ThinkPad Ultra Docking Station (40A20090EU)          | 6     | 2.0 |`17EF:100F`| 2015    |      |
+| Lenovo             | ThinkPad Ultra Docking Station (40AJ0135EU)          | 7     | 3.1 |`17EF:3070`| 2018    |      |
 | Lenovo             | ThinkPad X200 Ultrabase 42X4963                      | 3     | 2.0 |`17EF:1005`| 2008    | 2011 |
 | Lenovo             | ThinkPad X6 Ultrabase 42W3107                        | 4     | 2.0 |`17EF:1000`| 2006    | 2009 |
 | Lindy              | USB serial converter 4 port                          | 4     | 1.1 |`058F:9254`| 2008    |      |
