@@ -31,9 +31,9 @@ This is list of known compatible USB hubs:
 | Coolgear           | USBG-4U3MLR2                                         | 4     | 3.1 |`05E3:0620`| 2017    |      |
 | CyberPower         | CP-H420P                                             | 4     | 2.0 |`0409:0059`| 2004    |      |
 | Cypress            | CY4608 HX2VL development kit                         | 4     | 2.0 |`04B4:6570`| 2012    |      |
-| D-Link             | DUB-H4 rev D1 (black edition)                        | 4     | 2.0 |`05E3:0608`| 2012    |      |
-| D-Link             | DUB-H7 rev A  (silver edition)                       | 7     | 2.0 |`2001:F103`| 2005    | 2010 |
-| D-Link             | DUB-H7 rev D1 (black edition)                        | 7     | 2.0 |`05E3:0608`| 2012    |      |
+| D-Link             | DUB-H7 rev A (silver)                                | 7     | 2.0 |`2001:F103`| 2005    | 2010 |
+| D-Link             | DUB-H7 rev D (black). Note: rev B,C not supported    | 7     | 2.0 |`05E3:0608`| 2012    |      |
+| D-Link             | DUB-H4 rev D (black). Note: rev B,C not supported    | 4     | 2.0 |`05E3:0608`| 2012    |      |
 | Dell               | P2416D 24" QHD Monitor                               | 4     | 2.0 |           | 2017    |      |
 | Dell               | UltraSharp 1704FPT 17" LCD Monitor                   | 4     | 2.0 |`0424:A700`| 2005    | 2015 |
 | Elecom             | U2H-G4S                                              | 4     | 2.0 |           | 2006    | 2011 |
