@@ -754,10 +754,6 @@ static int usb_find_hubs()
                 if (hubs[i].nports != hubs[j].nports)
                     continue;
 
-                /* And the same level: */
-                if (hubs[i].level != hubs[j].level)
-                    continue;
-
                 /* Finally, we claim a match: */
                 match = j;
                 break;
