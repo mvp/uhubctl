@@ -28,7 +28,6 @@ This is list of known compatible USB hubs:
 | Belkin             | F5U701-BLK                                           | 7     | 2.0 |           | 2008    | 2012 |
 | Circuitco          | Beagleboard-xM (internal USB hub)                    | 4     | 2.0 |`0424:9514`| 2010    |      |
 | Club3D             | CSV-3242HD Dual Display Docking Station              | 4     | 3.0 |`2109:2811`| 2015    |      |
-| Coolgear           | USBG-4U3MLR2                                         | 4     | 3.1 |`05E3:0620`| 2017    |      |
 | CyberPower         | CP-H420P                                             | 4     | 2.0 |`0409:0059`| 2004    |      |
 | Cypress            | CY4608 HX2VL development kit                         | 4     | 2.0 |`04B4:6570`| 2012    |      |
 | D-Link             | DUB-H7 rev A (silver)                                | 7     | 2.0 |`2001:F103`| 2005    | 2010 |
