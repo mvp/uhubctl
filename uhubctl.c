@@ -895,7 +895,7 @@ int main(int argc, char *argv[])
             opt_location
         );
 #ifdef __gnu_linux__
-        if (rc < 0) {
+        if (rc < 0 && geteuid() != 0) {
             fprintf(stderr,
                 "There were permission problems while accessing USB.\n"
                 "To fix this, run this tool as root using 'sudo uhubctl',\n"
