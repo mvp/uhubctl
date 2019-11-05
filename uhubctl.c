@@ -182,7 +182,7 @@ struct descriptor_strings {
     char vendor[64];
     char product[64];
     char serial[64];
-    char description[256];
+    char description[512];
 };
 
 struct hub_info {
