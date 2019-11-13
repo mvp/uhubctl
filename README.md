@@ -25,6 +25,7 @@ This is list of known compatible USB hubs:
 | Asus               | Z87-PLUS Motherboard (onboard USB hub)               | 4     | 3.0 |           | 2013    | 2016 |
 | B+B SmartWorx      | UHR204                                               | 4     | 2.0 |`0856:DB00`| 2013    |      |
 | B+B SmartWorx      | USH304                                               | 4     | 3.0 |`04B4:6506`| 2017    |      |
+| Belkin             | F5U101                                               | 4     | 2.0 |`0451:2046`| 2005    | 2010 |
 | Belkin             | F5U701-BLK                                           | 7     | 2.0 |           | 2008    | 2012 |
 | Circuitco          | Beagleboard-xM (internal USB hub)                    | 4     | 2.0 |`0424:9514`| 2010    |      |
 | Club3D             | CSV-3242HD Dual Display Docking Station              | 4     | 3.0 |`2109:2811`| 2015    |      |
