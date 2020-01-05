@@ -408,9 +408,54 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
                 strcat(info->location, s);
             }
 
+            /* Get container_id: */
+            bzero(info->container_id, sizeof(info->container_id));
+            struct libusb_bos_descriptor *bos;
+            rc = libusb_get_bos_descriptor(devh, &bos);
+            if (rc == 0) {
+                int cap;
+#ifdef __FreeBSD__
+                for (cap=0; cap < bos->bNumDeviceCapabilities; cap++) {
+#else
+                for (cap=0; cap < bos->bNumDeviceCaps; cap++) {
+#endif
+                    if (bos->dev_capability[cap]->bDevCapabilityType == LIBUSB_BT_CONTAINER_ID) {
+                        struct libusb_container_id_descriptor *container_id;
+                        rc = libusb_get_container_id_descriptor(NULL, bos->dev_capability[cap], &container_id);
+                        if (rc == 0) {
+                            int i;
+                            for (i=0; i<16; i++) {
+                                sprintf(info->container_id+i*2, "%02x", container_id->ContainerID[i]);
+                            }
+                            info->container_id[i*2] = 0;
+                            libusb_free_container_id_descriptor(container_id);
+                        }
+                    }
+                }
+                libusb_free_bos_descriptor(bos);
+
+                /* Raspberry Pi 4 hack for USB3 root hub: */
+                if (strlen(info->container_id)==0 &&
+                    strcasecmp(info->vendor, "1d6b:0003")==0 &&
+                    info->level==1 &&
+                    info->nports==4 &&
+                    bcd_usb==USB_SS_BCD)
+                {
+                    strcpy(info->container_id, "5cf3ee30d5074925b001802d79434c30");
+                }
+            }
+
             info->ppps = 0;
             /* Logical Power Switching Mode */
             int lpsm = uhd->wHubCharacteristics[0] & HUB_CHAR_LPSM;
+            if (lpsm == HUB_CHAR_COMMON_LPSM && info->nports == 1) {
+                /* For 1 port hubs, ganged power switching is the same as per-port: */
+                lpsm = HUB_CHAR_INDV_PORT_LPSM;
+            }
+            /* Raspberry Pi 4 reports inconsistent descriptors, override: */
+            if (lpsm == HUB_CHAR_COMMON_LPSM && strcasecmp(info->vendor, "2109:3431")==0) {
+                lpsm = HUB_CHAR_INDV_PORT_LPSM;
+            }
             /* Over-Current Protection Mode */
             int ocpm = uhd->wHubCharacteristics[0] & HUB_CHAR_OCPM;
             /* LPSM must be supported per-port, and OCPM per port or ganged */
@@ -422,32 +467,6 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
             }
         } else {
             rc = len;
-        }
-        /* Get container_id: */
-        bzero(info->container_id, sizeof(info->container_id));
-        struct libusb_bos_descriptor *bos;
-        rc = libusb_get_bos_descriptor(devh, &bos);
-        if (rc == 0) {
-            int cap;
-#ifdef __FreeBSD__
-            for (cap=0; cap < bos->bNumDeviceCapabilities; cap++) {
-#else
-            for (cap=0; cap < bos->bNumDeviceCaps; cap++) {
-#endif
-                if (bos->dev_capability[cap]->bDevCapabilityType == LIBUSB_BT_CONTAINER_ID) {
-                    struct libusb_container_id_descriptor *container_id;
-                    rc = libusb_get_container_id_descriptor(NULL, bos->dev_capability[cap], &container_id);
-                    if (rc == 0) {
-                        int i;
-                        for (i=0; i<16; i++) {
-                            sprintf(info->container_id+i*2, "%02x", container_id->ContainerID[i]);
-                        }
-                        info->container_id[i*2] = 0;
-                        libusb_free_container_id_descriptor(container_id);
-                    }
-                }
-            }
-            libusb_free_bos_descriptor(bos);
         }
         libusb_close(devh);
     }
