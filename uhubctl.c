@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2019 Vadim Mikhailov
+ * Copyright (c) 2009-2020 Vadim Mikhailov
  *
  * Utility to turn USB port power on/off
  * for USB hubs that support per-port power switching.
