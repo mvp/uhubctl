@@ -60,9 +60,9 @@ This is list of known compatible USB hubs:
 | Plugable           | USB3-HUB7BC                                          | 7     | 3.0 |`2109:0813`| 2015    |      |
 | Plugable           | USB3-HUB7C                                           | 7     | 3.0 |`2109:0813`| 2015    |      |
 | Plugable           | USB3-HUB7-81X                                        | 7     | 3.0 |`2109:0813`| 2012    |      |
-| Raspberry Pi       | B+, 2B, 3B (port 2 only)                             | 4     | 2.0 |           | 2011    |      |
-| Raspberry Pi       | 3B+                                                  | 6     | 2.0 |`0424:2514`| 2018    |      |
-| Raspberry Pi       | 4B (port 4 only)                                     | 4     | 3.0 |`2109:3431`| 2019    |      |
+| Raspberry Pi       | B+, 2B, 3B (see Raspberry Pi section below)          | 4     | 2.0 |           | 2011    |      |
+| Raspberry Pi       | 3B+        (see Raspberry Pi section below)          | 4     | 2.0 |`0424:2514`| 2018    |      |
+| Raspberry Pi       | 4B         (see Raspberry Pi section below)          | 4     | 3.0 |`2109:3431`| 2019    |      |
 | Renesas            | uPD720202 PCIe USB 3.0 host controller               | 2     | 3.0 |           | 2013    |      |
 | Rosewill           | RHUB-210                                             | 4     | 2.0 |`0409:005A`| 2011    | 2014 |
 | Sanwa Supply       | USB-HUB14GPH                                         | 4     | 1.1 |           | 2001    | 2003 |
@@ -265,17 +265,44 @@ Doing so will confuse internal hub circuitry and will cause unpredictable behavi
 This is limitation of Raspberry Pi hardware design.
 For reference, Raspberry Pi models have following internal USB topology:
 
-* B+/2B/3B: one USB hub `1-1`, with port `1` for Ethernet+wifi, and ports `2-5` ganged, controlled by port `2`.
-  (Trying to control ports 3,4,5 won't do anything).
-* 3B+: 2 hubs - main hub `1-1`, all 4 ports ganged, all controlled by port `2`.
-   Second hub `1-1.1` (daisy-chained to main): 3 independently controlled ports, `1` is used for Ethernet+wifi,
-   and ports `2,3` are available with proper per-port power switching.
-   In other words, 2 out of total 4 ports wired outside do support independent power switching on 3B+.
-* 4B: Hardware only supports ganged power switching, firmware is reporting inconsistent USB descriptors.
-      USB3 hub `2`, 4 ports, incorrectly reports per-port power switching. BOS `ContainerID` not reported (required for USB3).
-      USB2 hub `1`, 1 port, no usable ports, connects hub `1-1` below.
-      USB2 hub `1-1`, 4 ports, dual to USB3 hub above. Hub descriptor reports ganged power switching. VBUS is controlled by port 4.
-      USB2 hub `3`, 1 port, OTG controller, incorrectly reports ganged power switching.
+* Raspberry Pi B+,2B,3B:
+
+  * Single hub `1-1`, ports 2-5 ganged, all controlled by port `2`:
+
+        uhubctl -l 1-1 -p 2 -a 0
+
+    Trying to control ports `3`,`4`,`5` will not do anything.
+    Port `1` controls power for Ethernet+Wifi.
+
+* Raspberry Pi 3B+:
+
+  * Main hub `1-1`, all 4 ports ganged, all controlled by port `2` (turns off secondary hub ports as well):
+
+        uhubctl -l 1-1 -p 2 -a 0
+
+  * Secondary hub `1-1.1` (daisy-chained to main): 3 independently controlled ports,
+    port `1` is used for Ethernet+wifi, and ports `2,3` support per-port power switching:
+
+        uhubctl -l 1-1.1 -p 3 -a 0
+
+    In other words, 2 out of total 4 ports wired outside of `3B+` support proper independent power switching.
+
+* Raspberry Pi 4B:
+
+  * USB2 hub `1`, 1 port, only connects hub `1-1` below.
+
+  * USB2 hub `1-1`, 4 ports ganged, dual to USB3 hub `2` below, all ports controlled by port 4:
+
+        uhubctl -l 1-1 -p 4 -a 0
+
+  * USB3 hub `2`, 4 ports ganged, dual to USB2 hub `1-1` above, all ports controlled by port 4:
+
+        uhubctl -l 2 -p 4 -a 0
+
+  * USB2 hub `3`, 1 port, OTG controller:
+
+        uhubctl -l 3 -p 1 -a 0
+
 
 As a workaround, you can buy any external USB hub from supported list,
 attach it to any USB port of Raspberry Pi, and control power on its ports independently.
