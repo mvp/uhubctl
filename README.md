@@ -263,9 +263,10 @@ Doing so will confuse internal hub circuitry and will cause unpredictable behavi
 #### _Raspberry Pi turns power off on all ports, not just the one I specified_
 
 This is limitation of Raspberry Pi hardware design.
-For reference, Raspberry Pi models have following internal USB topology:
 
-* Raspberry Pi B+,2B,3B:
+For reference, supported Raspberry Pi models have following internal USB topology:
+
+##### Raspberry Pi B+,2B,3B
 
   * Single hub `1-1`, ports 2-5 ganged, all controlled by port `2`:
 
@@ -274,7 +275,7 @@ For reference, Raspberry Pi models have following internal USB topology:
     Trying to control ports `3`,`4`,`5` will not do anything.
     Port `1` controls power for Ethernet+Wifi.
 
-* Raspberry Pi 3B+:
+##### Raspberry Pi 3B+
 
   * Main hub `1-1`, all 4 ports ganged, all controlled by port `2` (turns off secondary hub ports as well):
 
@@ -287,7 +288,7 @@ For reference, Raspberry Pi models have following internal USB topology:
 
     In other words, 2 out of total 4 ports wired outside of `3B+` support proper independent power switching.
 
-* Raspberry Pi 4B:
+##### Raspberry Pi 4B
 
   * USB2 hub `1`, 1 port, only connects hub `1-1` below.
 
