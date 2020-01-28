@@ -60,9 +60,9 @@ This is list of known compatible USB hubs:
 | Plugable           | USB3-HUB7BC                                          | 7     | 3.0 |`2109:0813`| 2015    |      |
 | Plugable           | USB3-HUB7C                                           | 7     | 3.0 |`2109:0813`| 2015    |      |
 | Plugable           | USB3-HUB7-81X                                        | 7     | 3.0 |`2109:0813`| 2012    |      |
-| Raspberry Pi       | B+, 2B, 3B (see Raspberry Pi section below)          | 4     | 2.0 |           | 2011    |      |
-| Raspberry Pi       | 3B+        (see Raspberry Pi section below)          | 4     | 2.0 |`0424:2514`| 2018    |      |
-| Raspberry Pi       | 4B         (see Raspberry Pi section below)          | 4     | 3.0 |`2109:3431`| 2019    |      |
+| Raspberry Pi       | B+, 2B, 3B ([see below](#raspberry-pi-b2b3b))        | 4     | 2.0 |           | 2011    |      |
+| Raspberry Pi       | 3B+        ([see below](#raspberry-pi-3b))           | 4     | 2.0 |`0424:2514`| 2018    |      |
+| Raspberry Pi       | 4B         ([see below](#raspberry-pi-4b))           | 4     | 3.0 |`2109:3431`| 2019    |      |
 | Renesas            | uPD720202 PCIe USB 3.0 host controller               | 2     | 3.0 |           | 2013    |      |
 | Rosewill           | RHUB-210                                             | 4     | 2.0 |`0409:005A`| 2011    | 2014 |
 | Sanwa Supply       | USB-HUB14GPH                                         | 4     | 1.1 |           | 2001    | 2003 |
