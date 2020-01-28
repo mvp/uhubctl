@@ -290,6 +290,9 @@ For reference, supported Raspberry Pi models have following internal USB topolog
 
 ##### Raspberry Pi 4B
 
+ > :warning: You may need to [update firmware](https://www.raspberrypi.org/documentation/hardware/raspberrypi/booteeprom.md)
+to vl805 00137ac or later to make power switching work on RPi 4B.
+
   * USB2 hub `1`, 1 port, only connects hub `1-1` below.
 
   * USB2 hub `1-1`, 4 ports ganged, dual to USB3 hub `2` below, all ports controlled by port 4:
