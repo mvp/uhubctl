@@ -79,7 +79,8 @@ exact product model and add output from `uhubctl`.
 
 Note that quite a few modern motherboards have built-in root hubs that
 do support this feature - you may not even need to buy any external hub.
-WARNING: turning off built-in USB ports may cut off your keyboard or mouse,
+
+> :warning: Turning off built-in USB ports may cut off your keyboard or mouse,
 so be careful what ports you are turning off!
 
 
@@ -273,20 +274,18 @@ For reference, supported Raspberry Pi models have following internal USB topolog
         uhubctl -l 1-1 -p 2 -a 0
 
     Trying to control ports `3`,`4`,`5` will not do anything.
-    Port `1` controls power for Ethernet+Wifi.
+    Port `1` controls power for Ethernet+WiFi.
 
 ##### Raspberry Pi 3B+
 
-  * Main hub `1-1`, all 4 ports ganged, all controlled by port `2` (turns off secondary hub ports as well):
+  * Main hub `1-1`, all 4 ports ganged, all controlled by port `2` (turns off secondary hub ports as well).
+    Port `1` connects hub `1-1.1` below, ports `2` and `3` are wired outside, port `4` not wired.
 
         uhubctl -l 1-1 -p 2 -a 0
 
-  * Secondary hub `1-1.1` (daisy-chained to main): 3 independently controlled ports,
-    port `1` is used for Ethernet+wifi, and ports `2,3` support per-port power switching:
+  * Secondary hub `1-1.1` (daisy-chained to main): 3 ports,
+    port `1` is used for Ethernet+WiFi, and ports `2` and `3` are wired outside.
 
-        uhubctl -l 1-1.1 -p 3 -a 0
-
-    In other words, 2 out of total 4 ports wired outside of `3B+` support proper independent power switching.
 
 ##### Raspberry Pi 4B
 
