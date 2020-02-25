@@ -84,6 +84,16 @@ do support this feature - you may not even need to buy any external hub.
 so be careful what ports you are turning off!
 
 
+Incompatible USB hubs
+=====================
+
+This is list of known *incompatible* USB hubs:
+
+| Manufacturer       | Product                                              | Ports | USB | VID:PID   | Release | EOL  |
+|:-------------------|:-----------------------------------------------------|:------|:----|:----------|:--------|:-----|
+| Belkin             | F5U404                                               | 4     | 2.0 |`0A5C:4500`| 2010    |      |
+
+
 USB 3.0 duality note
 ====================
 If you have USB 3.0 hub connected to USB3 upstream port, it will be detected
