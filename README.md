@@ -30,6 +30,7 @@ This is list of known compatible USB hubs:
 | Belkin             | F5U101                                               | 4     | 2.0 |`0451:2046`| 2005    | 2010 |
 | Belkin             | F5U701-BLK                                           | 7     | 2.0 |           | 2008    | 2012 |
 | Buffalo            | BSH4A05U3BK                                          | 4     | 3.0 |`05E3:0610`| 2015    |      |
+| Bytecc             | BT-UH340                                             | 4     | 3.0 |`2109:8110`| 2010    |      |
 | Circuitco          | Beagleboard-xM (internal USB hub)                    | 4     | 2.0 |`0424:9514`| 2010    |      |
 | Club3D             | CSV-3242HD Dual Display Docking Station              | 4     | 3.0 |`2109:2811`| 2015    |      |
 | CyberPower         | CP-H420P                                             | 4     | 2.0 |`0409:0059`| 2004    |      |
