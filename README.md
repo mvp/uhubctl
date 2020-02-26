@@ -250,6 +250,12 @@ You can use option `-r N` where N is some number from 10 to 1000 to fix this -
 `uhubctl` will try to turn power off many times in quick succession, and it should suppress that.
 This may be eventually fixed in kernel, see more discussion [here](https://bit.ly/2JzczjZ).
 
+If your device is USB mass storage, invoking `udisksctl` before calling `uhubctl`
+might help to mitigate this issue:
+
+    sudo udisksctl power-off --block-device /dev/disk/...`
+    sudo uhubctl -a off ...
+
 
 #### _Multiple 4-port hubs are detected, but I only have one 7-port hub connected_
 
