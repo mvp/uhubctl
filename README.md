@@ -109,11 +109,18 @@ is using `winusb.sys` driver, which according to Microsoft does not support
 [necessary USB control requests](https://social.msdn.microsoft.com/Forums/sqlserver/en-US/f680b63f-ca4f-4e52-baa9-9e64f8eee101).
 This may be fixed if `libusb` starts supporting different driver on Windows.
 
-First, you need to install library libusb-1.0 (version 1.0.12 or later):
+First, you need to install library libusb-1.0 (version 1.0.12 or later, 1.0.16 or later is recommended):
 
 * Ubuntu: `sudo apt-get install libusb-1.0-0-dev`
 * Redhat: `sudo yum install libusb1-devel`
 * MacOSX: `brew install libusb`, or `sudo port install libusb-devel`
+  > :warning: `libusb-1.0.23` is [broken](https://github.com/libusb/libusb/issues/707) on MacOS Catalina!
+  You have to install `libusb-1.0.22` until [libusb issue 707](https://github.com/libusb/libusb/issues/707) is fixed,
+  or use this workaround to force use of older Mojave build:
+
+      brew uninstall --ignore-dependencies libusb
+      brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/5314f1d/Formula/libusb.rb
+
 * FreeBSD: libusb is included by default
 * NetBSD: `sudo pkgin install libusb1 gmake pkg-config`
 * Windows: TBD?
