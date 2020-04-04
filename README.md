@@ -344,6 +344,7 @@ Notable projects using uhubctl
 | [USB drive data recovery](https://goo.gl/4MddLr)         | Recover data from failing USB hard drive              |
 | [Control power to 3D printer](https://git.io/fh5Tr)      | OctoPrint web plugin for USB power control            |
 | [USB fan for Raspberry Pi](https://bit.ly/2TRV6sM)       | Control USB fan to avoid Raspberry Pi overheating     |
+| [Raspberry Pi Reboot Router](https://bit.ly/3aNbQqs)     | Automatically reboot router if internet isn't working |
 
 
 Copyright
