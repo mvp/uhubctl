@@ -78,7 +78,8 @@ This table is by no means complete.
 If your hub works with `uhubctl`, but is not listed above, please report it
 by opening new issue at https://github.com/mvp/uhubctl/issues,
 so we can add it to supported table. In your report, please provide
-exact product model and add output from `uhubctl`.
+exact product model and add output from `uhubctl`
+and please test VBUS off support as described below in FAQ.
 
 Note that quite a few modern motherboards have built-in root hubs that
 do support this feature - you may not even need to buy any external hub.
