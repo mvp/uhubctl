@@ -338,15 +338,16 @@ Notable projects using uhubctl
 | [Build Status Light](https://goo.gl/3GA82o)              | Create a build status light in under 10 minutes       |
 | [Buildenlights](https://git.io/fj1FC)                    | GitLab/GitHub project build status as green/red light |
 | [Weather Station](https://goo.gl/3b1FzC)                 | Reset Weather Station when it freezes                 |
-| [sysmoQMOD](https://goo.gl/8wvcKA)                       | Reset cellular modems when necessary                  |
+| [sysmoQMOD](https://bit.ly/2VtWrVt)                      | Reset cellular modems when necessary                  |
 | [Smog Sensor](https://bit.ly/2EMwgCk)                    | Raspberry Pi based smog sensor power reset            |
 | [Terrible Cluster](https://goo.gl/XjiXFu)                | Power on/off Raspberry Pi cluster nodes as needed     |
-| [Ideal Music Server](https://bit.ly/2UJq6Z9)             | Turn off unused USB ports to improve audio quality    |
+| [Ideal Music Server](https://bit.ly/39MeVFQ)             | Turn off unused USB ports to improve audio quality    |
 | [USB drives with no phantom load](https://goo.gl/qfrmGK) | Power USB drives only when needed to save power       |
 | [USB drive data recovery](https://goo.gl/4MddLr)         | Recover data from failing USB hard drive              |
 | [Control power to 3D printer](https://git.io/fh5Tr)      | OctoPrint web plugin for USB power control            |
 | [USB fan for Raspberry Pi](https://bit.ly/2TRV6sM)       | Control USB fan to avoid Raspberry Pi overheating     |
 | [Raspberry Pi Reboot Router](https://bit.ly/3aNbQqs)     | Automatically reboot router if internet isn't working |
+| [Control USB Lamp With Voice](https://bit.ly/2VtW2SX)    | Voice Control of USB Lamp using Siri and Raspberry Pi |
 
 
 Copyright
