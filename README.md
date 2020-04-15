@@ -83,9 +83,6 @@ exact product model and add output from `uhubctl`.
 Note that quite a few modern motherboards have built-in root hubs that
 do support this feature - you may not even need to buy any external hub.
 
-> :warning: Turning off built-in USB ports may cut off your keyboard or mouse,
-so be careful what ports you are turning off!
-
 
 USB 3.0 duality note
 ====================
@@ -152,6 +149,9 @@ This means operate on default smart hub and turn power off (`-a off`, or `-a 0`)
 on port 2 (`-p 2`). Supported actions are `off`/`on`/`cycle` (or `0`/`1`/`2`).
 `cycle` means turn power off, wait some delay (configurable with `-d`) and turn it back on.
 Ports can be comma separated list, and may use `-` for ranges e.g. `2`, or `2,4`, or `2-5`, or `1-2,5-8`.
+
+> :warning: Turning off built-in USB ports may cut off your keyboard or mouse,
+so be careful which ports you are turning off!
 
 If you have more than one smart USB hub connected, you should choose
 specific hub to control using `-l` (location) parameter.
