@@ -309,20 +309,8 @@ For reference, supported Raspberry Pi models have following internal USB topolog
  > :warning: You may need to [update firmware](https://www.raspberrypi.org/documentation/hardware/raspberrypi/booteeprom.md)
 to vl805 00137ac or later to make power switching work on RPi 4B.
 
-  * USB2 hub `1`, 1 port, only connects hub `1-1` below.
-
-  * USB2 hub `1-1`, 4 ports ganged, dual to USB3 hub `2` below, all ports controlled by port 4:
-
-        uhubctl -l 1-1 -p 4 -a 0
-
-  * USB3 hub `2`, 4 ports ganged, dual to USB2 hub `1-1` above, all ports controlled by port 4:
-
-        uhubctl -l 2 -p 4 -a 0
-
-  * USB2 hub `3`, 1 port, OTG controller:
-
-        uhubctl -l 3 -p 1 -a 0
-
+  * USB2 hub and USB3 hub, 4 ports ganged:
+    uhubctl -l 2 -a 0
 
 As a workaround, you can buy any external USB hub from supported list,
 attach it to any USB port of Raspberry Pi, and control power on its ports independently.
