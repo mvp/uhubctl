@@ -311,13 +311,13 @@ to vl805 00137ac or later to make power switching work on RPi 4B.
 
   * USB2 hub `1`, 1 port, only connects hub `1-1` below.
 
-  * USB2 hub `1-1`, 4 ports ganged, dual to USB3 hub `2` below, all ports controlled by port 4:
+  * USB2 hub `1-1`, 4 ports ganged, dual to USB3 hub `2` below:
 
-        uhubctl -l 1-1 -p 4 -a 0
+        uhubctl -l 1-1 -a 0
 
-  * USB3 hub `2`, 4 ports ganged, dual to USB2 hub `1-1` above, all ports controlled by port 4:
+  * USB3 hub `2`, 4 ports ganged, dual to USB2 hub `1-1` above:
 
-        uhubctl -l 2 -p 4 -a 0
+        uhubctl -l 2 -a 0
 
   * USB2 hub `3`, 1 port, OTG controller:
 
