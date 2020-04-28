@@ -271,7 +271,7 @@ might help to mitigate this issue:
 
 Many hub manufacturers build their USB hubs using basic 4 port USB chips.
 E.g. to make 7 port hub, they daisy-chain two 4 port hubs - 1 port is lost to daisy-chaining,
-so it makes it 4+4-1=7 port hub. Simularly, 10 port hub could be built as 3 4-port hubs
+so it makes it 4+4-1=7 port hub. Similarly, 10 port hub could be built as 3 4-port hubs
 daisy-chained together, which gives 4+4+4-2=10 usable ports.
 
 Note that you should never try to change power state for ports used to daisy-chain internal hubs together.
