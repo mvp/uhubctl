@@ -14,7 +14,7 @@ RM		:= rm -rf
 CC ?= gcc
 CFLAGS ?= -g -O0
 CFLAGS += -Wall -Wextra -std=c99 -pedantic
-GIT_VERSION := $(shell git describe --abbrev=8 --dirty --always --tags)
+GIT_VERSION := $(shell git describe --match "v[0-9]*" --abbrev=8 --dirty --always --tags | cut -c2-)
 ifeq ($(GIT_VERSION),)
     GIT_VERSION := $(shell cat VERSION)
 endif
