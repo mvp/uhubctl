@@ -773,6 +773,18 @@ static int usb_find_hubs()
                 if (hubs[i].nports != hubs[j].nports)
                     continue;
 
+                /* Hubs should have the same location except for the bus number: */
+                char * ports_i = strchr(hubs[i].location,'-');
+                char * ports_j = strchr(hubs[j].location,'-');
+                if ((ports_i != NULL) && (ports_j != NULL))
+                {
+                    if ((strlen(ports_i + 1) > 0 && strlen(ports_j + 1) > 0) &&
+                        strcmp(ports_i + 1, ports_j + 1) != 0)
+                    {
+                        continue;
+                    }
+                }
+
                 /* Finally, we claim a match: */
                 match = j;
                 break;
