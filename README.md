@@ -57,6 +57,7 @@ This is list of known compatible USB hubs:
 | Maplin             | A08CQ                                                | 7     | 2.0 |`0409:0059`| 2008    | 2011 |
 | Microchip          | EVB-USB2517                                          | 7     | 2.0 |           | 2008    |      |
 | Moxa               | Uport-407                                            | 7     | 2.0 |`110A:0407`| 2009    |      |
+| NVidia             | Jetson Nano B01 ([details](https://git.io/JJaFR))    | 4     | 3.0 |           | 2019    |      |
 | Phidgets           | HUB0003_0                                            | 7     | 2.0 |`1A40:0201`| 2017    |      |
 | Plugable           | USB3-HUB7BC                                          | 7     | 3.0 |`2109:0813`| 2015    |      |
 | Plugable           | USB3-HUB7C                                           | 7     | 3.0 |`2109:0813`| 2015    |      |
