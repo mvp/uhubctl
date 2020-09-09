@@ -320,9 +320,7 @@ to make power switching work on RPi 4B.
 
         uhubctl -l 2 -a 0
 
-  * USB2 hub `3`, 1 port, OTG controller:
-
-        uhubctl -l 3 -p 1 -a 0
+  * USB2 hub `3`, 1 port, OTG controller. Power switching is [not supported](https://git.io/JUc5Q).
 
 
 As a workaround, you can buy any external USB hub from supported list,
