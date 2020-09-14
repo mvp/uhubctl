@@ -21,7 +21,7 @@ This is list of known compatible USB hubs:
 | AmazonBasics       | HU3641V1 ([RPi issue](https://goo.gl/CLt46M))        | 4     | 3.0 |`2109:2811`| 2013    |      |
 | AmazonBasics       | HU3770V1 ([RPi issue](https://goo.gl/CLt46M))        | 7     | 3.0 |`2109:2811`| 2013    |      |
 | AmazonBasics       | HU9003V1EBL                                          | 7     | 3.1 |`2109:2817`| 2018    |      |
-| AmazonBasics       | HU9002V1SBL, HU9002V1ESL, HUC9002V1SBL, HUC9002V1EBL | 10    | 3.1 |`2109:2817`| 2018    |      |
+| AmazonBasics       | HU9002V1SBL, HU9002V1ESL, HUC9002V1SBL, HUC9002V1EBL, HUC9002V1ESL | 10    | 3.1 |`2109:2817`| 2018    |      |
 | Apple              | Thunderbolt Display 27" (internal USB hub)           | 6     | 2.0 |           | 2011    | 2016 |
 | Apple              | USB Keyboard With Numeric Pad (internal USB hub)     | 3     | 2.0 |           | 2011    |      |
 | Asus               | Z87-PLUS Motherboard (onboard USB hub)               | 4     | 3.0 |           | 2013    | 2016 |
