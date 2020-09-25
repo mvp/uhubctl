@@ -190,6 +190,7 @@ struct hub_info {
     int bcd_usb;
     int nports;
     int ppps;
+    int gps; /* Granged Power Switching */
     int actionable; /* true if this hub is subject to action */
     char container_id[33]; /* container ID as hex string */
     char vendor[16];
@@ -446,6 +447,7 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
             }
 
             info->ppps = 0;
+            info->gps = 0;
             /* Logical Power Switching Mode */
             int lpsm = uhd->wHubCharacteristics[0] & HUB_CHAR_LPSM;
             if (lpsm == HUB_CHAR_COMMON_LPSM && info->nports == 1) {
@@ -464,6 +466,9 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
                  ocpm == HUB_CHAR_COMMON_OCPM))
             {
                 info->ppps = 1;
+            }
+            if (lpsm == HUB_CHAR_COMMON_LPSM && ocpm == HUB_CHAR_COMMON_OCPM) {
+                info->gps = 1;
             }
         } else {
             rc = len;
@@ -726,6 +731,11 @@ static int usb_find_hubs()
                 memcpy(&hubs[hub_count], &info, sizeof(info));
                 hub_count++;
             }
+        }
+        if (info.gps) { /* Ganged PS is supported */
+            info.actionable = 1;
+            memcpy(&hubs[hub_count], &info, sizeof(info));
+            hub_count++;
         }
     }
     if (!opt_exact) {
