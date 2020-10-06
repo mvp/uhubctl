@@ -261,8 +261,11 @@ You can use option `-r N` where N is some number from 10 to 1000 to fix this -
 `uhubctl` will try to turn power off many times in quick succession, and it should suppress that.
 This may be eventually fixed in kernel, see more discussion [here](https://bit.ly/2JzczjZ).
 
-If your device is USB mass storage, invoking `udisksctl` before calling `uhubctl`
-might help to mitigate this issue:
+Disabling USB authorization for device in question before turning power off with `uhubctl` should help:
+
+    echo 0 > sudo tee /sys/bus/usb/devices/${location}.${port}/authorized
+
+If your device is USB mass storage, invoking `udisksctl` before calling `uhubctl` should help too:
 
     sudo udisksctl power-off --block-device /dev/disk/...`
     sudo uhubctl -a off ...
