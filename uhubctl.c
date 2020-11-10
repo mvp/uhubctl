@@ -190,6 +190,7 @@ struct hub_info {
     int bcd_usb;
     int nports;
     int ppps;
+    int ganged_power_switching;
     int actionable; /* true if this hub is subject to action */
     char container_id[33]; /* container ID as hex string */
     char vendor[16];
@@ -446,24 +447,25 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
             }
 
             info->ppps = 0;
+            info->ganged_power_switching = 0;
             /* Logical Power Switching Mode */
             int lpsm = uhd->wHubCharacteristics[0] & HUB_CHAR_LPSM;
             if (lpsm == HUB_CHAR_COMMON_LPSM && info->nports == 1) {
                 /* For 1 port hubs, ganged power switching is the same as per-port: */
                 lpsm = HUB_CHAR_INDV_PORT_LPSM;
             }
-            /* Raspberry Pi 4 reports inconsistent descriptors, override: */
-            if (lpsm == HUB_CHAR_COMMON_LPSM && strcasecmp(info->vendor, "2109:3431")==0) {
-                lpsm = HUB_CHAR_INDV_PORT_LPSM;
-            }
             /* Over-Current Protection Mode */
             int ocpm = uhd->wHubCharacteristics[0] & HUB_CHAR_OCPM;
             /* LPSM must be supported per-port, and OCPM per port or ganged */
-            if ((lpsm == HUB_CHAR_INDV_PORT_LPSM) &&
-                (ocpm == HUB_CHAR_INDV_PORT_OCPM ||
-                 ocpm == HUB_CHAR_COMMON_OCPM))
+            if (ocpm == HUB_CHAR_INDV_PORT_OCPM ||
+                ocpm == HUB_CHAR_COMMON_OCPM)
             {
-                info->ppps = 1;
+                if (lpsm == HUB_CHAR_INDV_PORT_LPSM) {
+                    info->ppps = 1;
+                    info->ganged_power_switching = 1;
+                } else if (lpsm == HUB_CHAR_COMMON_LPSM) {
+                    info->ganged_power_switching = 1;
+                }
             }
         } else {
             rc = len;
@@ -705,7 +707,7 @@ static int usb_find_hubs()
             perm_ok = 0; /* USB permission issue? */
         }
         get_device_description(dev, &info.ds);
-        if (info.ppps) { /* PPPS is supported */
+        if (info.ppps || info.ganged_power_switching) { /* per-port or ganged power switching is supported */
             if (hub_count < MAX_HUBS) {
                 info.actionable = 1;
                 if (strlen(opt_location) > 0) {
@@ -948,6 +950,11 @@ int main(int argc, char *argv[])
         for (i=0; i<hub_count; i++) {
             if (hubs[i].actionable == 0)
                 continue;
+            if (hubs[i].ppps == 0 && opt_ports != ALL_HUB_PORTS) {
+                fprintf(stderr, "Can't switch individual ports on hub with ganged power switching.\n");
+                rc = 1;
+                goto cleanup;
+            }
             printf("Current status for hub %s [%s]\n",
                 hubs[i].location, hubs[i].ds.description
             );
