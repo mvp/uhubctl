@@ -118,11 +118,11 @@ First, you need to install library libusb-1.0 (version 1.0.12 or later, 1.0.16 o
 * Redhat: `sudo yum install libusb1-devel`
 * MacOSX: `brew install libusb`, or `sudo port install libusb-devel`
   > :warning: `libusb-1.0.23` is [broken](https://github.com/libusb/libusb/issues/707) on MacOS Catalina!
-  You have to install `libusb-1.0.22` until [libusb issue 707](https://github.com/libusb/libusb/issues/707) is fixed,
-  or use this workaround to force use of older Mojave build:
+  You have to install `libusb` from HEAD (master branch) until [libusb-1.0.24 is released](https://github.com/libusb/libusb/issues/618):
 
+      brew install automake autoconf libtool
       brew uninstall --ignore-dependencies libusb
-      brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/5314f1d/Formula/libusb.rb
+      brew install libusb --HEAD
 
 * FreeBSD: libusb is included by default
 * NetBSD: `sudo pkgin install libusb1 gmake pkg-config`
