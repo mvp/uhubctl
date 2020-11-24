@@ -41,9 +41,9 @@ This is list of known compatible USB hubs:
 | D-Link             | DUB-H7 rev A (silver)                                | 7     | 2.0 |`2001:F103`| 2005    | 2010 |
 | D-Link             | DUB-H7 rev D,E (black). Note: rev B,C not supported  | 7     | 2.0 |`05E3:0608`| 2012    |      |
 | Dell               | P2416D 24" QHD Monitor ([note](https://git.io/JUAu8))| 4     | 2.0 |           | 2017    |      |
+| Dell               | S2719DGF 27" WQHD Gaming-Monitor                     | 5     | 3.1 |`0424:5734`| 2018    |      |
 | Dell               | UltraSharp 1704FPT 17" LCD Monitor                   | 4     | 2.0 |`0424:A700`| 2005    | 2015 |
 | Dell               | UltraSharp U2415 24" LCD Monitor                     | 5     | 3.0 |           | 2014    |      |
-| Dell               | S2719DGF 27" WQHD Gaming-Monitor                     | 5     | 3.1 |           | 2018    |      |
 | Elecom             | U2H-G4S                                              | 4     | 2.0 |           | 2006    | 2011 |
 | GlobalScale        | ESPRESSObin SBUD102 V5                               | 1     | 3.0 |`1D6B:0003`| 2017    |      |
 | Hawking Technology | UH214                                                | 4     | 2.0 |           | 2003    | 2008 |
