@@ -188,13 +188,16 @@ struct descriptor_strings {
 struct hub_info {
     struct libusb_device *dev;
     int bcd_usb;
+    int super_speed; /* 1 if super speed hub, and 0 otherwise */
     int nports;
     int ppps;
     int actionable; /* true if this hub is subject to action */
     char container_id[33]; /* container ID as hex string */
     char vendor[16];
     char location[32];
-    int level;
+    uint8_t bus;
+    uint8_t port_numbers[MAX_HUB_CHAIN];
+    int pn_len; /* length of port numbers */
     struct descriptor_strings ds;
 };
 
@@ -385,9 +388,9 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
         );
 
         if (len >= minlen) {
-            unsigned char port_numbers[MAX_HUB_CHAIN] = {0};
             info->dev     = dev;
             info->bcd_usb = bcd_usb;
+            info->super_speed = (bcd_usb >= USB_SS_BCD);
             info->nports  = uhd->bNbrPorts;
             snprintf(
                 info->vendor, sizeof(info->vendor),
@@ -397,14 +400,13 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
             );
 
             /* Convert bus and ports array into USB location string */
-            int bus = libusb_get_bus_number(dev);
-            snprintf(info->location, sizeof(info->location), "%d", bus);
-            int pcount = get_port_numbers(dev, port_numbers, MAX_HUB_CHAIN);
-            info->level = pcount + 1;
+            info->bus = libusb_get_bus_number(dev);
+            snprintf(info->location, sizeof(info->location), "%d", info->bus);
+            info->pn_len = get_port_numbers(dev, info->port_numbers, sizeof(info->port_numbers));
             int k;
-            for (k=0; k<pcount; k++) {
+            for (k=0; k < info->pn_len; k++) {
                 char s[8];
-                snprintf(s, sizeof(s), "%s%d", k==0 ? "-" : ".", port_numbers[k]);
+                snprintf(s, sizeof(s), "%s%d", k==0 ? "-" : ".", info->port_numbers[k]);
                 strcat(info->location, s);
             }
 
@@ -434,10 +436,10 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
                 }
                 libusb_free_bos_descriptor(bos);
 
-                /* Raspberry Pi 4 hack for USB3 root hub: */
+                /* Raspberry Pi 4B hack for USB3 root hub: */
                 if (strlen(info->container_id)==0 &&
                     strcasecmp(info->vendor, "1d6b:0003")==0 &&
-                    info->level==1 &&
+                    info->pn_len==0 &&
                     info->nports==4 &&
                     bcd_usb==USB_SS_BCD)
                 {
@@ -452,7 +454,7 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
                 /* For 1 port hubs, ganged power switching is the same as per-port: */
                 lpsm = HUB_CHAR_INDV_PORT_LPSM;
             }
-            /* Raspberry Pi 4 reports inconsistent descriptors, override: */
+            /* Raspberry Pi 4B reports inconsistent descriptors, override: */
             if (lpsm == HUB_CHAR_COMMON_LPSM && strcasecmp(info->vendor, "2109:3431")==0) {
                 lpsm = HUB_CHAR_INDV_PORT_LPSM;
             }
@@ -581,17 +583,9 @@ static int print_port_status(struct hub_info * hub, int portmask)
     int port_status;
     struct libusb_device_handle * devh = NULL;
     int rc = 0;
-    int hub_bus;
-    int dev_bus;
-    unsigned char hub_pn[MAX_HUB_CHAIN];
-    unsigned char dev_pn[MAX_HUB_CHAIN];
-    int hub_plen;
-    int dev_plen;
     struct libusb_device *dev = hub->dev;
     rc = libusb_open(dev, &devh);
     if (rc == 0) {
-        hub_bus = libusb_get_bus_number(dev);
-        hub_plen = get_port_numbers(dev, hub_pn, sizeof(hub_pn));
         int port;
         for (port = 1; port <= hub->nports; port++) {
             if (portmask > 0 && (portmask & (1 << (port-1))) == 0) continue;
@@ -611,12 +605,15 @@ static int print_port_status(struct hub_info * hub, int portmask)
             struct libusb_device * udev;
             int i = 0;
             while ((udev = usb_devs[i++]) != NULL) {
+                uint8_t dev_bus;
+                uint8_t dev_pn[MAX_HUB_CHAIN];
+                int dev_plen;
                 dev_bus = libusb_get_bus_number(udev);
                 /* only match devices on the same bus: */
-                if (dev_bus != hub_bus) continue;
+                if (dev_bus != hub->bus) continue;
                 dev_plen = get_port_numbers(udev, dev_pn, sizeof(dev_pn));
-                if ((dev_plen == hub_plen + 1) &&
-                    (memcmp(hub_pn, dev_pn, hub_plen) == 0) &&
+                if ((dev_plen == hub->pn_len + 1) &&
+                    (memcmp(hub->port_numbers, dev_pn, hub->pn_len) == 0) &&
                     libusb_get_port_number(udev) == port)
                 {
                     rc = get_device_description(udev, &ds);
@@ -625,7 +622,7 @@ static int print_port_status(struct hub_info * hub, int portmask)
                 }
             }
 
-            if (hub->bcd_usb < USB_SS_BCD) {
+            if (!hub->super_speed) {
                 if (port_status == 0) {
                     printf(" off");
                 } else {
@@ -714,7 +711,7 @@ static int usb_find_hubs()
                     }
                 }
                 if (opt_level > 0) {
-                    if (opt_level != info.level) {
+                    if (opt_level != info.pn_len + 1) {
                         info.actionable = 0;
                     }
                 }
@@ -737,7 +734,8 @@ static int usb_find_hubs()
             /* Must have non empty container ID: */
             if (strlen(hubs[i].container_id) == 0)
                 continue;
-            int match = -1;
+            int best_match = -1;
+            int best_score = -1;
             for (j=0; j<hub_count; j++) {
                 if (i==j)
                     continue;
@@ -745,8 +743,7 @@ static int usb_find_hubs()
                 /* Find hub which is USB2/3 dual to the hub above */
 
                 /* Hub and its dual must be different types: one USB2, another USB3: */
-                if ((hubs[i].bcd_usb < USB_SS_BCD) ==
-                    (hubs[j].bcd_usb < USB_SS_BCD))
+                if (hubs[i].super_speed == hubs[j].super_speed)
                     continue;
 
                 /* Must have non empty container ID: */
@@ -762,6 +759,14 @@ static int usb_find_hubs()
                  * We should do few more checks below if multiple such devices are present.
                  */
 
+                /* Hubs should have the same number of ports */
+                if (hubs[i].nports != hubs[j].nports) {
+                    /* Except for some weird hubs like Apple mini-dock (has 2 usb2 + 1 usb3 ports) */
+                    if (hubs[i].nports + hubs[j].nports > 3) {
+                        continue;
+                    }
+                }
+
                 /* If serial numbers are both present, they must match: */
                 if ((strlen(hubs[i].ds.serial) > 0 && strlen(hubs[j].ds.serial) > 0) &&
                     strcmp(hubs[i].ds.serial, hubs[j].ds.serial) != 0)
@@ -769,18 +774,56 @@ static int usb_find_hubs()
                     continue;
                 }
 
-                /* Hubs should have the same number of ports: */
-                if (hubs[i].nports != hubs[j].nports)
-                    continue;
+                /* We have first possible candidate, but need to keep looking for better one */
 
-                /* Finally, we claim a match: */
-                match = j;
-                break;
+                if (best_score < 1) {
+                    best_score = 1;
+                    best_match = j;
+                }
+
+                /* Checks for various levels of USB2 vs USB3 path similarity... */
+
+                uint8_t* p1 = hubs[i].port_numbers;
+                uint8_t* p2 = hubs[j].port_numbers;
+                int l1 = hubs[i].pn_len;
+                int l2 = hubs[j].pn_len;
+                int s1 = hubs[i].super_speed;
+                int s2 = hubs[j].super_speed;
+
+                /* Check if port path is the same after removing top level (needed for M1 Macs): */
+                if (l1 >= 1 && l1 == l2 && memcmp(p1 + 1, p2 + 1, l1 - 1)==0) {
+                    if (best_score < 2) {
+                        best_score = 2;
+                        best_match = j;
+                    }
+                }
+
+                /* Raspberry Pi 4B hack (USB2 hub is one level deeper than USB3): */
+                if (l1 + s1 == l2 + s2 && l1 >= s2 && memcmp(p1 + s2, p2 + s1, l1 - s2)==0) {
+                    if (best_score < 3) {
+                        best_score = 3;
+                        best_match = j;
+                    }
+                }
+                /* Check if port path is exactly the same: */
+                if (l1 == l2 && memcmp(p1, p2, l1)==0) {
+                    if (best_score < 4) {
+                        best_score = 4;
+                        best_match = j;
+                    }
+                    /* Give even higher priority if `usb2bus + 1 == usb3bus` (Linux specific): */
+                    if (hubs[i].bus - s1 == hubs[j].bus - s2) {
+                        if (best_score < 5) {
+                            best_score = 5;
+                            best_match = j;
+                        }
+                    }
+                }
             }
-            if (match >= 0) {
-                if (!hubs[match].actionable) {
+            if (best_match >= 0) {
+                if (!hubs[best_match].actionable) {
                     /* Use 2 to signify that this is derived dual device */
-                    hubs[match].actionable = 2;
+                    hubs[best_match].actionable = 2;
                 }
             }
         }
@@ -789,7 +832,7 @@ static int usb_find_hubs()
     for (i=0; i<hub_count; i++) {
         if (!hubs[i].actionable)
             continue;
-        if (hubs[i].bcd_usb < USB_SS_BCD || opt_exact) {
+        if (!hubs[i].super_speed || opt_exact) {
             hub_phys_count++;
         }
     }
@@ -966,8 +1009,8 @@ int main(int argc, char *argv[])
                 for (port=1; port <= hubs[i].nports; port++) {
                     if ((1 << (port-1)) & ports) {
                         int port_status = get_port_status(devh, port);
-                        int power_mask = hubs[i].bcd_usb < USB_SS_BCD ? USB_PORT_STAT_POWER
-                                                                      : USB_SS_PORT_STAT_POWER;
+                        int power_mask = hubs[i].super_speed ? USB_SS_PORT_STAT_POWER
+                                                             : USB_PORT_STAT_POWER;
                         if (k == 0 && !(port_status & power_mask))
                             continue;
                         if (k == 1 && (port_status & power_mask))
@@ -993,7 +1036,7 @@ int main(int argc, char *argv[])
                     }
                 }
                 /* USB3 hubs need extra delay to actually turn off: */
-                if (k==0 && hubs[i].bcd_usb >= USB_SS_BCD)
+                if (k==0 && hubs[i].super_speed)
                     sleep_ms(150);
                 printf("Sent power %s request\n",
                     request == LIBUSB_REQUEST_CLEAR_FEATURE ? "off" : "on"
