@@ -42,6 +42,11 @@ ifeq ($(UNAME_S),NetBSD)
     LDFLAGS += $(shell pkg-config --libs libusb-1.0)
 endif
 
+ifeq ($(UNAME_S),SunOS)
+    CFLAGS  += $(shell pkg-config --cflags libusb-1.0)
+    LDFLAGS += $(shell pkg-config --libs libusb-1.0)
+endif
+
 PROGRAM = uhubctl
 
 $(PROGRAM): $(PROGRAM).c
