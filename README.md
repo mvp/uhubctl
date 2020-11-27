@@ -177,6 +177,12 @@ Then, add one or more udev rules like below to file `/etc/udev/rules.d/52-usb.ru
 
     SUBSYSTEM=="usb", ATTR{idVendor}=="2001", MODE="0666"
 
+Note that for USB3 hubs, some hubs use different vendor ID for USB2 vs USB3 components of the same chip,
+and both need permissions to make uhubctl work properly. E.g. for Raspberry Pi 4B, you need to add these 2 lines:
+
+    SUBSYSTEM=="usb", ATTR{idVendor}=="2109", MODE="0666"
+    SUBSYSTEM=="usb", ATTR{idVendor}=="1d6b", MODE="0666"
+
 If you don't like wide open mode `0666`, you can restrict access by group like this:
 
     SUBSYSTEM=="usb", ATTR{idVendor}=="2001", MODE="0664", GROUP="dialout"
