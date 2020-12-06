@@ -16,35 +16,22 @@ CFLAGS ?= -g -O0
 CFLAGS += -Wall -Wextra -std=c99 -pedantic
 GIT_VERSION := $(shell git describe --match "v[0-9]*" --abbrev=8 --dirty --always --tags | cut -c2-)
 ifeq ($(GIT_VERSION),)
-    GIT_VERSION := $(shell cat VERSION)
+	GIT_VERSION := $(shell cat VERSION)
 endif
 CFLAGS += -DPROGRAM_VERSION=\"$(GIT_VERSION)\"
 
+# Use hardening options on Linux
 ifeq ($(UNAME_S),Linux)
-	LDFLAGS += -Wl,-zrelro,-znow -lusb-1.0
+	LDFLAGS += -Wl,-zrelro,-znow
 endif
 
-ifeq ($(UNAME_S),Darwin)
-ifneq ($(wildcard /opt/local/include),)
-	# MacPorts
-	CFLAGS  += -I/opt/local/include
-	LDFLAGS += -L/opt/local/lib
-endif
+# Use pkg-config if available
+ifneq (,$(shell which pkg-config))
+	CFLAGS  += $(shell pkg-config --cflags libusb-1.0)
+	LDFLAGS += $(shell pkg-config --libs libusb-1.0)
+else
+# But it should still build if pkg-config is not available (e.g. Linux or Mac homebrew)
 	LDFLAGS += -lusb-1.0
-endif
-
-ifeq ($(UNAME_S),FreeBSD)
-	LDFLAGS += -lusb
-endif
-
-ifeq ($(UNAME_S),NetBSD)
-    CFLAGS  += $(shell pkg-config --cflags libusb-1.0)
-    LDFLAGS += $(shell pkg-config --libs libusb-1.0)
-endif
-
-ifeq ($(UNAME_S),SunOS)
-    CFLAGS  += $(shell pkg-config --cflags libusb-1.0)
-    LDFLAGS += $(shell pkg-config --libs libusb-1.0)
 endif
 
 PROGRAM = uhubctl

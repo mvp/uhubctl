@@ -107,13 +107,14 @@ Compiling
 =========
 
 This utility was tested to compile and work on Linux
-(Ubuntu/Debian, Redhat/Fedora/CentOS, Arch Linux, Gentoo, openSUSE, Buildroot), FreeBSD, NetBSD and Mac OS X.
+(Ubuntu/Debian, Redhat/Fedora/CentOS, Arch Linux, Gentoo, openSUSE, Buildroot), FreeBSD, NetBSD, SunOS and Mac OS X.
 
 While `uhubctl` compiles on Windows, USB power switching does not work on Windows because `libusb`
 is using `winusb.sys` driver, which according to Microsoft does not support
 [necessary USB control requests](https://social.msdn.microsoft.com/Forums/sqlserver/en-US/f680b63f-ca4f-4e52-baa9-9e64f8eee101).
 This may be fixed if `libusb` starts supporting different driver on Windows.
 
+Note that it is highly recommended to have `pkg-config` installed (many platforms provide it by default).
 First, you need to install library libusb-1.0 (version 1.0.12 or later, 1.0.16 or later is recommended):
 
 * Ubuntu: `sudo apt-get install libusb-1.0-0-dev`
