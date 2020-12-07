@@ -190,7 +190,7 @@ struct hub_info {
     int bcd_usb;
     int super_speed; /* 1 if super speed hub, and 0 otherwise */
     int nports;
-    int ppps;
+    int lpsm; /* logical power switching mode */
     int actionable; /* true if this hub is subject to action */
     char container_id[33]; /* container ID as hex string */
     char vendor[16];
@@ -218,6 +218,7 @@ static int opt_repeat = 1;
 static int opt_wait   = 20; /* wait before repeating in ms */
 static int opt_exact  = 0;  /* exact location match - disable USB3 duality handling */
 static int opt_reset  = 0;  /* reset hub after operation(s) */
+static int opt_force  = 0;  /* force operation even on unsupported hubs */
 
 static const struct option long_options[] = {
     { "location", required_argument, NULL, 'l' },
@@ -229,6 +230,7 @@ static const struct option long_options[] = {
     { "repeat",   required_argument, NULL, 'r' },
     { "wait",     required_argument, NULL, 'w' },
     { "exact",    no_argument,       NULL, 'e' },
+    { "force",    no_argument,       NULL, 'f' },
     { "reset",    no_argument,       NULL, 'R' },
     { "version",  no_argument,       NULL, 'v' },
     { "help",     no_argument,       NULL, 'h' },
@@ -252,6 +254,7 @@ static int print_usage()
         "--delay,    -d - delay for cycle action [%g sec].\n"
         "--repeat,   -r - repeat power off count [%d] (some devices need it to turn off).\n"
         "--exact,    -e - exact location (no USB3 duality handling).\n"
+        "--force,    -f - force operation even on unsupported hubs.\n"
         "--reset,    -R - reset hub after each power-on action, causing all devices to reassociate.\n"
         "--wait,     -w - wait before repeat power off [%d ms].\n"
         "--version,  -v - print program version.\n"
@@ -447,7 +450,6 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
                 }
             }
 
-            info->ppps = 0;
             /* Logical Power Switching Mode */
             int lpsm = uhd->wHubCharacteristics[0] & HUB_CHAR_LPSM;
             if (lpsm == HUB_CHAR_COMMON_LPSM && info->nports == 1) {
@@ -458,15 +460,8 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
             if (lpsm == HUB_CHAR_COMMON_LPSM && strcasecmp(info->vendor, "2109:3431")==0) {
                 lpsm = HUB_CHAR_INDV_PORT_LPSM;
             }
-            /* Over-Current Protection Mode */
-            int ocpm = uhd->wHubCharacteristics[0] & HUB_CHAR_OCPM;
-            /* LPSM must be supported per-port, and OCPM per port or ganged */
-            if ((lpsm == HUB_CHAR_INDV_PORT_LPSM) &&
-                (ocpm == HUB_CHAR_INDV_PORT_OCPM ||
-                 ocpm == HUB_CHAR_COMMON_OCPM))
-            {
-                info->ppps = 1;
-            }
+            info->lpsm = lpsm;
+            rc = 0;
         } else {
             rc = len;
         }
@@ -524,7 +519,7 @@ static int get_device_description(struct libusb_device * dev, struct descriptor_
     int rc;
     int id_vendor  = 0;
     int id_product = 0;
-    char ports[64]   = "";
+    char hub_specific[64] = "";
     struct libusb_device_descriptor desc;
     struct libusb_device_handle *devh = NULL;
     rc = libusb_get_device_descriptor(dev, &desc);
@@ -554,8 +549,16 @@ static int get_device_description(struct libusb_device * dev, struct descriptor_
             struct hub_info info;
             rc = get_hub_info(dev, &info);
             if (rc == 0) {
-                snprintf(ports, sizeof(ports), ", USB %x.%02x, %d ports",
-                   info.bcd_usb >> 8, info.bcd_usb & 0xFF, info.nports);
+                const char * lpsm_type;
+                if (info.lpsm == HUB_CHAR_INDV_PORT_LPSM) {
+                    lpsm_type = "ppps";
+                } else if (info.lpsm == HUB_CHAR_COMMON_LPSM) {
+                    lpsm_type = "ganged";
+                } else {
+                    lpsm_type = "nops";
+                }
+                snprintf(hub_specific, sizeof(hub_specific), ", USB %x.%02x, %d ports, %s",
+                   info.bcd_usb >> 8, info.bcd_usb & 0xFF, info.nports, lpsm_type);
             }
         }
         libusb_close(devh);
@@ -566,7 +569,7 @@ static int get_device_description(struct libusb_device * dev, struct descriptor_
         ds->vendor[0]  ? " " : "", ds->vendor,
         ds->product[0] ? " " : "", ds->product,
         ds->serial[0]  ? " " : "", ds->serial,
-        ports
+        hub_specific
     );
     return 0;
 }
@@ -700,9 +703,10 @@ static int usb_find_hubs()
         rc = get_hub_info(dev, &info);
         if (rc) {
             perm_ok = 0; /* USB permission issue? */
+            continue;
         }
         get_device_description(dev, &info.ds);
-        if (info.ppps) { /* PPPS is supported */
+        if (info.lpsm == HUB_CHAR_INDV_PORT_LPSM || opt_force) {
             if (hub_count < MAX_HUBS) {
                 info.actionable = 1;
                 if (strlen(opt_location) > 0) {
@@ -836,6 +840,14 @@ static int usb_find_hubs()
             hub_phys_count++;
         }
     }
+#ifdef __gnu_linux__
+    if (perm_ok == 0 && geteuid() != 0) {
+        fprintf(stderr,
+            "There were permission problems while accessing USB.\n"
+            "Follow https://git.io/JIB2Z for a fix!\n"
+        );
+    }
+#endif
     if (perm_ok == 0 && hub_phys_count == 0) {
         return LIBUSB_ERROR_ACCESS;
     }
@@ -850,7 +862,7 @@ int main(int argc, char *argv[])
     int option_index = 0;
 
     for (;;) {
-        c = getopt_long(argc, argv, "l:L:n:a:p:d:r:w:hveR",
+        c = getopt_long(argc, argv, "l:L:n:a:p:d:r:w:hvefR",
             long_options, &option_index);
         if (c == -1)
             break;  /* no more options left */
@@ -897,6 +909,9 @@ int main(int argc, char *argv[])
             break;
         case 'r':
             opt_repeat = atoi(optarg);
+            break;
+        case 'f':
+            opt_force = 1;
             break;
         case 'e':
             opt_exact = 1;
@@ -956,18 +971,6 @@ int main(int argc, char *argv[])
             strlen(opt_location) ? " at location " : "",
             opt_location
         );
-#ifdef __gnu_linux__
-        if (rc < 0 && geteuid() != 0) {
-            fprintf(stderr,
-                "There were permission problems while accessing USB.\n"
-                "To fix this, run this tool as root using 'sudo uhubctl',\n"
-                "or add one or more udev rules like below\n"
-                "to file '/etc/udev/rules.d/52-usb.rules':\n"
-                "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"2001\", MODE=\"0666\"\n"
-                "then run 'sudo udevadm trigger --attr-match=subsystem=usb'\n"
-            );
-        }
-#endif
         rc = 1;
         goto cleanup;
     }
