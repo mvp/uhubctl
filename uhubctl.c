@@ -209,6 +209,7 @@ static int hub_phys_count = 0;
 
 /* default options */
 static char opt_vendor[16]   = "";
+static char opt_search[64]   = "";     /* Search by attached device description */
 static char opt_location[32] = "";     /* Hub location a-b.c.d */
 static int opt_level = 0;              /* Hub location level (e.g., a-b is level 2, a-b.c is level 3)*/
 static int opt_ports  = ALL_HUB_PORTS; /* Bitmask of ports to operate on */
@@ -223,6 +224,7 @@ static int opt_force  = 0;  /* force operation even on unsupported hubs */
 static const struct option long_options[] = {
     { "location", required_argument, NULL, 'l' },
     { "vendor",   required_argument, NULL, 'n' },
+    { "search",   required_argument, NULL, 's' },
     { "level",    required_argument, NULL, 'L' },
     { "ports",    required_argument, NULL, 'p' },
     { "action",   required_argument, NULL, 'a' },
@@ -251,6 +253,7 @@ static int print_usage()
         "--location, -l - limit hub by location  [all smart hubs].\n"
         "--level     -L - limit hub by location level (e.g. a-b.c is level 3).\n"
         "--vendor,   -n - limit hub by vendor id [%s] (partial ok).\n"
+        "--search,   -s - limit hub by attached device description.\n"
         "--delay,    -d - delay for cycle action [%g sec].\n"
         "--repeat,   -r - repeat power off count [%d] (some devices need it to turn off).\n"
         "--exact,    -e - exact location (no USB3 duality handling).\n"
@@ -706,27 +709,59 @@ static int usb_find_hubs()
             continue;
         }
         get_device_description(dev, &info.ds);
-        if (info.lpsm == HUB_CHAR_INDV_PORT_LPSM || opt_force) {
-            if (hub_count < MAX_HUBS) {
-                info.actionable = 1;
-                if (strlen(opt_location) > 0) {
-                    if (strcasecmp(opt_location, info.location)) {
-                        info.actionable = 0;
+        if (info.lpsm != HUB_CHAR_INDV_PORT_LPSM && !opt_force) {
+            continue;
+        }
+        info.actionable = 1;
+        if (strlen(opt_search) > 0) {
+            /* Search by attached device description */
+            info.actionable = 0;
+            struct libusb_device * udev;
+            int k = 0;
+            while ((udev = usb_devs[k++]) != NULL) {
+                uint8_t dev_pn[MAX_HUB_CHAIN];
+                uint8_t dev_bus = libusb_get_bus_number(udev);
+                /* only match devices on the same bus: */
+                if (dev_bus != info.bus) continue;
+                int dev_plen = get_port_numbers(udev, dev_pn, sizeof(dev_pn));
+                if ((dev_plen == info.pn_len + 1) &&
+                    (memcmp(info.port_numbers, dev_pn, info.pn_len) == 0))
+                {
+                    struct descriptor_strings ds;
+                    bzero(&ds, sizeof(ds));
+                    rc = get_device_description(udev, &ds);
+                    if (rc != 0)
+                        break;
+                    if (strstr(ds.description, opt_search)) {
+                        info.actionable = 1;
+                        opt_ports &= 1 << (dev_pn[dev_plen-1] - 1);
+                        break;
                     }
                 }
-                if (opt_level > 0) {
-                    if (opt_level != info.pn_len + 1) {
-                        info.actionable = 0;
-                    }
-                }
-                if (strlen(opt_vendor) > 0) {
-                    if (strncasecmp(opt_vendor, info.vendor, strlen(opt_vendor))) {
-                        info.actionable = 0;
-                    }
-                }
-                memcpy(&hubs[hub_count], &info, sizeof(info));
-                hub_count++;
             }
+        }
+        if (strlen(opt_location) > 0) {
+            if (strcasecmp(opt_location, info.location)) {
+                info.actionable = 0;
+            }
+        }
+        if (opt_level > 0) {
+            if (opt_level != info.pn_len + 1) {
+                info.actionable = 0;
+            }
+        }
+        if (strlen(opt_vendor) > 0) {
+            if (strncasecmp(opt_vendor, info.vendor, strlen(opt_vendor))) {
+                info.actionable = 0;
+            }
+        }
+        memcpy(&hubs[hub_count], &info, sizeof(info));
+        if (hub_count < MAX_HUBS) {
+            hub_count++;
+        } else {
+            /* That should be impossible - but we don't want to crash! */
+            fprintf(stderr, "Too many hubs!");
+            break;
         }
     }
     if (!opt_exact) {
@@ -862,7 +897,7 @@ int main(int argc, char *argv[])
     int option_index = 0;
 
     for (;;) {
-        c = getopt_long(argc, argv, "l:L:n:a:p:d:r:w:hvefR",
+        c = getopt_long(argc, argv, "l:L:n:a:p:d:r:w:s:hvefR",
             long_options, &option_index);
         if (c == -1)
             break;  /* no more options left */
@@ -884,6 +919,9 @@ int main(int argc, char *argv[])
             break;
         case 'n':
             strncpy(opt_vendor, optarg, sizeof(opt_vendor));
+            break;
+        case 's':
+            strncpy(opt_search, optarg, sizeof(opt_search));
             break;
         case 'p':
             if (!strcasecmp(optarg, "all")) { /* all ports is the default */
@@ -966,7 +1004,7 @@ int main(int argc, char *argv[])
     rc = usb_find_hubs();
     if (rc <= 0) {
         fprintf(stderr,
-            "No compatible smart hubs detected%s%s!\n"
+            "No compatible devices detected%s%s!\n"
             "Run with -h to get usage info.\n",
             strlen(opt_location) ? " at location " : "",
             opt_location
