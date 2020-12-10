@@ -107,7 +107,7 @@ Compiling
 =========
 
 This utility was tested to compile and work on Linux
-(Ubuntu/Debian, Redhat/Fedora/CentOS, Arch Linux, Gentoo, openSUSE, Buildroot), FreeBSD, NetBSD, SunOS and Mac OS X.
+(Ubuntu/Debian, Redhat/Fedora/CentOS, Arch Linux, Gentoo, openSUSE, Buildroot), FreeBSD, NetBSD, SunOS and MacOS.
 
 While `uhubctl` compiles on Windows, USB power switching does not work on Windows because `libusb`
 is using `winusb.sys` driver, which according to Microsoft does not support
@@ -119,14 +119,7 @@ First, you need to install library libusb-1.0 (version 1.0.12 or later, 1.0.16 o
 
 * Ubuntu: `sudo apt-get install libusb-1.0-0-dev`
 * Redhat: `sudo yum install libusb1-devel`
-* MacOSX: `brew install libusb`, or `sudo port install libusb-devel`
-  > :warning: `libusb-1.0.23` is [broken](https://github.com/libusb/libusb/issues/707) on MacOS Catalina!
-  You have to install `libusb` from HEAD (master branch) until [libusb-1.0.24 is released](https://github.com/libusb/libusb/issues/618):
-
-      brew install automake autoconf libtool
-      brew uninstall --ignore-dependencies libusb
-      brew install libusb --HEAD
-
+* MacOS: `brew install libusb`, or `sudo port install libusb-devel`
 * FreeBSD: libusb is included by default
 * NetBSD: `sudo pkgin install libusb1 gmake pkg-config`
 * Windows: TBD?
@@ -138,7 +131,7 @@ To fetch uhubctl source:
 To compile, simply run `make` - this will generate `uhubctl` binary.
 Note that on some OS (e.g. FreeBSD/NetBSD) you need to use `gmake` instead to build.
 
-Also, for Mac OS X you can install `uhubctl` with Homebrew custom tap:
+Also, on MacOS you can install `uhubctl` with Homebrew custom tap:
 
 ```
 brew tap mvp/uhubctl https://github.com/mvp/uhubctl
