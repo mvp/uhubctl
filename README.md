@@ -115,6 +115,7 @@ is using `winusb.sys` driver, which according to Microsoft does not support
 This may be fixed if `libusb` starts supporting different driver on Windows.
 
 Note that it is highly recommended to have `pkg-config` installed (many platforms provide it by default).
+
 First, you need to install library libusb-1.0 (version 1.0.12 or later, 1.0.16 or later is recommended):
 
 * Ubuntu: `sudo apt-get install libusb-1.0-0-dev`
@@ -131,11 +132,15 @@ To fetch uhubctl source:
 To compile, simply run `make` - this will generate `uhubctl` binary.
 Note that on some OS (e.g. FreeBSD/NetBSD) you need to use `gmake` instead to build.
 
-Also, on MacOS you can install `uhubctl` with Homebrew custom tap:
+Also, on MacOS you can install stable version of `uhubctl` with Homebrew custom tap:
 
 ```
 brew tap mvp/uhubctl https://github.com/mvp/uhubctl
-brew install --HEAD uhubctl
+brew install uhubctl
+```
+To build/install from master branch, use `--HEAD`:
+```
+brew install uhubctl --HEAD
 ```
 
 Usage
