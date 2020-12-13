@@ -243,7 +243,7 @@ static const struct option long_options[] = {
 static int print_usage()
 {
     printf(
-        "uhubctl %s: utility to control USB port power for smart hubs.\n"
+        "uhubctl: utility to control USB port power for smart hubs.\n"
         "Usage: uhubctl [options]\n"
         "Without options, show status for all smart hubs.\n"
         "\n"
@@ -263,12 +263,13 @@ static int print_usage()
         "--version,  -v - print program version.\n"
         "--help,     -h - print this text.\n"
         "\n"
-        "Send bugs and requests to: https://github.com/mvp/uhubctl\n",
-        PROGRAM_VERSION,
+        "Send bugs and requests to: https://github.com/mvp/uhubctl\n"
+        "version: %s\n",
         strlen(opt_vendor) ? opt_vendor : "any",
         opt_delay,
         opt_repeat,
-        opt_wait
+        opt_wait,
+        PROGRAM_VERSION
     );
     return 0;
 }
