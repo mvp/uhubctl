@@ -125,14 +125,20 @@ First, you need to install library libusb-1.0 (version 1.0.12 or later, 1.0.16 o
 * NetBSD: `sudo pkgin install libusb1 gmake pkg-config`
 * Windows: TBD?
 
-To fetch uhubctl source:
+To fetch uhubctl source and compile it:
 
     git clone https://github.com/mvp/uhubctl
+    cd uhubctl
+    make
 
-To compile, simply run `make` - this will generate `uhubctl` binary.
+This should generate `uhubctl` binary.
+You can install it in your system as `/usr/sbin/uhubctl` using:
+
+    sudo make install
+
 Note that on some OS (e.g. FreeBSD/NetBSD) you need to use `gmake` instead to build.
 
-Also, on MacOS you can install stable version of `uhubctl` with Homebrew custom tap:
+Also, on MacOS you can install `uhubctl` with all necessary dependencies in one shot using Homebrew tap:
 
 ```
 brew tap mvp/uhubctl https://github.com/mvp/uhubctl
@@ -145,6 +151,12 @@ brew install uhubctl --HEAD
 
 Usage
 =====
+
+> :warning: On Linux, use `sudo` or configure USB permissions as described below!
+
+To list all supported hubs:
+
+    uhubctl
 
 You can control the power on a USB port(s) like this:
 
@@ -172,7 +184,7 @@ Linux USB permissions
 
 On Linux, you should configure `udev` USB permissions (otherwise you will have to run it as root using `sudo uhubctl`).
 To fix USB permissions, first run `sudo uhubctl` and note all `vid:pid` for hubs you need to control.
-Then, add one or more udev rules like below to file `/etc/udev/rules.d/52-usb.rules` (replace with your vendor id):
+Then, add one or more udev rules like below to file `/etc/udev/rules.d/52-usb.rules` (replace 2001 with your vendor id):
 
     SUBSYSTEM=="usb", ATTR{idVendor}=="2001", MODE="0666"
 
@@ -203,7 +215,8 @@ FAQ
 
 According to USB 2.0 specification, USB hubs can advertise no power switching,
 ganged (all ports at once) power switching or per-port (individual) power switching.
-Note that `uhubctl` will only detect USB hubs which support per-port power switching.
+Note that by default `uhubctl` will only detect USB hubs which support per-port power switching
+(but you can force it to try operating on unsupported hubs with option `-f`).
 You can find what kind of power switching your hardware supports by using `sudo lsusb -v`:
 
 No power switching:
