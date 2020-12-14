@@ -375,6 +375,7 @@ Notable projects using uhubctl
 | [USB fan for Raspberry Pi](https://bit.ly/2TRV6sM)       | Control USB fan to avoid Raspberry Pi overheating     |
 | [Raspberry Pi Reboot Router](https://bit.ly/3aNbQqs)     | Automatically reboot router if internet isn't working |
 | [Control USB Lamp With Voice](https://bit.ly/2VtW2SX)    | Voice Control of USB Lamp using Siri and Raspberry Pi |
+| [Control USB LED Strip](https://bit.ly/3oVWfeZ)          | Controlling USB powered LED Light Strip               |
 
 
 Copyright
