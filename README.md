@@ -27,6 +27,7 @@ This is list of known compatible USB hubs:
 | Apple              | Thunderbolt Display 27" (internal USB hub)           | 6     | 2.0 |           | 2011    | 2016 |
 | Apple              | USB Keyboard With Numeric Pad (internal USB hub)     | 3     | 2.0 |           | 2011    |      |
 | Asus               | Z87-PLUS Motherboard (onboard USB hub)               | 4     | 3.0 |           | 2013    | 2016 |
+| Aukey              | CB-C59                                               | 4     | 3.1 |`2109:2813`| 2017    |      |
 | B+B SmartWorx      | UHR204                                               | 4     | 2.0 |`0856:DB00`| 2013    |      |
 | B+B SmartWorx      | USH304                                               | 4     | 3.0 |`04B4:6506`| 2017    |      |
 | Basler             | 2000036234                                           | 4     | 3.0 |`0451:8046`| 2016    |      |
