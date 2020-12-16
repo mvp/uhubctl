@@ -308,7 +308,9 @@ Doing so will confuse internal hub circuitry and will cause unpredictable behavi
 
 #### _Raspberry Pi turns power off on all ports, not just the one I specified_
 
-This is limitation of Raspberry Pi hardware design.
+This is the limitation of Raspberry Pi hardware design.
+As a workaround, you can buy any external USB hub from supported list above,
+attach it to any USB port of Raspberry Pi, and control power on its ports independently.
 
 For reference, supported Raspberry Pi models have following internal USB topology:
 
@@ -349,10 +351,6 @@ to make power switching work on RPi 4B.
         uhubctl -l 2 -a 0
 
   * USB2 hub `3`, 1 port, OTG controller. Power switching is [not supported](https://git.io/JUc5Q).
-
-
-As a workaround, you can buy any external USB hub from supported list,
-attach it to any USB port of Raspberry Pi, and control power on its ports independently.
 
 
 
