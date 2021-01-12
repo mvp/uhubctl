@@ -75,6 +75,7 @@ void sleep_ms(int milliseconds)
 #define POWER_OFF                0
 #define POWER_ON                 1
 #define POWER_CYCLE              2
+#define POWER_TOGGLE             3
 
 #define MAX_HUB_CHAIN            8  /* Per USB 3.0 spec max hub chain is 7 */
 
@@ -942,6 +943,9 @@ int main(int argc, char *argv[])
             if (!strcasecmp(optarg, "cycle") || !strcasecmp(optarg, "2")) {
                 opt_action = POWER_CYCLE;
             }
+            if (!strcasecmp(optarg, "toggle") || !strcasecmp(optarg, "3")) {
+                opt_action = POWER_TOGGLE;
+            }
             break;
         case 'd':
             opt_delay = atof(optarg);
@@ -1029,6 +1033,9 @@ int main(int argc, char *argv[])
             continue;
         if (k == 1 && opt_action == POWER_KEEP)
             continue;
+        // if power_toggle is active: only one time
+        if (k == 1 && opt_action == POWER_TOGGLE)
+            continue;
         int i;
         for (i=0; i<hub_count; i++) {
             if (hubs[i].actionable == 0)
@@ -1051,9 +1058,12 @@ int main(int argc, char *argv[])
                 for (port=1; port <= hubs[i].nports; port++) {
                     if ((1 << (port-1)) & ports) {
                         int port_status = get_port_status(devh, port);
+                        printf("Port Status: %i\n", port_status);
+                        if (opt_action == POWER_TOGGLE)
+                            request = (port_status == 0) ? LIBUSB_REQUEST_SET_FEATURE : LIBUSB_REQUEST_CLEAR_FEATURE;
                         int power_mask = hubs[i].super_speed ? USB_SS_PORT_STAT_POWER
                                                              : USB_PORT_STAT_POWER;
-                        if (k == 0 && !(port_status & power_mask))
+                        if (k == 0 && !(port_status & power_mask) && (opt_action != POWER_TOGGLE))
                             continue;
                         if (k == 1 && (port_status & power_mask))
                             continue;
