@@ -249,7 +249,7 @@ static int print_usage()
         "Without options, show status for all smart hubs.\n"
         "\n"
         "Options [defaults in brackets]:\n"
-        "--action,   -a - action to off/on/cycle (0/1/2) for affected ports.\n"
+        "--action,   -a - action to off/on/cycle/toggle (0/1/2/3) for affected ports.\n"
         "--ports,    -p - ports to operate on    [all hub ports].\n"
         "--location, -l - limit hub by location  [all smart hubs].\n"
         "--level     -L - limit hub by location level (e.g. a-b.c is level 3).\n"
@@ -1033,7 +1033,7 @@ int main(int argc, char *argv[])
             continue;
         if (k == 1 && opt_action == POWER_KEEP)
             continue;
-        // if power_toggle is active: only one time
+        // if toggle requested, do it only once when `k == 0`
         if (k == 1 && opt_action == POWER_TOGGLE)
             continue;
         int i;
@@ -1058,11 +1058,11 @@ int main(int argc, char *argv[])
                 for (port=1; port <= hubs[i].nports; port++) {
                     if ((1 << (port-1)) & ports) {
                         int port_status = get_port_status(devh, port);
-                        printf("Port Status: %i\n", port_status);
-                        if (opt_action == POWER_TOGGLE)
-                            request = (port_status == 0) ? LIBUSB_REQUEST_SET_FEATURE : LIBUSB_REQUEST_CLEAR_FEATURE;
                         int power_mask = hubs[i].super_speed ? USB_SS_PORT_STAT_POWER
                                                              : USB_PORT_STAT_POWER;
+                        if (opt_action == POWER_TOGGLE) {
+                            request = (port_status & power_mask) ? LIBUSB_REQUEST_SET_FEATURE : LIBUSB_REQUEST_CLEAR_FEATURE;
+                        }
                         if (k == 0 && !(port_status & power_mask) && (opt_action != POWER_TOGGLE))
                             continue;
                         if (k == 1 && (port_status & power_mask))
