@@ -47,6 +47,7 @@ This is list of known compatible USB hubs:
 | Dell               | UltraSharp 1704FPT 17" LCD Monitor                   | 4     | 2.0 |`0424:A700`| 2005    | 2015 |
 | Dell               | UltraSharp U2415 24" LCD Monitor                     | 5     | 3.0 |           | 2014    |      |
 | Elecom             | U2H-G4S                                              | 4     | 2.0 |           | 2006    | 2011 |
+| ExSys              | EX-1113HMS                                           | 16    | 3.1 |           | 2018    |      |
 | GlobalScale        | ESPRESSObin SBUD102 V5                               | 1     | 3.0 |`1D6B:0003`| 2017    |      |
 | Hawking Technology | UH214                                                | 4     | 2.0 |           | 2003    | 2008 |
 | IOI                | U3H415E1                                             | 4     | 3.0 |           | 2012    |      |
