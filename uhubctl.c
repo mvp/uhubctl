@@ -877,15 +877,15 @@ static int usb_find_hubs()
             hub_phys_count++;
         }
     }
-#ifdef __gnu_linux__
-    if (perm_ok == 0 && geteuid() != 0) {
-        fprintf(stderr,
-            "There were permission problems while accessing USB.\n"
-            "Follow https://git.io/JIB2Z for a fix!\n"
-        );
-    }
-#endif
     if (perm_ok == 0 && hub_phys_count == 0) {
+#ifdef __gnu_linux__
+        if (geteuid() != 0) {
+            fprintf(stderr,
+                "There were permission problems while accessing USB.\n"
+                "Follow https://git.io/JIB2Z for a fix!\n"
+            );
+        }
+#endif
         return LIBUSB_ERROR_ACCESS;
     }
     return hub_phys_count;
@@ -1060,18 +1060,16 @@ int main(int argc, char *argv[])
                         int port_status = get_port_status(devh, port);
                         int power_mask = hubs[i].super_speed ? USB_SS_PORT_STAT_POWER
                                                              : USB_PORT_STAT_POWER;
+                        int powered_on = port_status & power_mask;
                         if (opt_action == POWER_TOGGLE) {
-                            request = (port_status & power_mask) ? LIBUSB_REQUEST_CLEAR_FEATURE : LIBUSB_REQUEST_SET_FEATURE;
+                            request = powered_on ? LIBUSB_REQUEST_CLEAR_FEATURE
+                                                 : LIBUSB_REQUEST_SET_FEATURE;
                         }
-                        if (k == 0 && !(port_status & power_mask) && (opt_action != POWER_TOGGLE))
+                        if (k == 0 && !powered_on && opt_action != POWER_TOGGLE)
                             continue;
-                        if (k == 1 && (port_status & power_mask))
+                        if (k == 1 && powered_on)
                             continue;
-                        int repeat = 1;
-                        if (k == 0)
-                            repeat = opt_repeat;
-                        if (!(port_status & ~power_mask))
-                            repeat = 1;
+                        int repeat = powered_on ? opt_repeat : 1;
                         while (repeat-- > 0) {
                             rc = libusb_control_transfer(devh,
                                 LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_OTHER,
