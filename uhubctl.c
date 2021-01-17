@@ -75,6 +75,7 @@ void sleep_ms(int milliseconds)
 #define POWER_OFF                0
 #define POWER_ON                 1
 #define POWER_CYCLE              2
+#define POWER_TOGGLE             3
 
 #define MAX_HUB_CHAIN            8  /* Per USB 3.0 spec max hub chain is 7 */
 
@@ -248,7 +249,7 @@ static int print_usage()
         "Without options, show status for all smart hubs.\n"
         "\n"
         "Options [defaults in brackets]:\n"
-        "--action,   -a - action to off/on/cycle (0/1/2) for affected ports.\n"
+        "--action,   -a - action to off/on/cycle/toggle (0/1/2/3) for affected ports.\n"
         "--ports,    -p - ports to operate on    [all hub ports].\n"
         "--location, -l - limit hub by location  [all smart hubs].\n"
         "--level     -L - limit hub by location level (e.g. a-b.c is level 3).\n"
@@ -942,6 +943,9 @@ int main(int argc, char *argv[])
             if (!strcasecmp(optarg, "cycle") || !strcasecmp(optarg, "2")) {
                 opt_action = POWER_CYCLE;
             }
+            if (!strcasecmp(optarg, "toggle") || !strcasecmp(optarg, "3")) {
+                opt_action = POWER_TOGGLE;
+            }
             break;
         case 'd':
             opt_delay = atof(optarg);
@@ -1029,6 +1033,9 @@ int main(int argc, char *argv[])
             continue;
         if (k == 1 && opt_action == POWER_KEEP)
             continue;
+        // if toggle requested, do it only once when `k == 0`
+        if (k == 1 && opt_action == POWER_TOGGLE)
+            continue;
         int i;
         for (i=0; i<hub_count; i++) {
             if (hubs[i].actionable == 0)
@@ -1053,7 +1060,10 @@ int main(int argc, char *argv[])
                         int port_status = get_port_status(devh, port);
                         int power_mask = hubs[i].super_speed ? USB_SS_PORT_STAT_POWER
                                                              : USB_PORT_STAT_POWER;
-                        if (k == 0 && !(port_status & power_mask))
+                        if (opt_action == POWER_TOGGLE) {
+                            request = (port_status & power_mask) ? LIBUSB_REQUEST_CLEAR_FEATURE : LIBUSB_REQUEST_SET_FEATURE;
+                        }
+                        if (k == 0 && !(port_status & power_mask) && (opt_action != POWER_TOGGLE))
                             continue;
                         if (k == 1 && (port_status & power_mask))
                             continue;
