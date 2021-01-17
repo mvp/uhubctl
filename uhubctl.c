@@ -1061,7 +1061,7 @@ int main(int argc, char *argv[])
                         int power_mask = hubs[i].super_speed ? USB_SS_PORT_STAT_POWER
                                                              : USB_PORT_STAT_POWER;
                         if (opt_action == POWER_TOGGLE) {
-                            request = (port_status & power_mask) ? LIBUSB_REQUEST_SET_FEATURE : LIBUSB_REQUEST_CLEAR_FEATURE;
+                            request = (port_status & power_mask) ? LIBUSB_REQUEST_CLEAR_FEATURE : LIBUSB_REQUEST_SET_FEATURE;
                         }
                         if (k == 0 && !(port_status & power_mask) && (opt_action != POWER_TOGGLE))
                             continue;
