@@ -258,6 +258,8 @@ Per-port power switching:
 3. If tests above were successful, please report your hub
    by opening new issue at https://github.com/mvp/uhubctl/issues,
    so we can add it to list of supported devices.
+   Please do not report unsupported hubs, unless it is different
+   hardware revision of some already listed supported model.
 
 
 #### _USB devices are not removed after port power down on Linux_
