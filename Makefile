@@ -10,6 +10,7 @@ INSTALL		:= install
 INSTALL_DIR	:= $(INSTALL) -m 755 -d
 INSTALL_PROGRAM	:= $(INSTALL) -m 755
 RM		:= rm -rf
+PKG_CONFIG	?= pkg-config
 
 CC ?= gcc
 CFLAGS ?= -g -O0
@@ -26,9 +27,9 @@ ifeq ($(UNAME_S),Linux)
 endif
 
 # Use pkg-config if available
-ifneq (,$(shell which pkg-config))
-	CFLAGS  += $(shell pkg-config --cflags libusb-1.0)
-	LDFLAGS += $(shell pkg-config --libs libusb-1.0)
+ifneq (,$(shell which $(PKG_CONFIG)))
+	CFLAGS  += $(shell $(PKG_CONFIG) --cflags libusb-1.0)
+	LDFLAGS += $(shell $(PKG_CONFIG) --libs libusb-1.0)
 else
 # But it should still build if pkg-config is not available (e.g. Linux or Mac homebrew)
 	LDFLAGS += -lusb-1.0
