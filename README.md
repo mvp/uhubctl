@@ -67,8 +67,9 @@ This is list of known compatible USB hubs:
 | NVidia             | Jetson Nano B01 ([details](https://git.io/JJaFR))    | 4     | 3.0 |           | 2019    |      |
 | Phidgets           | HUB0003_0                                            | 7     | 2.0 |`1A40:0201`| 2017    |      |
 | Plugable           | USB3-HUB7BC                                          | 7     | 3.0 |`2109:0813`| 2015    |      |
-| Plugable           | USB3-HUB7C                                           | 7     | 3.0 |`2109:0813`| 2015    |      |
+| Plugable           | USB3-HUB7C (only works for 2 charge ports)           | 7     | 3.0 |`2109:0813`| 2015    |      |
 | Plugable           | USB3-HUB7-81X                                        | 7     | 3.0 |`2109:0813`| 2012    |      |
+| Plugable           | USB3-HUB10-C2 (only works for 2 charge ports)        | 10    | 3.0 |           | 2014    |      |
 | Port Inc           | NWUSB01                                              | 4     | 1.1 |`0451:1446`| 1999    | 2003 |
 | Raspberry Pi       | B+, 2B, 3B ([see below](#raspberry-pi-b2b3b))        | 4     | 2.0 |           | 2011    |      |
 | Raspberry Pi       | 3B+        ([see below](#raspberry-pi-3b))           | 4     | 2.0 |`0424:2514`| 2018    |      |
