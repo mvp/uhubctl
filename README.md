@@ -39,7 +39,7 @@ This is list of known compatible USB hubs:
 | Club3D             | CSV-3242HD Dual Display Docking Station              | 4     | 3.0 |`2109:2811`| 2015    |      |
 | CyberPower         | CP-H420P                                             | 4     | 2.0 |`0409:0059`| 2004    |      |
 | Cypress            | CY4608 HX2VL development kit                         | 4     | 2.0 |`04B4:6570`| 2012    |      |
-| D-Link             | DUB-H4 rev B (silver). Note: rev B7+ not supported   | 4     | 2.0 |`05E3:0605`| 2005    | 2010 |
+| D-Link             | DUB-H4 rev B (silver). Note: rev B4+ not supported   | 4     | 2.0 |`05E3:0605`| 2005    | 2010 |
 | D-Link             | DUB-H4 rev D,E (black). Note: rev A,C,F not supported| 4     | 2.0 |`05E3:0608`| 2012    |      |
 | D-Link             | DUB-H7 rev A (silver)                                | 7     | 2.0 |`2001:F103`| 2005    | 2010 |
 | D-Link             | DUB-H7 rev D,E (black). Note: rev B,C,F not supported| 7     | 2.0 |`05E3:0608`| 2012    |      |
