@@ -381,6 +381,7 @@ Notable projects using uhubctl
 | [Control USB Lamp With Voice](https://bit.ly/2VtW2SX)    | Voice Control of USB Lamp using Siri and Raspberry Pi |
 | [Control USB LED Strip](https://bit.ly/3oVWfeZ)          | Controlling USB powered LED Light Strip               |
 | [Brew beer with Raspberry Pi](https://git.io/JtbLd)      | Automated beer brewing system using Raspberry Pi      |
+| [Webcam On-Air Sign](https://bit.ly/3witNsa)             | Automatically light up a sign when webcam is in use   |
 
 
 Copyright
