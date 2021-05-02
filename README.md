@@ -20,8 +20,8 @@ This is list of known compatible USB hubs:
 |:-------------------|:-----------------------------------------------------|:------|:----|:----------|:--------|:-----|
 | AmazonBasics       | HU3641V1 ([RPi issue](https://goo.gl/CLt46M))        | 4     | 3.0 |`2109:2811`| 2013    |      |
 | AmazonBasics       | HU3770V1 ([RPi issue](https://goo.gl/CLt46M))        | 7     | 3.0 |`2109:2811`| 2013    |      |
-| AmazonBasics       | HU9003V1EBL                                          | 7     | 3.1 |`2109:2817`| 2018    |      |
-| AmazonBasics       | HU9002V1SBL, HU9002V1ESL                             | 10    | 3.1 |`2109:2817`| 2018    |      |
+| AmazonBasics       | HU9003V1EBL, HUC9003V1EBL                            | 7     | 3.1 |`2109:2817`| 2018    |      |
+| AmazonBasics       | HU9002V1SBL, HU9002V1EBL, HU9002V1ESL                | 10    | 3.1 |`2109:2817`| 2018    |      |
 | AmazonBasics       | HUC9002V1SBL, HUC9002V1EBL, HUC9002V1ESL             | 10    | 3.1 |`2109:2817`| 2018    |      |
 | AmazonBasics       | U3-7HUB (only works for 1 charge port)               | 7     | 3.0 |`2109:2813`| 2020    |      |
 | Anker              | AK-68ANHUB-BV7A-0004 ([note](https://git.io/JLnZb))  | 7     | 3.0 |`2109:0812`| 2014    |      |
