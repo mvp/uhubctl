@@ -382,6 +382,7 @@ Notable projects using uhubctl
 | [Control USB LED Strip](https://bit.ly/3oVWfeZ)          | Controlling USB powered LED Light Strip               |
 | [Brew beer with Raspberry Pi](https://git.io/JtbLd)      | Automated beer brewing system using Raspberry Pi      |
 | [Webcam On-Air Sign](https://bit.ly/3witNsa)             | Automatically light up a sign when webcam is in use   |
+| [Do it yourself PPPS](https://git.io/J3lHs)              | Solder wires in your USB hub to support uhubctl       |
 
 
 Copyright
