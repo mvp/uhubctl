@@ -47,6 +47,7 @@ This is list of known compatible USB hubs:
 | Dell               | S2719DGF 27" WQHD Gaming-Monitor                     | 5     | 3.1 |`0424:5734`| 2018    |      |
 | Dell               | UltraSharp 1704FPT 17" LCD Monitor                   | 4     | 2.0 |`0424:A700`| 2005    | 2015 |
 | Dell               | UltraSharp U2415 24" LCD Monitor                     | 5     | 3.0 |           | 2014    |      |
+| Delock             | 87445 ([note](https://git.io/Jsuz5))                 | 4     | 2.0 |`05E3:0608`| 2009    | 2013 |
 | Elecom             | U2H-G4S                                              | 4     | 2.0 |           | 2006    | 2011 |
 | ExSys              | EX-1113HMS                                           | 16    | 3.1 |           | 2018    |      |
 | GlobalScale        | ESPRESSObin SBUD102 V5                               | 1     | 3.0 |`1D6B:0003`| 2017    |      |
