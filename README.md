@@ -86,7 +86,6 @@ This is list of known compatible USB hubs:
 | Sunix              | SHB4200MA                                            | 4     | 2.0 |`0409:0058`| 2006    | 2009 |
 | Targus             | PAUH212/PAUH212U                                     | 7     | 2.0 |           | 2004    | 2009 |
 | Texas Instruments  | TUSB4041PAPEVM                                       | 4     | 2.1 |`0451:8142`| 2015    |      |
-| UNITEK             | Y-3098ABK                                            | 4     | 3.0 |`0bda:0411`| 2019    |      |
 
 This table is by no means complete.
 If your hub works with `uhubctl`, but is not listed above, please report it
