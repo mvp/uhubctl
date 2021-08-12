@@ -86,7 +86,7 @@ This is list of known compatible USB hubs:
 | Sunix              | SHB4200MA                                            | 4     | 2.0 |`0409:0058`| 2006    | 2009 |
 | Targus             | PAUH212/PAUH212U                                     | 7     | 2.0 |           | 2004    | 2009 |
 | Texas Instruments  | TUSB4041PAPEVM                                       | 4     | 2.1 |`0451:8142`| 2015    |      |
-| UUGear             | MEGA4 (for Raspberry Pi 4B)                          | 4     | 3.1 |           | 2021    |      |
+| UUGear             | MEGA4 (for Raspberry Pi 4B)                          | 4     | 3.1 |`2109:0817`| 2021    |      |
 
 This table is by no means complete.
 If your hub works with `uhubctl`, but is not listed above, please report it
@@ -320,6 +320,7 @@ Doing so will confuse internal hub circuitry and will cause unpredictable behavi
 This is the limitation of Raspberry Pi hardware design.
 As a workaround, you can buy any external USB hub from supported list above,
 attach it to any USB port of Raspberry Pi, and control power on its ports independently.
+Also, there are supported hubs designed specifically for Raspberry Pi, e.g. UUGear MEGA4.
 
 For reference, supported Raspberry Pi models have following internal USB topology:
 
