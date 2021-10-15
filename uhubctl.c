@@ -221,6 +221,7 @@ static int opt_wait   = 20; /* wait before repeating in ms */
 static int opt_exact  = 0;  /* exact location match - disable USB3 duality handling */
 static int opt_reset  = 0;  /* reset hub after operation(s) */
 static int opt_force  = 0;  /* force operation even on unsupported hubs */
+static int opt_skip_query  = 0;  /* skip USB hub status query */
 
 static const struct option long_options[] = {
     { "location", required_argument, NULL, 'l' },
@@ -234,6 +235,7 @@ static const struct option long_options[] = {
     { "wait",     required_argument, NULL, 'w' },
     { "exact",    no_argument,       NULL, 'e' },
     { "force",    no_argument,       NULL, 'f' },
+    { "skipquery",no_argument,       NULL, 'q' },
     { "reset",    no_argument,       NULL, 'R' },
     { "version",  no_argument,       NULL, 'v' },
     { "help",     no_argument,       NULL, 'h' },
@@ -259,6 +261,7 @@ static int print_usage()
         "--repeat,   -r - repeat power off count [%d] (some devices need it to turn off).\n"
         "--exact,    -e - exact location (no USB3 duality handling).\n"
         "--force,    -f - force operation even on unsupported hubs.\n"
+        "--skipquery,-q - skip USB hub status query.\n"
         "--reset,    -R - reset hub after each power-on action, causing all devices to reassociate.\n"
         "--wait,     -w - wait before repeat power off [%d ms].\n"
         "--version,  -v - print program version.\n"
@@ -899,7 +902,7 @@ int main(int argc, char *argv[])
     int option_index = 0;
 
     for (;;) {
-        c = getopt_long(argc, argv, "l:L:n:a:p:d:r:w:s:hvefR",
+        c = getopt_long(argc, argv, "l:L:n:a:p:d:r:w:s:hvefRq",
             long_options, &option_index);
         if (c == -1)
             break;  /* no more options left */
@@ -955,6 +958,9 @@ int main(int argc, char *argv[])
             break;
         case 'f':
             opt_force = 1;
+            break;
+        case 'q':
+            opt_skip_query = 1;
             break;
         case 'e':
             opt_exact = 1;
@@ -1040,10 +1046,12 @@ int main(int argc, char *argv[])
         for (i=0; i<hub_count; i++) {
             if (hubs[i].actionable == 0)
                 continue;
-            printf("Current status for hub %s [%s]\n",
-                hubs[i].location, hubs[i].ds.description
-            );
-            print_port_status(&hubs[i], opt_ports);
+            if (opt_skip_query == 0) {
+                printf("Current status for hub %s [%s]\n",
+                    hubs[i].location, hubs[i].ds.description
+                );
+                print_port_status(&hubs[i], opt_ports);
+            }
             if (opt_action == POWER_KEEP) { /* no action, show status */
                 continue;
             }
