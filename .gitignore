@@ -6,3 +6,7 @@ uhubctl
 
 # Mac symbols
 *.dSYM
+
+# Patches
+*.patch
+*.diff
