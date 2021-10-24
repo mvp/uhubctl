@@ -56,9 +56,11 @@ This is list of known compatible USB hubs:
 | GlobalScale        | ESPRESSObin SBUD102 V5                               | 1     | 3.0 |`1D6B:0003`| 2017    |      |
 | Hardkernel         | ODROID-C4 ([note](https://git.io/JG0mP))             | 4     | 3.0 |           | 2020    |      |
 | Hawking Technology | UH214                                                | 4     | 2.0 |           | 2003    | 2008 |
+| Hewlett Packard    | P5Q58UT                                              | 3     | 3.0 |           | 2019    |      |
 | IOI                | U3H415E1                                             | 4     | 3.0 |           | 2012    |      |
 | j5create           | JUH470 (works only in USB2 mode)                     | 3     | 3.0 |`05E3:0610`| 2014    |      |
 | Juiced Systems     | 6HUB-01                                              | 7     | 3.0 |`0BDA:0411`| 2014    | 2018 |
+| LG Electronics     | 27MD5KL-B monitor                                    | 4     | 3.1 |`043E:9A60`| 2019    |      |
 | LG Electronics     | 38WK95C-W monitor                                    | 4     | 3.0 |`0451:8142`| 2018    |      |
 | Lenovo             | ThinkPad Ultra Docking Station (40A20090EU)          | 6     | 2.0 |`17EF:100F`| 2015    |      |
 | Lenovo             | ThinkPad Ultra Docking Station (40AJ0135EU)          | 7     | 3.1 |`17EF:3070`| 2018    |      |
@@ -69,6 +71,7 @@ This is list of known compatible USB hubs:
 | Maplin             | A08CQ                                                | 7     | 2.0 |`0409:0059`| 2008    | 2011 |
 | Microchip          | EVB-USB2517                                          | 7     | 2.0 |           | 2008    |      |
 | Microchip          | EVB-USB2534BC                                        | 4     | 2.0 |           | 2013    |      |
+| Microchip          | EVB-USB5807                                          | 7     | 3.1 |           | 2016    |      |
 | Moxa               | Uport-407                                            | 7     | 2.0 |`110A:0407`| 2009    |      |
 | NVidia             | Jetson Nano B01 ([details](https://git.io/JJaFR))    | 4     | 3.0 |           | 2019    |      |
 | Phidgets           | HUB0003_0                                            | 7     | 2.0 |`1A40:0201`| 2017    |      |
