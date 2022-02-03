@@ -67,6 +67,7 @@ This is list of known compatible USB hubs:
 | Lenovo             | ThinkPad Ultra Docking Station (40AJ0135EU)          | 7     | 3.1 |`17EF:3070`| 2018    |      |
 | Lenovo             | ThinkPad X200 Ultrabase 42X4963                      | 3     | 2.0 |`17EF:1005`| 2008    | 2011 |
 | Lenovo             | ThinkPad X6 Ultrabase 42W3107                        | 4     | 2.0 |`17EF:1000`| 2006    | 2009 |
+| Lenovo             | ThinkVision T24i-10 Monitor                          | 4     | 2.0 |`17EF:0610`| 2018    |      |
 | Lindy              | USB serial converter 4 port                          | 4     | 1.1 |`058F:9254`| 2008    |      |
 | Linksys            | USB2HUB4 ([note](https://git.io/JYiDZ))              | 4     | 2.0 |           | 2004    | 2010 |
 | Maplin             | A08CQ                                                | 7     | 2.0 |`0409:0059`| 2008    | 2011 |
