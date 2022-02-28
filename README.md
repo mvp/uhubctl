@@ -36,7 +36,7 @@ This is list of known compatible USB hubs:
 | Belkin             | F5U101                                               | 4     | 2.0 |`0451:2046`| 2005    | 2010 |
 | BenQ               | PD2700U 4K Monitor (works only in USB2 mode)         | 4     | 3.1 |`05E3:0610`| 2018    |      |
 | Buffalo            | BSH4A05U3BK                                          | 4     | 3.0 |`05E3:0610`| 2015    |      |
-| Bytecc             | BT-UH340                                             | 4     | 3.0 |`2109:8110`| 2010    |      |
+| Bytecc             | BT-UH340 ([warning](https://bit.ly/35BNi5U))         | 4     | 3.0 |`2109:8110`| 2010    |      |
 | Centech            | CT-USB4HUB ReTRY HUB                                 | 4     | 3.1 |`0424:2744`| 2017    |      |
 | Circuitco          | Beagleboard-xM (internal USB hub)                    | 4     | 2.0 |`0424:9514`| 2010    |      |
 | Club3D             | CSV-3242HD Dual Display Docking Station              | 4     | 3.0 |`2109:2811`| 2015    |      |
