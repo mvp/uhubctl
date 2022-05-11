@@ -405,7 +405,7 @@ Notable projects using uhubctl
 Copyright
 =========
 
-Copyright (C) 2009-2020 Vadim Mikhailov
+Copyright (C) 2009-2022 Vadim Mikhailov
 
 This file can be distributed under the terms and conditions of the
 GNU General Public License version 2.
