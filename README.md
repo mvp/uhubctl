@@ -131,6 +131,8 @@ Compiling
 This utility was tested to compile and work on Linux
 (Ubuntu/Debian, Redhat/Fedora/CentOS, Arch Linux, Gentoo, openSUSE, Buildroot), FreeBSD, NetBSD, SunOS and MacOS.
 
+> :warning: MacOS 12.4 and later has [changed](https://github.com/mvp/uhubctl/issues/419) USB stack behavior which broke [libusb_get_port_numbers()](https://github.com/libusb/libusb/issues/1156). Currently there is no workaround for this except for NOT upgrading to MacOS 12.4 and beyond.
+
 While `uhubctl` compiles on Windows, USB power switching does not work on Windows because `libusb`
 is using `winusb.sys` driver, which according to Microsoft does not support
 [necessary USB control requests](https://social.msdn.microsoft.com/Forums/sqlserver/en-US/f680b63f-ca4f-4e52-baa9-9e64f8eee101).
