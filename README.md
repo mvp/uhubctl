@@ -102,6 +102,7 @@ This is list of known compatible USB hubs:
 | Targus             | PAUH212/PAUH212U                                     | 7     | 2.0 |           | 2004    | 2009 |
 | Texas Instruments  | TUSB4041PAPEVM                                       | 4     | 2.1 |`0451:8142`| 2015    |      |
 | UUGear             | MEGA4 (for Raspberry Pi 4B)                          | 4     | 3.1 |`2109:0817`| 2021    |      |
+| ORICO              | MH4U-U3                                              | 4     | 3.0 |`2109:0817`|         |      |
 
 This table is by no means complete.
 If your hub works with `uhubctl`, but is not listed above, please report it
