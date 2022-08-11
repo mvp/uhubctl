@@ -408,6 +408,7 @@ Notable projects using uhubctl
 | [Brew beer with Raspberry Pi](https://git.io/JtbLd)      | Automated beer brewing system using Raspberry Pi      |
 | [Webcam On-Air Sign](https://bit.ly/3witNsa)             | Automatically light up a sign when webcam is in use   |
 | [Do it yourself PPPS](https://git.io/J3lHs)              | Solder wires in your USB hub to support uhubctl       |
+| [Python Wrapper for uhubctl](https://github.com/nbuchwitz/python3-uhubctl) | Module to use uhubctl with Python |
 
 
 Copyright
