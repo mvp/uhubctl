@@ -58,6 +58,7 @@ This is list of known compatible USB hubs:
 | GlobalScale        | ESPRESSObin SBUD102 V5                               | 1     | 3.0 |`1D6B:0003`| 2017    |      |
 | Hardkernel         | ODROID-C4 ([note](https://git.io/JG0mP))             | 4     | 3.0 |           | 2020    |      |
 | Hawking Technology | UH214                                                | 4     | 2.0 |           | 2003    | 2008 |
+| Hewlett Packard    | USB-C Dock G5 5TW10AA                                | 5     | 3.2 |`03F0:076B`| 2019    |      |
 | Hewlett Packard    | P5Q58UT                                              | 3     | 3.0 |           | 2019    |      |
 | IOI                | U3H415E1                                             | 4     | 3.0 |           | 2012    |      |
 | j5create           | JUH377 ([note](https://bit.ly/3Mx9eQI))              | 7     | 3.0 |           | 2016    |      |
