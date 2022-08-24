@@ -919,16 +919,16 @@ int main(int argc, char *argv[])
             printf("\n");
             break;
         case 'l':
-            strncpy(opt_location, optarg, sizeof(opt_location));
+            snprintf(opt_location, sizeof(opt_location), "%s", optarg);
             break;
         case 'L':
             opt_level = atoi(optarg);
             break;
         case 'n':
-            strncpy(opt_vendor, optarg, sizeof(opt_vendor));
+            snprintf(opt_vendor, sizeof(opt_vendor), "%s", optarg);
             break;
         case 's':
-            strncpy(opt_search, optarg, sizeof(opt_search));
+            snprintf(opt_search, sizeof(opt_search), "%s", optarg);
             break;
         case 'p':
             if (!strcasecmp(optarg, "all")) { /* all ports is the default */
