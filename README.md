@@ -57,7 +57,7 @@ This is list of known compatible USB hubs:
 | GlobalScale        | ESPRESSObin SBUD102 V5                               | 1     | 3.0 |`1D6B:0003`| 2017    |      |
 | Hardkernel         | ODROID-C4 ([note](https://git.io/JG0mP))             | 4     | 3.0 |           | 2020    |      |
 | Hawking Technology | UH214                                                | 4     | 2.0 |           | 2003    | 2008 |
-| Hewlett Packard    | USB-C Dock G5 5TW10AA                                | 5     | 3.2 |`03F0:076B`| 2019    |      |
+| Hewlett Packard    | USB-C Dock G5 5TW10AA                                | 5     | 3.0 |`03F0:076B`| 2019    |      |
 | Hewlett Packard    | P5Q58UT                                              | 3     | 3.0 |           | 2019    |      |
 | IOI                | U3H415E1                                             | 4     | 3.0 |           | 2012    |      |
 | j5create           | JUH377 ([note](https://bit.ly/3Mx9eQI))              | 7     | 3.0 |           | 2016    |      |
@@ -93,10 +93,10 @@ This is list of known compatible USB hubs:
 | Raspberry Pi       | 4B         ([see below](#raspberry-pi-4b))           | 4     | 3.0 |`2109:3431`| 2019    |      |
 | Renesas            | uPD720202 PCIe USB 3.0 host controller               | 2     | 3.0 |           | 2013    |      |
 | Rosewill           | RHUB-210                                             | 4     | 2.0 |`0409:005A`| 2011    | 2014 |
-| Rosonway           | RSH-518C ([note](https://bit.ly/3kYZUsA))            | 7     | 3.2 |`2109:0817`| 2021    |      |
-| Rosonway           | RSH-A13 ([warning](https://bit.ly/3OToUOL))          | 13    | 3.2 |`2109:2822`| 2021    |      |
-| Rosonway           | RSH-A16 ([note](https://git.io/JTawg), [warning](https://bit.ly/39B0tGS)) | 16    | 3.2 |`0bda:0411`| 2020    |      |
-| Rosonway           | RSH-A104 ([USB2 only](https://bit.ly/3A0qiKF))       | 4     | 3.2 |`2109:2822`| 2022    |      |
+| Rosonway           | RSH-518C ([note](https://bit.ly/3kYZUsA))            | 7     | 3.0 |`2109:0817`| 2021    |      |
+| Rosonway           | RSH-A13 ([warning](https://bit.ly/3OToUOL))          | 13    | 3.1 |`2109:2822`| 2021    |      |
+| Rosonway           | RSH-A16 ([note](https://git.io/JTawg), [warning](https://bit.ly/39B0tGS)) | 16    | 3.0 |`0bda:0411`| 2020    |      |
+| Rosonway           | RSH-A104 ([USB2 only](https://bit.ly/3A0qiKF))       | 4     | 3.1 |`2109:2822`| 2022    |      |
 | Sanwa Supply       | USB-HUB14GPH                                         | 4     | 1.1 |           | 2001    | 2003 |
 | Seagate            | Backup Plus Hub STEL8000100                          | 2     | 3.0 |`0BC2:AB44`| 2016    |      |
 | Seeed Studio       | reTerminal CM4104032                                 | 2     | 2.0 |`0424:2514`| 2021    |      |
