@@ -508,6 +508,47 @@ static int get_port_status(struct libusb_device_handle *devh, int port)
 
 
 /*
+ * Use a control transfer via libusb to turn a port off/on.
+ * Returns >= 0 on success.
+ */
+
+static int set_port_status_libusb(struct libusb_device_handle *devh, int port, int on)
+{
+    int rc = 0;
+    int request = on ? LIBUSB_REQUEST_SET_FEATURE
+                     : LIBUSB_REQUEST_CLEAR_FEATURE;
+    int repeat = on ? 1 : opt_repeat;
+
+    while (repeat-- > 0) {
+        rc = libusb_control_transfer(devh,
+            LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_OTHER,
+            request, USB_PORT_FEAT_POWER,
+            port, NULL, 0, USB_CTRL_GET_TIMEOUT
+        );
+        if (rc < 0) {
+            perror("Failed to control port power!\n");
+        }
+        if (repeat > 0) {
+            sleep_ms(opt_wait);
+        }
+    }
+
+    return rc;
+}
+
+
+/*
+ * Try different methods to power a port off/on.
+ * Return >= 0 on success.
+ */
+
+static int set_port_status(struct libusb_device_handle *devh, int port, int on)
+{
+    return set_port_status_libusb(devh, port, on);
+}
+
+
+/*
  * Get USB device descriptor strings and summary description.
  *
  * Summary will use following format:
@@ -1060,45 +1101,29 @@ int main(int argc, char *argv[])
             if (rc == 0) {
                 /* will operate on these ports */
                 int ports = ((1 << hubs[i].nports) - 1) & opt_ports;
-                int request = (k == 0) ? LIBUSB_REQUEST_CLEAR_FEATURE
-                                       : LIBUSB_REQUEST_SET_FEATURE;
+                int should_be_on = k;
+
                 int port;
                 for (port=1; port <= hubs[i].nports; port++) {
                     if ((1 << (port-1)) & ports) {
                         int port_status = get_port_status(devh, port);
                         int power_mask = hubs[i].super_speed ? USB_SS_PORT_STAT_POWER
                                                              : USB_PORT_STAT_POWER;
-                        int powered_on = port_status & power_mask;
+                        int is_on = (port_status & power_mask) != 0;
+
                         if (opt_action == POWER_TOGGLE) {
-                            request = powered_on ? LIBUSB_REQUEST_CLEAR_FEATURE
-                                                 : LIBUSB_REQUEST_SET_FEATURE;
+                            should_be_on = !is_on;
                         }
-                        if (k == 0 && !powered_on && opt_action != POWER_TOGGLE)
-                            continue;
-                        if (k == 1 && powered_on)
-                            continue;
-                        int repeat = powered_on ? opt_repeat : 1;
-                        while (repeat-- > 0) {
-                            rc = libusb_control_transfer(devh,
-                                LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_OTHER,
-                                request, USB_PORT_FEAT_POWER,
-                                port, NULL, 0, USB_CTRL_GET_TIMEOUT
-                            );
-                            if (rc < 0) {
-                                perror("Failed to control port power!\n");
-                            }
-                            if (repeat > 0) {
-                                sleep_ms(opt_wait);
-                            }
+
+                        if (is_on != should_be_on) {
+                            rc = set_port_status(devh, port, should_be_on);
                         }
                     }
                 }
                 /* USB3 hubs need extra delay to actually turn off: */
                 if (k==0 && hubs[i].super_speed)
                     sleep_ms(150);
-                printf("Sent power %s request\n",
-                    request == LIBUSB_REQUEST_CLEAR_FEATURE ? "off" : "on"
-                );
+                printf("Sent power %s request\n", should_be_on ? "on" : "off");
                 printf("New status for hub %s [%s]\n",
                     hubs[i].location, hubs[i].ds.description
                 );
