@@ -59,6 +59,7 @@ This is list of known compatible USB hubs:
 | Hawking Technology | UH214                                                | 4     | 2.0 |           | 2003    | 2008 |
 | Hewlett Packard    | USB-C Dock G5 5TW10AA                                | 5     | 3.0 |`03F0:076B`| 2019    |      |
 | Hewlett Packard    | P5Q58UT                                              | 3     | 3.0 |           | 2019    |      |
+| Inateck            | HB2025A ([USB2 only](https://bit.ly/3wXF5UO))        | 4     | 3.1 |`2109:2822`| 2021    |      |
 | IOI                | U3H415E1                                             | 4     | 3.0 |           | 2012    |      |
 | j5create           | JUH377 ([note](https://bit.ly/3Mx9eQI))              | 7     | 3.0 |           | 2016    |      |
 | j5create           | JUH470 ([note](https://bit.ly/3CRWamP))              | 3     | 3.0 |`05E3:0610`| 2014    |      |
