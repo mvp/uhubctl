@@ -26,6 +26,7 @@ This is list of known compatible USB hubs:
 | AmazonBasics       | U3-7HUB (only works for 1 charge port)               | 7     | 3.0 |`2109:2813`| 2020    |      |
 | Anker              | AK-A83650A1 ([note](https://git.io/JzpPb))           | 4     | 3.1 |`2109:0817`| 2020    |      |
 | Anker              | AK-68ANHUB-BV7A-0004 ([note](https://git.io/JLnZb))  | 7     | 3.0 |`2109:0812`| 2014    |      |
+| Apple              | Pro Display XDR MWPE2LL/A (internal USB hub)         | 4     | 2.0 |`05AC:9139`| 2019    |      |
 | Apple              | Thunderbolt Display 27" (internal USB hub)           | 6     | 2.0 |           | 2011    | 2016 |
 | Apple              | USB Keyboard With Numeric Pad (internal USB hub)     | 3     | 2.0 |           | 2011    |      |
 | Asus               | Z87-PLUS Motherboard (onboard USB hub)               | 4     | 3.0 |           | 2013    | 2016 |
