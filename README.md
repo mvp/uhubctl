@@ -212,10 +212,20 @@ Linux USB permissions
 =====================
 
 On Linux, you should configure `udev` USB permissions (otherwise you will have to run it as root using `sudo uhubctl`).
+
+Starting with Linux Kernel 6.0 there is a standard interface to turn USB hub ports on or off,
+and `uhubctl` will try to use it (instead of `libusb`) to set the port status.
+This is why there are additional rules for 6.0+ kernels.
+There is no harm in having these rules on systems running older kernel versions.
+
 To fix USB permissions, first run `sudo uhubctl` and note all `vid:pid` for hubs you need to control.
 Then, add one or more udev rules like below to file `/etc/udev/rules.d/52-usb.rules` (replace 2001 with your vendor id):
 
     SUBSYSTEM=="usb", ATTR{idVendor}=="2001", MODE="0666"
+
+    # Linux 6.0 or later (its ok to have this block present in older Linux):
+    SUBSYSTEM=="usb", DRIVER=="hub", \
+      RUN="/bin/sh -c \"chmod -f 666 $sys$devpath/*-port*/disable || true\""
 
 Note that for USB3 hubs, some hubs use different vendor ID for USB2 vs USB3 components of the same chip,
 and both need permissions to make uhubctl work properly. E.g. for Raspberry Pi 4B, you need to add these 2 lines:
@@ -226,6 +236,11 @@ and both need permissions to make uhubctl work properly. E.g. for Raspberry Pi 4
 If you don't like wide open mode `0666`, you can restrict access by group like this:
 
     SUBSYSTEM=="usb", ATTR{idVendor}=="2001", MODE="0664", GROUP="dialout"
+
+    # Linux 6.0 or later (its ok to have this block present in older Linux):
+    SUBSYSTEM=="usb", DRIVER=="hub", \
+      RUN+="/bin/sh -c \"chown -f root:dialout $sys$devpath/*-port*/disable || true\"" \
+      RUN+="/bin/sh -c \"chmod -f 660 $sys$devpath/*-port*/disable || true\""
 
 and then add permitted users to `dialout` group:
 
