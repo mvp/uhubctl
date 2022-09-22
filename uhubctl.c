@@ -230,6 +230,14 @@ static int opt_nodesc = 0;  /* skip querying device description */
 static int opt_nosysfs = 0; /* don't use the Linux sysfs port disable interface, even if available */
 #endif
 
+
+static const char short_options[] =
+    "l:L:n:a:p:d:r:w:s:hvefRN"
+#ifdef __gnu_linux__
+    "S"
+#endif
+;
+
 static const struct option long_options[] = {
     { "location", required_argument, NULL, 'l' },
     { "vendor",   required_argument, NULL, 'n' },
@@ -1021,8 +1029,7 @@ int main(int argc, char *argv[])
     int option_index = 0;
 
     for (;;) {
-        c = getopt_long(argc, argv, "l:L:n:a:p:d:r:w:s:hvefRNS",
-            long_options, &option_index);
+        c = getopt_long(argc, argv, short_options, long_options, &option_index);
         if (c == -1)
             break;  /* no more options left */
         switch (c) {
