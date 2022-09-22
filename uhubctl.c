@@ -47,6 +47,10 @@ int snprintf(char * __restrict __str, size_t __size, const char * __restrict __f
 #include <time.h>   /* for nanosleep */
 #endif
 
+#ifdef __gnu_linux__
+#include <fcntl.h> /* for open() / O_WRONLY */
+#endif
+
 /* cross-platform sleep function */
 
 void sleep_ms(int milliseconds)
@@ -222,6 +226,9 @@ static int opt_exact  = 0;  /* exact location match - disable USB3 duality handl
 static int opt_reset  = 0;  /* reset hub after operation(s) */
 static int opt_force  = 0;  /* force operation even on unsupported hubs */
 static int opt_nodesc = 0;  /* skip querying device description */
+#ifdef __gnu_linux__
+static int opt_nosysfs = 0; /* don't use the Linux sysfs port disable interface, even if available */
+#endif
 
 static const struct option long_options[] = {
     { "location", required_argument, NULL, 'l' },
@@ -236,6 +243,9 @@ static const struct option long_options[] = {
     { "exact",    no_argument,       NULL, 'e' },
     { "force",    no_argument,       NULL, 'f' },
     { "nodesc",   no_argument,       NULL, 'N' },
+#ifdef __gnu_linux__
+    { "nosysfs",  no_argument,       NULL, 'S' },
+#endif
     { "reset",    no_argument,       NULL, 'R' },
     { "version",  no_argument,       NULL, 'v' },
     { "help",     no_argument,       NULL, 'h' },
@@ -262,6 +272,9 @@ static int print_usage()
         "--exact,    -e - exact location (no USB3 duality handling).\n"
         "--force,    -f - force operation even on unsupported hubs.\n"
         "--nodesc,   -N - do not query device description (helpful for unresponsive devices).\n"
+#ifdef __gnu_linux__
+        "--nosysfs,  -S - do not use the Linux sysfs port disable interface.\n"
+#endif
         "--reset,    -R - reset hub after each power-on action, causing all devices to reassociate.\n"
         "--wait,     -w - wait before repeat power off [%d ms].\n"
         "--version,  -v - print program version.\n"
@@ -504,6 +517,108 @@ static int get_port_status(struct libusb_device_handle *devh, int port)
         return rc;
     }
     return ust.wPortStatus;
+}
+
+
+#ifdef __gnu_linux__
+/*
+ * Try to use the Linux sysfs interface to power a port off/on.
+ * Returns 0 on success.
+ */
+
+static int set_port_status_linux(struct libusb_device_handle *devh, struct hub_info *hub, int port, int on)
+{
+    int configuration = 0;
+    char disable_path[PATH_MAX];
+
+    int rc = libusb_get_configuration(devh, &configuration);
+    if (rc < 0) {
+        return rc;
+    }
+
+    // The "disable" sysfs interface is available starting with kernel version 6.0.
+    // For earlier kernel versions the open() call will fail and we fall
+    // back to using libusb.
+    snprintf(disable_path, PATH_MAX,
+        "/sys/bus/usb/devices/%s:%d.0/%s-port%i/disable",
+        hub->location, configuration, hub->location, port
+    );
+
+    int disable_fd = open(disable_path, O_WRONLY);
+    if (disable_fd >= 0) {
+      rc = write(disable_fd, on ? "0" : "1", 1);
+      close(disable_fd);
+    }
+
+    if (disable_fd < 0  || rc < 0) {
+        // ENOENT is the expected error when running on Linux kernel < 6.0 where
+        // the interface does not exist yet. No need to report anything in this case.
+        // If the file exists but another error occurs it is most likely a permission
+        // issue. Print an error message mostly geared towards setting up udev.
+        if (errno != ENOENT) {
+            fprintf(stderr,
+                "Failed to set port status by writing to %s (%s).\n"
+                "Follow https://git.io/JIB2Z to make sure that udev is set up correctly.\n"
+                "Falling back to libusb based port control.\n"
+                "Use -S to skip trying the sysfs interface and printing this message.\n",
+                disable_path, strerror(errno)
+            );
+        }
+
+        return -1;
+    }
+
+    return 0;
+}
+#endif
+
+
+/*
+ * Use a control transfer via libusb to turn a port off/on.
+ * Returns >= 0 on success.
+ */
+
+static int set_port_status_libusb(struct libusb_device_handle *devh, int port, int on)
+{
+    int rc = 0;
+    int request = on ? LIBUSB_REQUEST_SET_FEATURE
+                     : LIBUSB_REQUEST_CLEAR_FEATURE;
+    int repeat = on ? 1 : opt_repeat;
+
+    while (repeat-- > 0) {
+        rc = libusb_control_transfer(devh,
+            LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_OTHER,
+            request, USB_PORT_FEAT_POWER,
+            port, NULL, 0, USB_CTRL_GET_TIMEOUT
+        );
+        if (rc < 0) {
+            perror("Failed to control port power!\n");
+        }
+        if (repeat > 0) {
+            sleep_ms(opt_wait);
+        }
+    }
+
+    return rc;
+}
+
+
+/*
+ * Try different methods to power a port off/on.
+ * Return >= 0 on success.
+ */
+
+static int set_port_status(struct libusb_device_handle *devh, struct hub_info *hub, int port, int on)
+{
+#ifdef __gnu_linux__
+    if (!opt_nosysfs) {
+        if (set_port_status_linux(devh, hub, port, on) == 0) {
+            return 0;
+        }
+    }
+#endif
+
+    return set_port_status_libusb(devh, port, on);
 }
 
 
@@ -904,7 +1019,7 @@ int main(int argc, char *argv[])
     int option_index = 0;
 
     for (;;) {
-        c = getopt_long(argc, argv, "l:L:n:a:p:d:r:w:s:hvefRN",
+        c = getopt_long(argc, argv, "l:L:n:a:p:d:r:w:s:hvefRNS",
             long_options, &option_index);
         if (c == -1)
             break;  /* no more options left */
@@ -964,6 +1079,11 @@ int main(int argc, char *argv[])
         case 'N':
             opt_nodesc = 1;
             break;
+#ifdef __gnu_linux__
+        case 'S':
+            opt_nosysfs = 1;
+            break;
+#endif
         case 'e':
             opt_exact = 1;
             break;
@@ -1060,45 +1180,29 @@ int main(int argc, char *argv[])
             if (rc == 0) {
                 /* will operate on these ports */
                 int ports = ((1 << hubs[i].nports) - 1) & opt_ports;
-                int request = (k == 0) ? LIBUSB_REQUEST_CLEAR_FEATURE
-                                       : LIBUSB_REQUEST_SET_FEATURE;
+                int should_be_on = k;
+
                 int port;
                 for (port=1; port <= hubs[i].nports; port++) {
                     if ((1 << (port-1)) & ports) {
                         int port_status = get_port_status(devh, port);
                         int power_mask = hubs[i].super_speed ? USB_SS_PORT_STAT_POWER
                                                              : USB_PORT_STAT_POWER;
-                        int powered_on = port_status & power_mask;
+                        int is_on = (port_status & power_mask) != 0;
+
                         if (opt_action == POWER_TOGGLE) {
-                            request = powered_on ? LIBUSB_REQUEST_CLEAR_FEATURE
-                                                 : LIBUSB_REQUEST_SET_FEATURE;
+                            should_be_on = !is_on;
                         }
-                        if (k == 0 && !powered_on && opt_action != POWER_TOGGLE)
-                            continue;
-                        if (k == 1 && powered_on)
-                            continue;
-                        int repeat = powered_on ? opt_repeat : 1;
-                        while (repeat-- > 0) {
-                            rc = libusb_control_transfer(devh,
-                                LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_OTHER,
-                                request, USB_PORT_FEAT_POWER,
-                                port, NULL, 0, USB_CTRL_GET_TIMEOUT
-                            );
-                            if (rc < 0) {
-                                perror("Failed to control port power!\n");
-                            }
-                            if (repeat > 0) {
-                                sleep_ms(opt_wait);
-                            }
+
+                        if (is_on != should_be_on) {
+                            rc = set_port_status(devh, &hubs[i], port, should_be_on);
                         }
                     }
                 }
                 /* USB3 hubs need extra delay to actually turn off: */
                 if (k==0 && hubs[i].super_speed)
                     sleep_ms(150);
-                printf("Sent power %s request\n",
-                    request == LIBUSB_REQUEST_CLEAR_FEATURE ? "off" : "on"
-                );
+                printf("Sent power %s request\n", should_be_on ? "on" : "off");
                 printf("New status for hub %s [%s]\n",
                     hubs[i].location, hubs[i].ds.description
                 );
