@@ -546,8 +546,8 @@ static int set_port_status_linux(struct libusb_device_handle *devh, struct hub_i
 
     int disable_fd = open(disable_path, O_WRONLY);
     if (disable_fd >= 0) {
-      rc = write(disable_fd, on ? "0" : "1", 1);
-      close(disable_fd);
+        rc = write(disable_fd, on ? "0" : "1", 1);
+        close(disable_fd);
     }
 
     if (disable_fd < 0  || rc < 0) {
@@ -616,6 +616,8 @@ static int set_port_status(struct libusb_device_handle *devh, struct hub_info *h
             return 0;
         }
     }
+#else
+    (void)hub;
 #endif
 
     return set_port_status_libusb(devh, port, on);
