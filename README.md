@@ -307,6 +307,8 @@ Per-port power switching:
 
 #### _USB devices are not removed after port power down on Linux_
 
+> :arrow_right: This is fixed by [#450](https://github.com/mvp/uhubctl/pull/450) if you are using Linux kernel 6.0 or later.
+
 After powering down USB port, udev does not get any event, so it keeps the device files around.
 However, trying to access the device files will lead to an IO error.
 
@@ -324,6 +326,8 @@ Note that path `/sys/bus/usb/devices/${location}.${port}` will only exist if dev
 When you turn power back on, device should re-enumerate properly (no need to call `udevadm` again).
 
 #### _Power comes back on after few seconds on Linux_
+
+> :arrow_right: This is fixed by [#450](https://github.com/mvp/uhubctl/pull/450) if you are using Linux kernel 6.0 or later.
 
 Some device drivers in kernel are surprised by USB device being turned off and automatically try to power it back on.
 
