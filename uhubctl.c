@@ -544,9 +544,10 @@ static int set_port_status_linux(struct libusb_device_handle *devh, struct hub_i
         return rc;
     }
 
-    // The "disable" sysfs interface is available starting with kernel version 6.0.
-    // For earlier kernel versions the open() call will fail and we fall
-    // back to using libusb.
+    /*
+     * The "disable" sysfs interface is available only starting with kernel version 6.0.
+     * For earlier kernel versions the open() call will fail and we fall back to using libusb.
+     */
     snprintf(disable_path, PATH_MAX,
         "/sys/bus/usb/devices/%s:%d.0/%s-port%i/disable",
         hub->location, configuration, hub->location, port
@@ -558,11 +559,13 @@ static int set_port_status_linux(struct libusb_device_handle *devh, struct hub_i
         close(disable_fd);
     }
 
-    if (disable_fd < 0  || rc < 0) {
-        // ENOENT is the expected error when running on Linux kernel < 6.0 where
-        // the interface does not exist yet. No need to report anything in this case.
-        // If the file exists but another error occurs it is most likely a permission
-        // issue. Print an error message mostly geared towards setting up udev.
+    if (disable_fd < 0 || rc < 0) {
+        /*
+         * ENOENT is the expected error when running on Linux kernel < 6.0 where
+         * sysfs disable interface does not exist yet - no need to report anything in this case.
+         * If the file exists but another error occurs it is most likely a permission issue.
+         * Print an error message mostly geared towards setting up udev.
+         */
         if (errno != ENOENT) {
             fprintf(stderr,
                 "Failed to set port status by writing to %s (%s).\n"
@@ -1170,7 +1173,7 @@ int main(int argc, char *argv[])
             continue;
         if (k == 1 && opt_action == POWER_KEEP)
             continue;
-        // if toggle requested, do it only once when `k == 0`
+        /* if toggle requested, do it only once when `k == 0` */
         if (k == 1 && opt_action == POWER_TOGGLE)
             continue;
         int i;
