@@ -1,0 +1,24 @@
+# uhubctl – USB hub per-port power control https://github.com/mvp/uhubctl
+#
+# Copyright (c) 2009-2022, Vadim Mikhailov
+#
+# This file can be distributed under the terms and conditions of the
+# GNU General Public License version 2.
+
+# uhubctl udev rules for rootless operation on Linux for users in group `dialout`.
+#
+# Copy this file to /etc/udev/rules.d, then reboot or run:
+#
+#   sudo udevadm trigger --attr-match=subsystem=usb
+#
+# To add yourself to this permission group, run:
+#
+#   sudo usermod -a -G dialout $USER
+
+# This is for Linux before 6.0:
+SUBSYSTEM=="usb", DRIVER=="hub", MODE="0664", GROUP="dialout"
+
+# This is for Linux 6.0 or later (ok to keep this block present for older Linux kernels):
+SUBSYSTEM=="usb", DRIVER=="hub", \
+  RUN+="/bin/sh -c \"chown -f root:dialout $sys$devpath/*-port*/disable || true\"" \
+  RUN+="/bin/sh -c \"chmod -f 660 $sys$devpath/*-port*/disable || true\""
