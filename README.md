@@ -30,16 +30,16 @@ This is list of known compatible USB hubs:
 | Apple              | Thunderbolt Display 27" (internal USB hub)           | 6     | 2.0 |           | 2011    | 2016 |
 | Apple              | USB Keyboard With Numeric Pad (internal USB hub)     | 3     | 2.0 |           | 2011    |      |
 | Asus               | Z87-PLUS Motherboard (onboard USB hub)               | 4     | 3.0 |           | 2013    | 2016 |
-| Aukey              | CB-C59                                               | 4     | 3.1 |`2109:2813`| 2017    |      |
+| Aukey              | CB-C59                                               | 4     | 3.0 |`2109:2813`| 2017    |      |
 | B+B SmartWorx      | UHR204                                               | 4     | 2.0 |`0856:DB00`| 2013    |      |
 | B+B SmartWorx      | USH304                                               | 4     | 3.0 |`04B4:6506`| 2017    |      |
 | Basler             | 2000036234                                           | 4     | 3.0 |`0451:8046`| 2016    |      |
 | Belkin             | F5U101                                               | 4     | 2.0 |`0451:2046`| 2005    | 2010 |
-| BenQ               | PD2700U 4K Monitor (works only in USB2 mode)         | 4     | 3.1 |`05E3:0610`| 2018    |      |
+| BenQ               | PD2700U 4K Monitor (works only in USB2 mode)         | 4     | 3.0 |`05E3:0610`| 2018    |      |
 | BenQ               | PD3220U                                              | 4     | 3.1 |`05E3:0610`| 2019    |      |
 | Buffalo            | BSH4A05U3BK                                          | 4     | 3.0 |`05E3:0610`| 2015    |      |
 | Bytecc             | BT-UH340 ([warning](https://bit.ly/35BNi5U))         | 4     | 3.0 |`2109:8110`| 2010    |      |
-| Centech            | CT-USB4HUB ReTRY HUB                                 | 4     | 3.1 |`0424:2744`| 2017    |      |
+| Centech            | CT-USB4HUB ReTRY HUB                                 | 4     | 3.0 |`0424:2744`| 2017    |      |
 | Circuitco          | Beagleboard-xM (internal USB hub)                    | 4     | 2.0 |`0424:9514`| 2010    |      |
 | Club3D             | CSV-3242HD Dual Display Docking Station              | 4     | 3.0 |`2109:2811`| 2015    |      |
 | CyberPower         | CP-H420P                                             | 4     | 2.0 |`0409:0059`| 2004    |      |
@@ -48,14 +48,14 @@ This is list of known compatible USB hubs:
 | D-Link             | DUB-H7 rev A (silver)                                | 7     | 2.0 |`2001:F103`| 2005    | 2010 |
 | D-Link             | DUB-H7 rev D,E (black). Rev B,C,F,G not supported    | 7     | 2.0 |`05E3:0608`| 2012    |      |
 | Dell               | P2416D 24" QHD Monitor ([note](https://git.io/JUAu8))| 4     | 2.0 |           | 2017    |      |
-| Dell               | S2719DGF 27" WQHD Gaming-Monitor                     | 5     | 3.1 |`0424:5734`| 2018    |      |
+| Dell               | S2719DGF 27" WQHD Gaming-Monitor                     | 5     | 3.0 |`0424:5734`| 2018    |      |
 | Dell               | UltraSharp 1704FPT 17" LCD Monitor                   | 4     | 2.0 |`0424:A700`| 2005    | 2015 |
 | Dell               | UltraSharp U2415 24" LCD Monitor                     | 5     | 3.0 |           | 2014    |      |
 | Dell               | UltraSharp U3419W 34" Curved Monitor                 | 6     | 3.0 |           | 2020    |      |
-| Delock             | 62537                                                | 4     | 3.1 |           | 2020    |      |
+| Delock             | 62537                                                | 4     | 3.0 |           | 2020    |      |
 | Delock             | 87445 ([note](https://git.io/Jsuz5))                 | 4     | 2.0 |`05E3:0608`| 2009    | 2013 |
 | Elecom             | U2H-G4S                                              | 4     | 2.0 |           | 2006    | 2011 |
-| ExSys              | EX-1113HMS                                           | 16    | 3.1 |           | 2018    |      |
+| ExSys              | EX-1113HMS                                           | 16    | 3.0 |           | 2018    |      |
 | GlobalScale        | ESPRESSObin SBUD102 V5                               | 1     | 3.0 |`1D6B:0003`| 2017    |      |
 | Hardkernel         | ODROID-C4 ([note](https://git.io/JG0mP))             | 4     | 3.0 |           | 2020    |      |
 | Hawking Technology | UH214                                                | 4     | 2.0 |           | 2003    | 2008 |
@@ -66,7 +66,7 @@ This is list of known compatible USB hubs:
 | j5create           | JUH377 ([note](https://bit.ly/3Mx9eQI))              | 7     | 3.0 |           | 2016    |      |
 | j5create           | JUH470 ([note](https://bit.ly/3CRWamP))              | 3     | 3.0 |`05E3:0610`| 2014    |      |
 | Juiced Systems     | 6HUB-01                                              | 7     | 3.0 |`0BDA:0411`| 2014    | 2018 |
-| LG Electronics     | 27MD5KL-B monitor                                    | 4     | 3.1 |`043E:9A60`| 2019    |      |
+| LG Electronics     | 27MD5KL-B monitor                                    | 4     | 3.0 |`043E:9A60`| 2019    |      |
 | LG Electronics     | 27UK850-W monitor                                    | 2     | 3.0 |           | 2018    |      |
 | LG Electronics     | 38WK95C-W monitor                                    | 4     | 3.0 |`0451:8142`| 2018    |      |
 | Lenovo             | ThinkPad Ultra Docking Station (40A20090EU)          | 6     | 2.0 |`17EF:100F`| 2015    |      |
@@ -80,7 +80,7 @@ This is list of known compatible USB hubs:
 | Maplin             | A08CQ                                                | 7     | 2.0 |`0409:0059`| 2008    | 2011 |
 | Microchip          | EVB-USB2517                                          | 7     | 2.0 |           | 2008    |      |
 | Microchip          | EVB-USB2534BC                                        | 4     | 2.0 |           | 2013    |      |
-| Microchip          | EVB-USB5807                                          | 7     | 3.1 |           | 2016    |      |
+| Microchip          | EVB-USB5807                                          | 7     | 3.0 |           | 2016    |      |
 | Moxa               | Uport-407                                            | 7     | 2.0 |`110A:0407`| 2009    |      |
 | NVidia             | Jetson Nano B01 ([details](https://git.io/JJaFR))    | 4     | 3.0 |           | 2019    |      |
 | NVidia             | Jetson Xavier NX ([details](https://bit.ly/3PN2DDp)) | 4     | 3.0 |           | 2020    |      |
@@ -106,7 +106,7 @@ This is list of known compatible USB hubs:
 | Sunix              | SHB4200MA                                            | 4     | 2.0 |`0409:0058`| 2006    | 2009 |
 | Targus             | PAUH212/PAUH212U                                     | 7     | 2.0 |           | 2004    | 2009 |
 | Texas Instruments  | TUSB4041PAPEVM                                       | 4     | 2.1 |`0451:8142`| 2015    |      |
-| UUGear             | MEGA4 (for Raspberry Pi 4B)                          | 4     | 3.1 |`2109:0817`| 2021    |      |
+| UUGear             | MEGA4 (for Raspberry Pi 4B)                          | 4     | 3.0 |`2109:0817`| 2021    |      |
 
 This table is by no means complete.
 If your hub works with `uhubctl`, but is not listed above, please report it
