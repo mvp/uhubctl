@@ -68,6 +68,7 @@ This is list of known compatible USB hubs:
 | Juiced Systems     | 6HUB-01                                              | 7     | 3.0 |`0BDA:0411`| 2014    | 2018 |
 | LG Electronics     | 27MD5KL-B monitor                                    | 4     | 3.0 |`043E:9A60`| 2019    |      |
 | LG Electronics     | 27UK850-W monitor                                    | 2     | 3.0 |           | 2018    |      |
+| LG Electronics     | 27UN83A-W monitor                                    | 2     | 3.0 |`0451:8142`| 2020    |      |
 | LG Electronics     | 38WK95C-W monitor                                    | 4     | 3.0 |`0451:8142`| 2018    |      |
 | Lenovo             | ThinkPad Ultra Docking Station (40A20090EU)          | 6     | 2.0 |`17EF:100F`| 2015    |      |
 | Lenovo             | ThinkPad Ultra Docking Station (40AJ0135EU)          | 7     | 3.1 |`17EF:3070`| 2018    |      |
