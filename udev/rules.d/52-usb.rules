@@ -16,7 +16,7 @@
 #   sudo usermod -a -G dialout $USER
 
 # This is for Linux before 6.0:
-SUBSYSTEM=="usb", DRIVER=="hub", MODE="0664", GROUP="dialout"
+SUBSYSTEM=="usb", DRIVER=="usb", MODE="0664", GROUP="dialout"
 
 # This is for Linux 6.0 or later (ok to keep this block present for older Linux kernels):
 SUBSYSTEM=="usb", DRIVER=="hub", \
