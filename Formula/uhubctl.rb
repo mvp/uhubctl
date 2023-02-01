@@ -3,7 +3,7 @@ class Uhubctl < Formula
   homepage "https://github.com/mvp/uhubctl"
   head "https://github.com/mvp/uhubctl.git"
   url "https://github.com/mvp/uhubctl/archive/v2.5.0.tar.gz"
-  sha256 "7be75781b709c36c03c68555f06347d70e5f4e8fd2d17fd481f20626fb4c6038"
+  sha256 "d4452252f7862f7a45dd9c62f2ea7cd3a57ab5f5ab0e54a857d4c695699bbba3"
   license "GPL-2.0"
 
   depends_on "libusb"
