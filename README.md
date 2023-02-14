@@ -36,6 +36,7 @@ This is list of known compatible USB hubs:
 | B+B SmartWorx      | USH304                                               | 4     | 3.0 |`04B4:6506`| 2017    |      |
 | Basler             | 2000036234                                           | 4     | 3.0 |`0451:8046`| 2016    |      |
 | Belkin             | F5U101                                               | 4     | 2.0 |`0451:2046`| 2005    | 2010 |
+| Belkin             | F5U238UKCRL-MOB                                      | 4     | 2.0 |`0409:0059`| 2004    | 2010 |
 | BenQ               | PD2700U 4K Monitor (works only in USB2 mode)         | 4     | 3.0 |`05E3:0610`| 2018    |      |
 | BenQ               | PD3220U                                              | 4     | 3.1 |`05E3:0610`| 2019    |      |
 | Buffalo            | BSH4A05U3BK                                          | 4     | 3.0 |`05E3:0610`| 2015    |      |
