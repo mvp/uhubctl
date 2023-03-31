@@ -261,7 +261,7 @@ static const struct option long_options[] = {
 };
 
 
-static int print_usage()
+static int print_usage(void)
 {
     printf(
         "uhubctl: utility to control USB port power for smart hubs.\n"
@@ -823,7 +823,7 @@ static int print_port_status(struct hub_info * hub, int portmask)
  *  In case of error returns negative error code.
  */
 
-static int usb_find_hubs()
+static int usb_find_hubs(void)
 {
     struct libusb_device *dev;
     int perm_ok = 1;
