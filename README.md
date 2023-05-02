@@ -80,6 +80,7 @@ This is list of known compatible USB hubs:
 | Lindy              | USB serial converter 4 port                          | 4     | 1.1 |`058F:9254`| 2008    |      |
 | Linksys            | USB2HUB4 ([note](https://git.io/JYiDZ))              | 4     | 2.0 |           | 2004    | 2010 |
 | Maplin             | A08CQ                                                | 7     | 2.0 |`0409:0059`| 2008    | 2011 |
+| Microchip          | EVB9512                                              | 2     | 2.0 |           | 2009    |      |
 | Microchip          | EVB-USB2517                                          | 7     | 2.0 |           | 2008    |      |
 | Microchip          | EVB-USB2534BC                                        | 4     | 2.0 |           | 2013    |      |
 | Microchip          | EVB-USB5807                                          | 7     | 3.0 |           | 2016    |      |
