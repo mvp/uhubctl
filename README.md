@@ -106,7 +106,7 @@ This is list of known compatible USB hubs:
 | Sanwa Supply       | USB-HUB14GPH                                         | 4     | 1.1 |           | 2001    | 2003 |
 | Seagate            | Backup Plus Hub STEL8000100                          | 2     | 3.0 |`0BC2:AB44`| 2016    |      |
 | Seeed Studio       | reTerminal CM4104032                                 | 2     | 2.0 |`0424:2514`| 2021    |      |
-| StarTech           | HB30A4AIB ([warning](issues/509))                    | 4     | 3.0 |`2109:2817`| 2018    |      |
+| StarTech           | HB30A4AIB (warning: #509)                            | 4     | 3.0 |`2109:2817`| 2018    |      |
 | Sunix              | SHB4200MA                                            | 4     | 2.0 |`0409:0058`| 2006    | 2009 |
 | Targus             | PAUH212/PAUH212U                                     | 7     | 2.0 |           | 2004    | 2009 |
 | Texas Instruments  | TUSB4041PAPEVM                                       | 4     | 2.1 |`0451:8142`| 2015    |      |
