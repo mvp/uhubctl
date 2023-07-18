@@ -413,29 +413,30 @@ to make power switching work on RPi 4B.
 
 Notable projects using uhubctl
 ==============================
-| Project                                                  | Description                                           |
-|:---------------------------------------------------------|:------------------------------------------------------|
-| [Morse code USB light](https://git.io/fj1F4)             | Flash a message in Morse code with USB light          |
-| [Webcam USB light](https://git.io/fj1FB)                 | Turn on/off LED when webcam is turned on/off          |
-| [Cinema Lightbox](https://goo.gl/fjCvkz)                 | Turn on/off Cinema Lightbox from iOS Home app         |
-| [Build Status Light](https://goo.gl/3GA82o)              | Create a build status light in under 10 minutes       |
-| [Buildenlights](https://git.io/fj1FC)                    | GitLab/GitHub project build status as green/red light |
-| [Weather Station](https://goo.gl/3b1FzC)                 | Reset Weather Station when it freezes                 |
-| [sysmoQMOD](https://bit.ly/2VtWrVt)                      | Reset cellular modems when necessary                  |
-| [Smog Sensor](https://bit.ly/2EMwgCk)                    | Raspberry Pi based smog sensor power reset            |
-| [Terrible Cluster](https://goo.gl/XjiXFu)                | Power on/off Raspberry Pi cluster nodes as needed     |
-| [Ideal Music Server](https://bit.ly/39MeVFQ)             | Turn off unused USB ports to improve audio quality    |
-| [USB drives with no phantom load](https://goo.gl/qfrmGK) | Power USB drives only when needed to save power       |
-| [USB drive data recovery](https://goo.gl/4MddLr)         | Recover data from failing USB hard drive              |
-| [Control power to 3D printer](https://git.io/fh5Tr)      | OctoPrint web plugin for USB power control            |
-| [USB fan for Raspberry Pi](https://bit.ly/2TRV6sM)       | Control USB fan to avoid Raspberry Pi overheating     |
-| [Raspberry Pi Reboot Router](https://bit.ly/3aNbQqs)     | Automatically reboot router if internet isn't working |
-| [Control USB Lamp With Voice](https://bit.ly/2VtW2SX)    | Voice Control of USB Lamp using Siri and Raspberry Pi |
-| [Control USB LED Strip](https://bit.ly/3oVWfeZ)          | Controlling USB powered LED Light Strip               |
-| [Brew beer with Raspberry Pi](https://git.io/JtbLd)      | Automated beer brewing system using Raspberry Pi      |
-| [Webcam On-Air Sign](https://bit.ly/3witNsa)             | Automatically light up a sign when webcam is in use   |
-| [Do it yourself PPPS](https://git.io/J3lHs)              | Solder wires in your USB hub to support uhubctl       |
-| [Python Wrapper for uhubctl](https://github.com/nbuchwitz/python3-uhubctl) | Module to use uhubctl with Python |
+| Project                                                  | Description                                             |
+|:---------------------------------------------------------|:--------------------------------------------------------|
+| [Morse code USB light](https://git.io/fj1F4)             | Flash a message in Morse code with USB light            |
+| [Webcam USB light](https://git.io/fj1FB)                 | Turn on/off LED when webcam is turned on/off            |
+| [Cinema Lightbox](https://goo.gl/fjCvkz)                 | Turn on/off Cinema Lightbox from iOS Home app           |
+| [Build Status Light](https://goo.gl/3GA82o)              | Create a build status light in under 10 minutes         |
+| [Buildenlights](https://git.io/fj1FC)                    | GitLab/GitHub project build status as green/red light   |
+| [Weather Station](https://goo.gl/3b1FzC)                 | Reset Weather Station when it freezes                   |
+| [sysmoQMOD](https://bit.ly/2VtWrVt)                      | Reset cellular modems when necessary                    |
+| [Smog Sensor](https://bit.ly/2EMwgCk)                    | Raspberry Pi based smog sensor power reset              |
+| [Terrible Cluster](https://goo.gl/XjiXFu)                | Power on/off Raspberry Pi cluster nodes as needed       |
+| [Ideal Music Server](https://bit.ly/39MeVFQ)             | Turn off unused USB ports to improve audio quality      |
+| [USB drives with no phantom load](https://goo.gl/qfrmGK) | Power USB drives only when needed to save power         |
+| [USB drive data recovery](https://goo.gl/4MddLr)         | Recover data from failing USB hard drive                |
+| [Control power to 3D printer](https://git.io/fh5Tr)      | OctoPrint web plugin for USB power control              |
+| [USB fan for Raspberry Pi](https://bit.ly/2TRV6sM)       | Control USB fan to avoid Raspberry Pi overheating       |
+| [Raspberry Pi Reboot Router](https://bit.ly/3aNbQqs)     | Automatically reboot router if internet isn't working   |
+| [Control USB Lamp With Voice](https://bit.ly/2VtW2SX)    | Voice Control of USB Lamp using Siri and Raspberry Pi   |
+| [Control USB LED Strip](https://bit.ly/3oVWfeZ)          | Controlling USB powered LED Light Strip                 |
+| [Brew beer with Raspberry Pi](https://git.io/JtbLd)      | Automated beer brewing system using Raspberry Pi        |
+| [Webcam On-Air Sign](https://bit.ly/3witNsa)             | Automatically light up a sign when webcam is in use     |
+| [Do it yourself PPPS](https://git.io/J3lHs)              | Solder wires in your USB hub to support uhubctl         |
+| [Open source PPPS hub](https://tinyurl.com/yckhystt)     | Open source hardware project for uhubctl compatible hub |
+| [Python Wrapper for uhubctl](https://github.com/nbuchwitz/python3-uhubctl) | Module to use uhubctl with Python     |
 
 
 Copyright
