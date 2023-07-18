@@ -44,6 +44,7 @@ This is list of known compatible USB hubs:
 | Centech            | CT-USB4HUB ReTRY HUB                                 | 4     | 3.0 |`0424:2744`| 2017    |      |
 | Circuitco          | Beagleboard-xM (internal USB hub)                    | 4     | 2.0 |`0424:9514`| 2010    |      |
 | Club3D             | CSV-3242HD Dual Display Docking Station              | 4     | 3.0 |`2109:2811`| 2015    |      |
+| Coolgear           | USBG-12U2ML                                          | 12    | 2.0 |`05e3:0607`| 2015    |      |
 | CyberPower         | CP-H420P                                             | 4     | 2.0 |`0409:0059`| 2004    |      |
 | Cypress            | CY4608 HX2VL devkit ([note](https://bit.ly/3sMPfpu)) | 4     | 2.0 |`04B4:6570`| 2012    |      |
 | D-Link             | DUB-H4 rev D,E (black). Note: rev A,C,F not supported| 4     | 2.0 |`05E3:0608`| 2012    |      |
