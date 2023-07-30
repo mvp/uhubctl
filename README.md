@@ -55,6 +55,7 @@ This is list of known compatible USB hubs:
 | Dell               | UltraSharp 1704FPT 17" LCD Monitor                   | 4     | 2.0 |`0424:A700`| 2005    | 2015 |
 | Dell               | UltraSharp U2415 24" LCD Monitor                     | 5     | 3.0 |           | 2014    |      |
 | Dell               | UltraSharp U3419W 34" Curved Monitor                 | 6     | 3.0 |           | 2020    |      |
+| Dell               | Wyse 3040 ([-f required](https://tinyurl.com/wyse3k))| 6     | 3.0 |           | 2017    |      |
 | Delock             | 62537                                                | 4     | 3.0 |           | 2020    |      |
 | Delock             | 87445 ([note](https://git.io/Jsuz5))                 | 4     | 2.0 |`05E3:0608`| 2009    | 2013 |
 | Elecom             | U2H-G4S                                              | 4     | 2.0 |           | 2006    | 2011 |
