@@ -219,6 +219,7 @@ static char opt_location[32] = "";     /* Hub location a-b.c.d */
 static int opt_level = 0;              /* Hub location level (e.g., a-b is level 2, a-b.c is level 3)*/
 static int opt_ports  = ALL_HUB_PORTS; /* Bitmask of ports to operate on */
 static int opt_action = POWER_KEEP;
+static int opt_dquirk = 0; 
 static double opt_delay = 2;
 static int opt_repeat = 1;
 static int opt_wait   = 20; /* wait before repeating in ms */
@@ -232,7 +233,7 @@ static int opt_nosysfs = 0; /* don't use the Linux sysfs port disable interface,
 
 
 static const char short_options[] =
-    "l:L:n:a:p:d:r:w:s:hvefRN"
+    "l:L:n:a:p:d:r:w:s:hvefqRN"
 #ifdef __gnu_linux__
     "S"
 #endif
@@ -254,6 +255,7 @@ static const struct option long_options[] = {
 #ifdef __gnu_linux__
     { "nosysfs",  no_argument,       NULL, 'S' },
 #endif
+    { "dquirk",   no_argument,       NULL, 'q' },
     { "reset",    no_argument,       NULL, 'R' },
     { "version",  no_argument,       NULL, 'v' },
     { "help",     no_argument,       NULL, 'h' },
@@ -275,6 +277,7 @@ static int print_usage(void)
         "--level     -L - limit hub by location level (e.g. a-b.c is level 3).\n"
         "--vendor,   -n - limit hub by vendor id [%s] (partial ok).\n"
         "--search,   -s - limit hub by attached device description.\n"
+        "--dquirk,   -q - Fix D-Link port numbering.\n"
         "--delay,    -d - delay for cycle action [%g sec].\n"
         "--repeat,   -r - repeat power off count [%d] (some devices need it to turn off).\n"
         "--exact,    -e - exact location (no USB3 duality handling).\n"
@@ -361,9 +364,9 @@ static int ports2bitmap(char* const portlist)
             ports |= (1 << (i-1));
         }
     }
+    printf("ports bitmap = %d\n", ports);
     return ports;
 }
-
 
 /*
  * Compatibility wrapper around libusb_get_port_numbers()
@@ -513,6 +516,24 @@ static int get_port_status(struct libusb_device_handle *devh, int port)
     if (devh == NULL)
         return -1;
 
+    if (opt_dquirk == 1) {
+        if (port == 1) {
+             port = 5;
+        } else if (port == 2) {     
+             port = 6;
+        } else if (port == 3) {     
+             port = 1;
+        } else if (port == 4) {     
+             port = 2;
+        } else if (port == 5) {     
+             port = 7;
+        } else if (port == 6) {     
+             port = 3;
+        } else if (port == 7) {     
+             port = 4;
+        }
+    }    
+    
     rc = libusb_control_transfer(devh,
         LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_CLASS
                            | LIBUSB_RECIPIENT_OTHER, /* port status */
@@ -621,6 +642,23 @@ static int set_port_status_libusb(struct libusb_device_handle *devh, int port, i
 
 static int set_port_status(struct libusb_device_handle *devh, struct hub_info *hub, int port, int on)
 {
+    if (opt_dquirk == 1) {
+        if (port == 1) {
+             port = 5;
+        } else if (port == 2) {     
+             port = 6;
+        } else if (port == 3) {     
+             port = 1;
+        } else if (port == 4) {     
+             port = 2;
+        } else if (port == 5) {     
+             port = 7;
+        } else if (port == 6) {     
+             port = 3;
+        } else if (port == 7) {     
+             port = 4;
+        }
+    }    
 #ifdef __gnu_linux__
     if (!opt_nosysfs) {
         if (set_port_status_linux(devh, hub, port, on) == 0) {
@@ -1078,6 +1116,9 @@ int main(int argc, char *argv[])
             if (!strcasecmp(optarg, "toggle") || !strcasecmp(optarg, "3")) {
                 opt_action = POWER_TOGGLE;
             }
+            break;
+        case 'q':
+            opt_dquirk = 1;
             break;
         case 'd':
             opt_delay = atof(optarg);
