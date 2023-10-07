@@ -32,7 +32,7 @@ This is list of known compatible USB hubs:
 | Asus               | Z87-PLUS Motherboard (onboard USB hub)               | 4     | 3.0 |           | 2013    | 2016 |
 | Aukey              | CB-C59                                               | 4     | 3.0 |`2109:2813`| 2017    |      |
 | B+B SmartWorx      | UHR204                                               | 4     | 2.0 |`0856:DB00`| 2013    |      |
-| B+B SmartWorx      | USH304                                               | 4     | 3.0 |`04B4:6506`| 2017    |      |
+| B+B SmartWorx      | USH304                                               | 4     | 3.0 |`04B4:6506`| 2017    | 2019 |
 | Basler             | 2000036234                                           | 4     | 3.0 |`0451:8046`| 2016    |      |
 | Belkin             | F5U101                                               | 4     | 2.0 |`0451:2046`| 2005    | 2010 |
 | Belkin             | F5U238UKCRL-MOB                                      | 4     | 2.0 |`0409:0059`| 2004    | 2010 |
@@ -55,7 +55,7 @@ This is list of known compatible USB hubs:
 | Dell               | UltraSharp U2415 24" LCD Monitor                     | 5     | 3.0 |           | 2014    |      |
 | Dell               | UltraSharp U3419W 34" Curved Monitor                 | 6     | 3.0 |           | 2020    |      |
 | Dell               | Wyse 3040 ([-f required](https://tinyurl.com/wyse3k))| 6     | 3.0 |           | 2017    |      |
-| Delock             | 62537                                                | 4     | 3.0 |           | 2020    |      |
+| Delock             | 62537                                                | 4     | 3.0 |           | 2017    | 2021 |
 | Delock             | 87445 ([note](https://git.io/Jsuz5))                 | 4     | 2.0 |`05E3:0608`| 2009    | 2013 |
 | Elecom             | U2H-G4S                                              | 4     | 2.0 |           | 2006    | 2011 |
 | GlobalScale        | ESPRESSObin SBUD102 V5                               | 1     | 3.0 |`1D6B:0003`| 2017    |      |
