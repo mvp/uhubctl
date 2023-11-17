@@ -844,7 +844,7 @@ static int usb_find_hubs(void)
             continue;
         }
         get_device_description(dev, &info.ds);
-        if (info.lpsm != HUB_CHAR_INDV_PORT_LPSM && !opt_force) {
+        if (info.lpsm == HUB_CHAR_NO_LPSM && !opt_force) {
             continue;
         }
         info.actionable = 1;
