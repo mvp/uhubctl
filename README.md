@@ -100,6 +100,9 @@ This is list of known compatible USB hubs:
 | Raspberry Pi       | 3B+        ([see below](#raspberry-pi-3b))           | 4     | 2.0 |`0424:2514`| 2018    |      |
 | Raspberry Pi       | 4B         ([see below](#raspberry-pi-4b))           | 4     | 3.0 |`2109:3431`| 2019    |      |
 | Renesas            | uPD720202 PCIe USB 3.0 host controller               | 2     | 3.0 |           | 2013    |      |
+| KUNBUS GmbH        | RevPi Connect (+) / S / SE                           | 2     | 2.0 |`0424:9514`| 2018    |      |
+| KUNBUS GmbH        | RevPi Connect 4                                      | 2     | 3.0 |           | 2022    |      |
+| KUNBUS GmbH        | RevPi Core 3 / S / SE                                | 2     | 2.0 |`0424:9514`| 2017    |      |
 | Rosewill           | RHUB-210                                             | 4     | 2.0 |`0409:005A`| 2011    | 2014 |
 | Rosonway           | RSH-518C ([note](https://bit.ly/3kYZUsA))            | 7     | 3.0 |`2109:0817`| 2021    |      |
 | Rosonway           | RSH-A13 ([warning](https://bit.ly/3OToUOL))          | 13    | 3.1 |`2109:2822`| 2021    |      |
