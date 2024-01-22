@@ -18,6 +18,7 @@ This is list of known compatible USB hubs:
 
 | Manufacturer       | Product                                              | Ports | USB | VID:PID   | Release | EOL  |
 |:-------------------|:-----------------------------------------------------|:------|:----|:----------|:--------|:-----|
+| Acer               | BE270U monitor ([see](https://tinyurl.com/acer550)   | 4     | 3.0 |`2109:2811`| 2016    |      |
 | AmazonBasics       | HU3641V1 ([RPi issue](https://goo.gl/CLt46M))        | 4     | 3.0 |`2109:2811`| 2013    |      |
 | AmazonBasics       | HU3770V1 ([RPi issue](https://goo.gl/CLt46M))        | 7     | 3.0 |`2109:2811`| 2013    |      |
 | AmazonBasics       | HU9003V1EBL, HUC9003V1EBL                            | 7     | 3.1 |`2109:2817`| 2018    |      |
