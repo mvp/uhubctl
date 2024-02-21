@@ -18,7 +18,7 @@ This is list of known compatible USB hubs:
 
 | Manufacturer       | Product                                              | Ports | USB | VID:PID   | Release | EOL  |
 |:-------------------|:-----------------------------------------------------|:------|:----|:----------|:--------|:-----|
-| Acer               | BE270U monitor ([see](https://tinyurl.com/acer550)   | 4     | 3.0 |`2109:2811`| 2016    |      |
+| Acer               | BE270U monitor ([see](https://tinyurl.com/acer550))  | 4     | 3.0 |`2109:2811`| 2016    |      |
 | AmazonBasics       | HU3641V1 ([RPi issue](https://goo.gl/CLt46M))        | 4     | 3.0 |`2109:2811`| 2013    |      |
 | AmazonBasics       | HU3770V1 ([RPi issue](https://goo.gl/CLt46M))        | 7     | 3.0 |`2109:2811`| 2013    |      |
 | AmazonBasics       | HU9003V1EBL, HUC9003V1EBL                            | 7     | 3.1 |`2109:2817`| 2018    |      |
@@ -45,7 +45,6 @@ This is list of known compatible USB hubs:
 | Circuitco          | Beagleboard-xM (internal USB hub)                    | 4     | 2.0 |`0424:9514`| 2010    |      |
 | Club3D             | CSV-3242HD Dual Display Docking Station              | 4     | 3.0 |`2109:2811`| 2015    |      |
 | Coolgear           | USBG-12U2ML                                          | 12    | 2.0 |`05e3:0607`| 2015    |      |
-| CyberPower         | CP-H420P                                             | 4     | 2.0 |`0409:0059`| 2004    |      |
 | Cypress            | CY4608 HX2VL devkit ([note](https://bit.ly/3sMPfpu)) | 4     | 2.0 |`04B4:6570`| 2012    |      |
 | D-Link             | DUB-H4 rev D,E (black). Note: rev A,C,F not supported| 4     | 2.0 |`05E3:0608`| 2012    |      |
 | D-Link             | DUB-H7 rev A (silver)                                | 7     | 2.0 |`2001:F103`| 2005    | 2010 |
