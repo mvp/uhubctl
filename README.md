@@ -149,9 +149,6 @@ Compiling
 This utility was tested to compile and work on Linux
 (Ubuntu/Debian, Redhat/Fedora/CentOS, Arch Linux, Gentoo, openSUSE, Buildroot), FreeBSD, NetBSD, SunOS and MacOS.
 
-> :warning: MacOS 12.4 x86 has [USB stack bug](https://github.com/libusb/libusb/issues/1156) which breaks `uhubctl` operation.
-Solution is to upgrade to MacOS 12.5 which has this bug fixed.
-
 While `uhubctl` compiles on Windows, USB power switching does not work on Windows because `libusb`
 is using `winusb.sys` driver, which according to Microsoft does not support
 [necessary USB control requests](https://social.msdn.microsoft.com/Forums/sqlserver/en-US/f680b63f-ca4f-4e52-baa9-9e64f8eee101).
@@ -320,16 +317,13 @@ Per-port power switching:
 
 #### _USB devices are not removed after port power down on Linux_
 
-> :arrow_right: This is fixed by [#450](https://github.com/mvp/uhubctl/pull/450) if you are using Linux kernel 6.0 or later.
-
 After powering down USB port, udev does not get any event, so it keeps the device files around.
 However, trying to access the device files will lead to an IO error.
 
-This is Linux kernel issue. It may be eventually fixed in kernel, see more discussion [here](https://bit.ly/2JzczjZ).
-Basically what happens here is that kernel USB driver knows about power off,
-but doesn't send notification about it to udev.
+This is Linux kernel [issue](https://bit.ly/2JzczjZ) and is [fixed](https://github.com/mvp/uhubctl/pull/450)
+since uhubctl 2.5.0 for systems with Linux kernel 6.0 or later.
 
-You can use this workaround for this issue:
+If you are still using Linux 5.x or older, you can use this workaround for this issue:
 
     sudo uhubctl -a off -l ${location} -p ${port}
     sudo udevadm trigger --action=remove /sys/bus/usb/devices/${location}.${port}/
@@ -340,13 +334,15 @@ When you turn power back on, device should re-enumerate properly (no need to cal
 
 #### _Power comes back on after few seconds on Linux_
 
-> :arrow_right: This is fixed by [#450](https://github.com/mvp/uhubctl/pull/450) if you are using Linux kernel 6.0 or later.
-
 Some device drivers in kernel are surprised by USB device being turned off and automatically try to power it back on.
 
-You can use option `-r N` where N is some number from 10 to 1000 to fix this -
+This is Linux kernel [issue](https://bit.ly/2JzczjZ) and is [fixed](https://github.com/mvp/uhubctl/pull/450)
+since uhubctl 2.5.0 for systems with Linux kernel 6.0 or later.
+
+If you are still using Linux 5.x or older:
+
+You can use option `-r N`, where N is some number from 10 to 1000 to fix this -
 `uhubctl` will try to turn power off many times in quick succession, and it should suppress that.
-This may be eventually fixed in kernel, see more discussion [here](https://bit.ly/2JzczjZ).
 
 Disabling USB authorization for device in question before turning power off with `uhubctl` should help:
 
@@ -449,7 +445,7 @@ Notable projects using uhubctl
 Copyright
 =========
 
-Copyright (C) 2009-2023 Vadim Mikhailov
+Copyright (C) 2009-2024 Vadim Mikhailov
 
 This file can be distributed under the terms and conditions of the
 GNU General Public License version 2.
