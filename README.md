@@ -105,6 +105,7 @@ This is list of known compatible USB hubs:
 | Raspberry Pi       | B+, 2B, 3B ([see below](#raspberry-pi-b2b3b))        | 4     | 2.0 |           | 2011    |      |
 | Raspberry Pi       | 3B+        ([see below](#raspberry-pi-3b))           | 4     | 2.0 |`0424:2514`| 2018    |      |
 | Raspberry Pi       | 4B         ([see below](#raspberry-pi-4b))           | 4     | 3.0 |`2109:3431`| 2019    |      |
+| Raspberry Pi       | 5          ([see below](#raspberry-pi-5))            | 4     | 3.0 |`1d6b:0002`| 2023    |      |
 | Renesas            | uPD720202 PCIe USB 3.0 host controller               | 2     | 3.0 |           | 2013    |      |
 | Rosewill           | RHUB-210                                             | 4     | 2.0 |`0409:005A`| 2011    | 2014 |
 | Rosonway           | RSH-518C ([note](https://bit.ly/3kYZUsA))            | 7     | 3.0 |`2109:0817`| 2021    |      |
@@ -415,7 +416,36 @@ to make power switching work on RPi 4B.
 
   * USB2 hub `3`, 1 port, OTG controller. Power switching is [not supported](https://git.io/JUc5Q).
 
+##### Raspberry Pi 5
 
+  Raspberry Pi 5 has two USB2 ports and two USB3 ports (total 4).
+These ports are connected to 4 distinct USB hubs `1`,`2`,`3`,`4` in really weird configuration.
+If USB3 device is connected to blue socket, it will be detected on USB3 hub `2` or `4`.
+If USB2 device is connected to any socket or USB3 device connected to black socket,
+it will be detected on USB2 hub `1` or `3`.
+Regardless of USB2/USB3 connection type, blue sockets are always port `1`,
+and black sockets are always port `2`.
+
+  Each of 4 USB onboard hubs advertises as supporting per-port power switching, but this is not true.
+In reality, Raspberry Pi 5 all 4 ports are ganged together in one group,
+despite belonging to 4 different logical USB hubs.
+
+To turn off VBUS power it has to be disabled across all onboard hubs and ports with:
+
+   ```
+   uhubctl -l 1 -a 0
+   uhubctl -l 3 -a 0
+   ```
+
+To turn it back on:
+
+   ```
+   uhubctl -l 1 -a 1
+   uhubctl -l 3 -a 1
+   ```
+
+Note that VBUS power goes down only if all ports are off -
+enabling any single port enables VBUS back for all 4 ports.
 
 Notable projects using uhubctl
 ==============================

@@ -490,6 +490,32 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
                 lpsm = HUB_CHAR_INDV_PORT_LPSM;
             }
             info->lpsm = lpsm;
+
+            /* Raspberry Pi 5 hack */
+
+            /* TODO: make this hack more reliable by querying Raspberry Pi model */
+
+            if (strlen(info->container_id)==0 &&
+                info->lpsm==HUB_CHAR_INDV_PORT_LPSM &&
+                info->pn_len==0)
+            {
+                /* USB2 */
+                if (strcasecmp(info->vendor, "1d6b:0002")==0 &&
+                    info->nports==2 &&
+                    !info->super_speed &&
+                    (info->bus==1 || info->bus==3))
+                {
+                    strcpy(info->container_id, "Raspberry Pi 5 Fake Container Id");
+                }
+                /* USB3 */
+                if (strcasecmp(info->vendor, "1d6b:0003")==0 &&
+                    info->nports==1 &&
+                    info->super_speed &&
+                    (info->bus==2 || info->bus==4))
+                {
+                    strcpy(info->container_id, "Raspberry Pi 5 Fake Container Id");
+                }
+            }
             rc = 0;
         } else {
             rc = len;
@@ -685,6 +711,7 @@ static int get_device_description(struct libusb_device * dev, struct descriptor_
         }
         if (desc.bDeviceClass == LIBUSB_CLASS_HUB) {
             struct hub_info info;
+            bzero(&info, sizeof(info));
             rc = get_hub_info(dev, &info);
             if (rc == 0) {
                 const char * lpsm_type;
