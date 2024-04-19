@@ -73,6 +73,7 @@ This is list of known compatible USB hubs:
 | KUNBUS GmbH        | RevPi Connect 4                                      | 2     | 3.0 |           | 2022    |      |
 | KUNBUS GmbH        | RevPi Core 3 / S / SE                                | 2     | 2.0 |`0424:9514`| 2017    |      |
 | LG Electronics     | 27MD5KL-B monitor                                    | 4     | 3.0 |`043E:9A60`| 2019    |      |
+| LG Electronics     | 27GL850-B monitor                                    | 4     | 3.0 |`0451:8142`| 2019    |      |
 | LG Electronics     | 27UK850-W monitor                                    | 2     | 3.0 |           | 2018    |      |
 | LG Electronics     | 27UN83A-W monitor                                    | 2     | 3.0 |`0451:8142`| 2020    |      |
 | LG Electronics     | 38WK95C-W monitor                                    | 4     | 3.0 |`0451:8142`| 2018    |      |
