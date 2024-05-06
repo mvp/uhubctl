@@ -473,6 +473,7 @@ Notable projects using uhubctl
 | [Do it yourself PPPS](https://git.io/J3lHs)              | Solder wires in your USB hub to support uhubctl         |
 | [Open source PPPS hub](https://tinyurl.com/yckhystt)     | Open source hardware project for uhubctl compatible hub |
 | [Python Wrapper for uhubctl](https://github.com/nbuchwitz/python3-uhubctl) | Module to use uhubctl with Python     |
+| [labgrid](https://github.com/labgrid-project/labgrid)    | Framework for testing embedded Linux on hardware        |
 
 
 Copyright
