@@ -99,7 +99,6 @@ This is list of known compatible USB hubs:
 | Plugable           | USB3-HUB7BC                                          | 7     | 3.0 |`2109:0813`| 2015    |      |
 | Plugable           | USB3-HUB7C (only works for 2 charge ports)           | 7     | 3.0 |`2109:0813`| 2015    |      |
 | Plugable           | USBC-HUB7BC (works for 6/7 ports, not the rightmost) | 7     | 3.0 |`2109:0817`| 2021    |      |
-| Plugable           | USB3-HUB7-81X (only works for 2 charge ports)        | 7     | 3.0 |`2109:0813`| 2012    |      |
 | Plugable           | USB3-HUB10-C2 (only works for 2 charge ports)        | 10    | 3.0 |           | 2014    |      |
 | Port Inc           | NWUSB01                                              | 4     | 1.1 |`0451:1446`| 1999    | 2003 |
 | Raspberry Pi       | B+, 2B, 3B ([see below](#raspberry-pi-b2b3b))        | 4     | 2.0 |           | 2011    |      |
