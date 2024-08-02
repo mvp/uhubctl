@@ -19,6 +19,9 @@
 #include <errno.h>
 #include <ctype.h>
 #include <fcntl.h>
+#include <stdbool.h>
+
+#include "cJSON.h"
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -182,6 +185,38 @@ struct usb_port_status {
 #define HUB_CHAR_TTTT           0x0060 /* TT Think Time mask */
 #define HUB_CHAR_PORTIND        0x0080 /* per-port indicators (LEDs) */
 
+/*
+ * USB Speed definitions
+ */
+#define USB_SPEED_UNKNOWN        0
+#define USB_SPEED_LOW            1   /* USB 1.0/1.1 Low Speed: 1.5 Mbit/s */
+#define USB_SPEED_FULL           2   /* USB 1.0/1.1 Full Speed: 12 Mbit/s */
+#define USB_SPEED_HIGH           3   /* USB 2.0 High Speed: 480 Mbit/s */
+#define USB_SPEED_SUPER          4   /* USB 3.0 SuperSpeed: 5 Gbit/s */
+#define USB_SPEED_SUPER_PLUS     5   /* USB 3.1 SuperSpeed+: 10 Gbit/s */
+#define USB_SPEED_SUPER_PLUS_20  6   /* USB 3.2 SuperSpeed+ 20Gbps: 20 Gbit/s */
+#define USB_SPEED_USB4_20        7   /* USB4 20Gbps */
+#define USB_SPEED_USB4_40        8   /* USB4 40Gbps */
+#define USB_SPEED_USB4_80        9   /* USB4 Version 2.0: 80Gbps */
+
+/*
+ * USB Port StatusS Speed masks
+ */
+#define USB_PORT_STAT_SPEED_MASK     0x1C00
+
+/* 
+ * USB 3.0 and 3.1 speed encodings
+*/
+#define USB_PORT_STAT_SPEED_5GBPS    0x0000
+#define USB_PORT_STAT_SPEED_10GBPS   0x0400
+#define USB_PORT_STAT_SPEED_20GBPS   0x0800
+
+/*
+ * Additional speed encodings for USB4 
+ */
+#define USB_PORT_STAT_SPEED_40GBPS   0x0C00
+#define USB_PORT_STAT_SPEED_80GBPS   0x1000
+
 /* List of all USB devices enumerated by libusb */
 static struct libusb_device **usb_devs = NULL;
 
@@ -229,6 +264,8 @@ static int opt_exact  = 0;  /* exact location match - disable USB3 duality handl
 static int opt_reset  = 0;  /* reset hub after operation(s) */
 static int opt_force  = 0;  /* force operation even on unsupported hubs */
 static int opt_nodesc = 0;  /* skip querying device description */
+static int opt_json = 0;    /* output in JSON format */
+
 #if defined(__linux__)
 static int opt_nosysfs = 0; /* don't use the Linux sysfs port disable interface, even if available */
 #if (LIBUSB_API_VERSION >= 0x01000107) /* 1.0.23 */
@@ -241,7 +278,7 @@ static int is_rpi_4b = 0;
 static int is_rpi_5  = 0;
 
 static const char short_options[] =
-    "l:L:n:a:p:d:r:w:s:H:hvefRN"
+    "l:L:n:a:p:d:r:w:s:H:hvefRNj"
 #if defined(__linux__)
     "S"
 #if (LIBUSB_API_VERSION >= 0x01000107) /* 1.0.23 */
@@ -273,6 +310,8 @@ static const struct option long_options[] = {
     { "reset",    no_argument,       NULL, 'R' },
     { "version",  no_argument,       NULL, 'v' },
     { "help",     no_argument,       NULL, 'h' },
+    { "json",     no_argument,       NULL, 'j' },
+
     { 0,          0,                 NULL, 0   },
 };
 
@@ -1145,6 +1184,417 @@ static int usb_find_hubs(void)
     return hub_phys_count;
 }
 
+int is_mass_storage_device(struct libusb_device *dev)
+{
+    struct libusb_config_descriptor *config;
+    int ret = 0;
+    
+    if (libusb_get_config_descriptor(dev, 0, &config) == 0) {
+        for (int i = 0; i < config->bNumInterfaces; i++) {
+            const struct libusb_interface *interface = &config->interface[i];
+            for (int j = 0; j < interface->num_altsetting; j++) {
+                const struct libusb_interface_descriptor *altsetting = &interface->altsetting[j];
+                if (altsetting->bInterfaceClass == LIBUSB_CLASS_MASS_STORAGE) {
+                    ret = 1;
+                    goto out;
+                }
+            }
+        }
+    out:
+        libusb_free_config_descriptor(config);
+    }
+    return ret;
+}
+
+
+// Helper function to create the status flags JSON object
+cJSON* create_status_flags_json(int port_status)
+{
+    cJSON* flags = cJSON_CreateObject();
+    
+    struct {
+        int mask;
+        const char* name;
+    } flag_defs[] = {
+        {USB_PORT_STAT_CONNECTION, "connection"},
+        {USB_PORT_STAT_ENABLE, "enable"},
+        {USB_PORT_STAT_SUSPEND, "suspend"},
+        {USB_PORT_STAT_OVERCURRENT, "overcurrent"},
+        {USB_PORT_STAT_RESET, "reset"},
+        {USB_PORT_STAT_POWER, "power"},
+        {USB_PORT_STAT_LOW_SPEED, "lowspeed"},
+        {USB_PORT_STAT_HIGH_SPEED, "highspeed"},
+        {USB_PORT_STAT_TEST, "test"},
+        {USB_PORT_STAT_INDICATOR, "indicator"},
+        {0, NULL}
+    };
+    
+    for (int i = 0; flag_defs[i].name != NULL; i++) {
+        cJSON_AddBoolToObject(flags, flag_defs[i].name, (port_status & flag_defs[i].mask) != 0);
+    }
+    
+    return flags;
+}
+
+// Helper function to create human-readable descriptions of set flags
+cJSON* create_human_readable_json(int port_status)
+{
+    cJSON* human_readable = cJSON_CreateObject();
+    
+    struct {
+        int mask;
+        const char* name;
+        const char* description;
+    } flag_defs[] = {
+        {USB_PORT_STAT_CONNECTION, "connection", "Device is connected"},
+        {USB_PORT_STAT_ENABLE, "enable", "Port is enabled"},
+        {USB_PORT_STAT_SUSPEND, "suspend", "Port is suspended"},
+        {USB_PORT_STAT_OVERCURRENT, "overcurrent", "Over-current condition exists"},
+        {USB_PORT_STAT_RESET, "reset", "Port is in reset state"},
+        {USB_PORT_STAT_POWER, "power", "Port power is enabled"},
+        {USB_PORT_STAT_LOW_SPEED, "lowspeed", "Low-speed device attached"},
+        {USB_PORT_STAT_HIGH_SPEED, "highspeed", "High-speed device attached"},
+        {USB_PORT_STAT_TEST, "test", "Port is in test mode"},
+        {USB_PORT_STAT_INDICATOR, "indicator", "Port indicator control"},
+        {0, NULL, NULL}
+    };
+    
+    for (int i = 0; flag_defs[i].name != NULL; i++) {
+        if (port_status & flag_defs[i].mask) {
+            cJSON_AddStringToObject(human_readable, flag_defs[i].name, flag_defs[i].description);
+        }
+    }
+    
+    return human_readable;
+}
+
+// Helper function to determine port speed
+void get_port_speed(int port_status, char** speed_str, int64_t* speed_bits)
+{
+    *speed_str = "Disconnected";
+    *speed_bits = 0;
+
+    if (port_status & USB_PORT_STAT_CONNECTION) {
+        if (port_status & USB_PORT_STAT_LOW_SPEED) {
+            *speed_str = "USB1.0 Low Speed 1.5 Mbps";
+            *speed_bits = 1500000; // 1.5 Mbit/s
+        } else if (port_status & USB_PORT_STAT_HIGH_SPEED) {
+            *speed_str = "USB2.0 High Speed 480Mbps";
+            *speed_bits = 480000000; // 480 Mbit/s
+        } else if (port_status & USB_SS_PORT_STAT_POWER) {
+            int speed_mask = port_status & USB_PORT_STAT_SPEED_MASK;
+            switch (speed_mask) {
+                case USB_PORT_STAT_SPEED_5GBPS:
+                    *speed_str = "USB3.0 SuperSpeed 5 Gbps";
+                    *speed_bits = 5000000000LL;
+                    break;
+                case USB_PORT_STAT_SPEED_10GBPS:
+                    *speed_str = "USB 3.1 Gen 2 SuperSpeed+ 10 Gbps";
+                    *speed_bits = 10000000000LL;
+                    break;
+                case USB_PORT_STAT_SPEED_20GBPS:
+                    *speed_str = "USB 3.2 Gen 2x2 SuperSpeed+ 20 Gbps";
+                    *speed_bits = 20000000000LL;
+                    break;
+                case USB_PORT_STAT_SPEED_40GBPS:
+                    *speed_str = "USB4 40 Gbps";
+                    *speed_bits = 40000000000LL;
+                    break;
+                case USB_PORT_STAT_SPEED_80GBPS:
+                    *speed_str = "USB4 80 Gbps";
+                    *speed_bits = 80000000000LL;
+                    break;
+                default:
+                    *speed_str = "USB1.1 Full Speed 12Mbps";
+                    *speed_bits = 12000000; // 12 Mbit/s (default for USB 1.1)
+            }
+        }
+    }
+}
+// Helper function to get class name
+const char* get_class_name(uint8_t class_code)
+{
+    switch(class_code) {
+        case LIBUSB_CLASS_PER_INTERFACE:
+            return "Per Interface";
+        case LIBUSB_CLASS_AUDIO:
+            return "Audio";
+        case LIBUSB_CLASS_COMM:
+            return "Communications";
+        case LIBUSB_CLASS_HID:
+            return "Human Interface Device";
+        case LIBUSB_CLASS_PHYSICAL:
+            return "Physical";
+        case LIBUSB_CLASS_PRINTER:
+            return "Printer";
+        case LIBUSB_CLASS_IMAGE:
+            return "Image";
+        case LIBUSB_CLASS_MASS_STORAGE:
+            return "Mass Storage";
+        case LIBUSB_CLASS_HUB:
+            return "Hub";
+        case LIBUSB_CLASS_DATA:
+            return "Data";
+        case LIBUSB_CLASS_SMART_CARD:
+            return "Smart Card";
+        case LIBUSB_CLASS_CONTENT_SECURITY:
+            return "Content Security";
+        case LIBUSB_CLASS_VIDEO:
+            return "Video";
+        case LIBUSB_CLASS_PERSONAL_HEALTHCARE:
+            return "Personal Healthcare";
+        case LIBUSB_CLASS_DIAGNOSTIC_DEVICE:
+            return "Diagnostic Device";
+        case LIBUSB_CLASS_WIRELESS:
+            return "Wireless";
+        case LIBUSB_CLASS_APPLICATION:
+            return "Application";
+        case LIBUSB_CLASS_VENDOR_SPEC:
+            return "Vendor Specific";
+        default:
+            return "Unknown";
+    }
+}
+const char* get_primary_device_class_name(struct libusb_device *dev, struct libusb_device_descriptor *desc)
+{
+    if (desc->bDeviceClass != LIBUSB_CLASS_PER_INTERFACE) {
+        return get_class_name(desc->bDeviceClass);
+    }
+
+    struct libusb_config_descriptor *config;
+    if (libusb_get_config_descriptor(dev, 0, &config) != 0) {
+        return "Unknown";
+    }
+
+    const char* primary_class = "Composite Device";
+    for (int i = 0; i < config->bNumInterfaces; i++) {
+        const struct libusb_interface *interface = &config->interface[i];
+        for (int j = 0; j < interface->num_altsetting; j++) {
+            const struct libusb_interface_descriptor *altsetting = &interface->altsetting[j];
+            const char* interface_class_name = get_class_name(altsetting->bInterfaceClass);
+            
+            // Prioritized classes
+            switch (altsetting->bInterfaceClass) {
+                case LIBUSB_CLASS_HID:
+                    libusb_free_config_descriptor(config);
+                    return interface_class_name; // Human Interface Device
+                case LIBUSB_CLASS_MASS_STORAGE:
+                    primary_class = interface_class_name; // Mass Storage
+                    break;
+                case LIBUSB_CLASS_AUDIO:
+                case LIBUSB_CLASS_VIDEO:
+                    libusb_free_config_descriptor(config);
+                    return interface_class_name; // Audio or Video
+                case LIBUSB_CLASS_PRINTER:
+                    libusb_free_config_descriptor(config);
+                    return interface_class_name; // Printer
+                case LIBUSB_CLASS_COMM:
+                case LIBUSB_CLASS_DATA:
+                    if (strcmp(primary_class, "Composite Device") == 0) {
+                        primary_class = "Communications"; // CDC devices often have both COMM and DATA interfaces
+                    }
+                    break;
+                case LIBUSB_CLASS_SMART_CARD:
+                    libusb_free_config_descriptor(config);
+                    return interface_class_name; // Smart Card
+                case LIBUSB_CLASS_CONTENT_SECURITY:
+                    libusb_free_config_descriptor(config);
+                    return interface_class_name; // Content Security
+                case LIBUSB_CLASS_WIRELESS:
+                    if (strcmp(primary_class, "Composite Device") == 0) {
+                        primary_class = interface_class_name; // Wireless Controller
+                    }
+                    break;
+                case LIBUSB_CLASS_APPLICATION:
+                    if (strcmp(primary_class, "Composite Device") == 0) {
+                        primary_class = interface_class_name; // Application Specific
+                    }
+                    break;
+                // Add more cases here if needed
+            }
+        }
+    }
+
+    libusb_free_config_descriptor(config);
+    return primary_class;
+}
+
+// Helper function to add device information to the JSON object
+void add_device_info_json(cJSON* port_json, struct libusb_device *dev, const struct descriptor_strings* ds)
+{
+    struct libusb_device_descriptor desc;
+    if (libusb_get_device_descriptor(dev, &desc) == 0) {
+        char vendor_id[8], product_id[8];
+        snprintf(vendor_id, sizeof(vendor_id), "0x%04x", desc.idVendor);
+        snprintf(product_id, sizeof(product_id), "0x%04x", desc.idProduct);
+        cJSON_AddStringToObject(port_json, "vendor_id", vendor_id);
+        cJSON_AddStringToObject(port_json, "product_id", product_id);
+        
+        cJSON_AddNumberToObject(port_json, "device_class", desc.bDeviceClass);
+        
+        const char* class_name = get_primary_device_class_name(dev, &desc);
+        cJSON_AddStringToObject(port_json, "device_class_name", class_name);
+
+        // Add interface information
+        struct libusb_config_descriptor *config;
+        if (libusb_get_config_descriptor(dev, 0, &config) == 0) {
+            cJSON* interfaces = cJSON_CreateArray();
+            for (int i = 0; i < config->bNumInterfaces; i++) {
+                const struct libusb_interface *interface = &config->interface[i];
+                for (int j = 0; j < interface->num_altsetting; j++) {
+                    const struct libusb_interface_descriptor *altsetting = &interface->altsetting[j];
+                    cJSON* intf = cJSON_CreateObject();
+                    cJSON_AddNumberToObject(intf, "interface_number", i);
+                    cJSON_AddNumberToObject(intf, "alt_setting", j);
+                    cJSON_AddNumberToObject(intf, "interface_class", altsetting->bInterfaceClass);
+                    cJSON_AddStringToObject(intf, "interface_class_name", get_class_name(altsetting->bInterfaceClass));
+                    cJSON_AddItemToArray(interfaces, intf);
+                }
+            }
+            cJSON_AddItemToObject(port_json, "interfaces", interfaces);
+            libusb_free_config_descriptor(config);
+        }
+
+        // Add serial number if available
+        if (desc.iSerialNumber) {
+            struct libusb_device_handle *devh;
+            if (libusb_open(dev, &devh) == 0) {
+                unsigned char serial[256];
+                int ret = libusb_get_string_descriptor_ascii(devh, desc.iSerialNumber, serial, sizeof(serial));
+                if (ret > 0) {
+                    cJSON_AddStringToObject(port_json, "serial_number", (char*)serial);
+                }
+                libusb_close(devh);
+            }
+        }
+
+        // Add USB version
+        char usb_version[8];
+        snprintf(usb_version, sizeof(usb_version), "%x.%02x", desc.bcdUSB >> 8, desc.bcdUSB & 0xFF);
+        cJSON_AddStringToObject(port_json, "usb_version", usb_version);
+
+        // Add device version
+        char device_version[8];
+        snprintf(device_version, sizeof(device_version), "%x.%02x", desc.bcdDevice >> 8, desc.bcdDevice & 0xFF);
+        cJSON_AddStringToObject(port_json, "device_version", device_version);
+
+        // Add number of configurations
+        cJSON_AddNumberToObject(port_json, "num_configurations", desc.bNumConfigurations);
+
+        // Check if it's a mass storage device
+        cJSON_AddBoolToObject(port_json, "is_mass_storage", is_mass_storage_device(dev));
+    }
+
+    // Add description from the descriptor strings
+    cJSON_AddStringToObject(port_json, "description", ds->description);
+}
+
+
+// Main function to create port status JSON
+cJSON* create_port_status_json(int port, int port_status, const struct descriptor_strings* ds, struct libusb_device *dev)
+{
+    cJSON* port_json = cJSON_CreateObject();
+    cJSON_AddNumberToObject(port_json, "port", port);
+    
+    char status_hex[7];
+    snprintf(status_hex, sizeof(status_hex), "0x%04x", port_status);
+    cJSON_AddStringToObject(port_json, "status", status_hex);
+    
+    cJSON_AddItemToObject(port_json, "flags", create_status_flags_json(port_status));
+    cJSON_AddItemToObject(port_json, "human_readable", create_human_readable_json(port_status));
+
+    char* speed_str;
+    int64_t speed_bits;
+    get_port_speed(port_status, &speed_str, &speed_bits);
+    cJSON_AddStringToObject(port_json, "speed", speed_str);
+    cJSON_AddNumberToObject(port_json, "speed_bits", (double)speed_bits);
+   
+    if (port_status & USB_PORT_STAT_CONNECTION) {
+        add_device_info_json(port_json, dev, ds);
+    }
+
+    return port_json;
+}
+cJSON* create_hub_json(struct hub_info* hub, int portmask)
+{
+    cJSON* hub_json = cJSON_CreateObject();
+    cJSON_AddStringToObject(hub_json, "location", hub->location);
+    cJSON_AddStringToObject(hub_json, "description", hub->ds.description);
+    
+    cJSON* hub_info = cJSON_CreateObject();
+    
+    unsigned int vendor_id, product_id;
+    sscanf(hub->vendor, "%x:%x", &vendor_id, &product_id);
+    
+    char vendor_id_hex[8], product_id_hex[8];
+    snprintf(vendor_id_hex, sizeof(vendor_id_hex), "0x%04x", vendor_id);
+    snprintf(product_id_hex, sizeof(product_id_hex), "0x%04x", product_id);
+    
+    cJSON_AddStringToObject(hub_info, "vendor_id", vendor_id_hex);
+    cJSON_AddStringToObject(hub_info, "product_id", product_id_hex);
+    
+    char usb_version[16];
+    snprintf(usb_version, sizeof(usb_version), "%x.%02x", hub->bcd_usb >> 8, hub->bcd_usb & 0xFF);
+    cJSON_AddStringToObject(hub_info, "usb_version", usb_version);
+    
+    cJSON_AddNumberToObject(hub_info, "num_ports", hub->nports);
+    
+    const char* power_switching_mode;
+    switch (hub->lpsm) {
+        case HUB_CHAR_INDV_PORT_LPSM:
+            power_switching_mode = "per-port";
+            break;
+        case HUB_CHAR_COMMON_LPSM:
+            power_switching_mode = "ganged";
+            break;
+        default:
+            power_switching_mode = "unknown";
+    }
+    cJSON_AddStringToObject(hub_info, "power_switching_mode", power_switching_mode);
+    
+    cJSON_AddItemToObject(hub_json, "hub_info", hub_info);
+    
+    cJSON* ports = cJSON_CreateArray();
+    struct libusb_device_handle* devh = NULL;
+    int rc = libusb_open(hub->dev, &devh);
+    if (rc == 0) {
+        for (int port = 1; port <= hub->nports; port++) {
+            if (portmask > 0 && (portmask & (1 << (port-1))) == 0) continue;
+            
+            int port_status = get_port_status(devh, port);
+            if (port_status == -1) continue;
+
+            struct descriptor_strings ds;
+            bzero(&ds, sizeof(ds));
+            struct libusb_device* udev = NULL;
+            int i = 0;
+            while ((udev = usb_devs[i++]) != NULL) {
+                uint8_t dev_bus = libusb_get_bus_number(udev);
+                if (dev_bus != hub->bus) continue;
+                
+                uint8_t dev_pn[MAX_HUB_CHAIN];
+                int dev_plen = get_port_numbers(udev, dev_pn, sizeof(dev_pn));
+                if ((dev_plen == hub->pn_len + 1) &&
+                    (memcmp(hub->port_numbers, dev_pn, hub->pn_len) == 0) &&
+                    libusb_get_port_number(udev) == port)
+                {
+                    rc = get_device_description(udev, &ds);
+                    if (rc == 0) break;
+                }
+            }
+
+            cJSON* port_json = create_port_status_json(port, port_status, &ds, udev);
+            cJSON_AddItemToArray(ports, port_json);
+        }
+        libusb_close(devh);
+    }
+    cJSON_AddItemToObject(hub_json, "ports", ports);
+
+    return hub_json;
+}
+
+
+
 
 int main(int argc, char *argv[])
 {
@@ -1155,6 +1605,9 @@ int main(int argc, char *argv[])
     int sys_fd;
     libusb_device_handle *sys_devh = NULL;
 #endif
+
+    // Initialize opt_action to POWER_KEEP
+    opt_action = POWER_KEEP;
 
     for (;;) {
         c = getopt_long(argc, argv, short_options, long_options, &option_index);
@@ -1254,6 +1707,9 @@ int main(int argc, char *argv[])
             fprintf(stderr, "Run with -h to get usage info.\n");
             exit(1);
             break;
+        case 'j':
+            opt_json = 1;
+            break;
         default:
             abort();
         }
@@ -1267,9 +1723,7 @@ int main(int argc, char *argv[])
 
     rc = libusb_init(NULL);
     if (rc < 0) {
-        fprintf(stderr,
-            "Error initializing USB!\n"
-        );
+        fprintf(stderr, "Error initializing USB!\n");
         exit(1);
     }
 
@@ -1303,9 +1757,7 @@ int main(int argc, char *argv[])
     rc = libusb_get_device_list(NULL, &usb_devs);
 #endif
     if (rc < 0) {
-        fprintf(stderr,
-            "Cannot enumerate USB devices!\n"
-        );
+        fprintf(stderr, "Cannot enumerate USB devices!\n");
         rc = 1;
         goto cleanup;
     }
@@ -1325,86 +1777,129 @@ int main(int argc, char *argv[])
         goto cleanup;
     }
 
-    if (hub_phys_count > 1 && opt_action >= 0) {
+    if (hub_phys_count > 1 && opt_action != POWER_KEEP) {
         fprintf(stderr,
             "Error: changing port state for multiple hubs at once is not supported.\n"
             "Use -l to limit operation to one hub!\n"
         );
         exit(1);
     }
-    int k; /* k=0 for power OFF, k=1 for power ON */
-    for (k=0; k<2; k++) { /* up to 2 power actions - off/on */
-        if (k == 0 && opt_action == POWER_ON )
-            continue;
-        if (k == 1 && opt_action == POWER_OFF)
-            continue;
-        if (k == 1 && opt_action == POWER_KEEP)
-            continue;
-        /* if toggle requested, do it only once when `k == 0` */
-        if (k == 1 && opt_action == POWER_TOGGLE)
-            continue;
-        int i;
-        for (i=0; i<hub_count; i++) {
+
+    cJSON *root = NULL;
+    if (opt_json) {
+        root = cJSON_CreateObject();
+        cJSON *hubs_array = cJSON_CreateArray();
+        cJSON_AddItemToObject(root, "hubs", hubs_array);
+    }
+
+    // If no action is specified or JSON output is requested, just print status
+    if (opt_action == POWER_KEEP || opt_json) {
+        for (int i = 0; i < hub_count; i++) {
             if (hubs[i].actionable == 0)
                 continue;
-            printf("Current status for hub %s [%s]\n",
-                hubs[i].location, hubs[i].ds.description
-            );
-            print_port_status(&hubs[i], opt_ports);
-            if (opt_action == POWER_KEEP) { /* no action, show status */
-                continue;
-            }
-            struct libusb_device_handle * devh = NULL;
-            rc = libusb_open(hubs[i].dev, &devh);
-            if (rc == 0) {
-                /* will operate on these ports */
-                int ports = ((1 << hubs[i].nports) - 1) & opt_ports;
-                int should_be_on = k;
-                if (opt_action == POWER_FLASH) {
-                    should_be_on = !should_be_on;
-                }
-
-                int port;
-                for (port=1; port <= hubs[i].nports; port++) {
-                    if ((1 << (port-1)) & ports) {
-                        int port_status = get_port_status(devh, port);
-                        int power_mask = hubs[i].super_speed ? USB_SS_PORT_STAT_POWER
-                                                             : USB_PORT_STAT_POWER;
-                        int is_on = (port_status & power_mask) != 0;
-
-                        if (opt_action == POWER_TOGGLE) {
-                            should_be_on = !is_on;
-                        }
-
-                        if (is_on != should_be_on) {
-                            rc = set_port_status(devh, &hubs[i], port, should_be_on);
-                        }
-                    }
-                }
-                /* USB3 hubs need extra delay to actually turn off: */
-                if (k==0 && hubs[i].super_speed)
-                    sleep_ms(150);
-                printf("Sent power %s request\n", should_be_on ? "on" : "off");
-                printf("New status for hub %s [%s]\n",
-                    hubs[i].location, hubs[i].ds.description
-                );
+            
+            if (opt_json) {
+                cJSON *hub_json = create_hub_json(&hubs[i], opt_ports);
+                cJSON_AddItemToArray(cJSON_GetObjectItem(root, "hubs"), hub_json);
+            } else {
+                printf("Current status for hub %s [%s]\n",
+                    hubs[i].location, hubs[i].ds.description);
                 print_port_status(&hubs[i], opt_ports);
+            }
+        }
+    } else {
+        // Main action loop (only runs if an action is specified)
+        int k;
+        for (k = 0; k < 2; k++) {
+            if (k == 0 && opt_action == POWER_ON)
+                continue;
+            if (k == 1 && opt_action == POWER_OFF)
+                continue;
+            if (k == 1 && opt_action == POWER_TOGGLE)
+                continue;
 
-                if (k == 1 && opt_reset == 1) {
-                    printf("Resetting hub...\n");
-                    rc = libusb_reset_device(devh);
-                    if (rc < 0) {
-                        perror("Reset failed!\n");
-                    } else {
-                        printf("Reset successful!\n");
+            for (int i=0; i<hub_count; i++) {
+                if (hubs[i].actionable == 0)
+                    continue;
+
+                cJSON *hub_json = NULL;
+                if (opt_json) {
+                    hub_json = create_hub_json(&hubs[i], opt_ports);
+                } else {
+                    printf("Current status for hub %s [%s]\n",
+                        hubs[i].location, hubs[i].ds.description);
+                    print_port_status(&hubs[i], opt_ports);
+                }
+
+                struct libusb_device_handle *devh = NULL;
+                rc = libusb_open(hubs[i].dev, &devh);
+                if (rc == 0) {
+                    /* will operate on these ports */
+                    int ports = ((1 << hubs[i].nports) - 1) & opt_ports;
+                    int should_be_on = k;
+                    if (opt_action == POWER_FLASH) {
+                        should_be_on = !should_be_on;
+                    }
+
+                    for (int port=1; port <= hubs[i].nports; port++) {
+                        if ((1 << (port-1)) & ports) {
+                            int port_status = get_port_status(devh, port);
+                            int power_mask = hubs[i].super_speed ? USB_SS_PORT_STAT_POWER
+                                                                 : USB_PORT_STAT_POWER;
+                            int is_on = (port_status & power_mask) != 0;
+
+                            if (opt_action == POWER_TOGGLE) {
+                                should_be_on = !is_on;
+                            }
+
+                            if (is_on != should_be_on) {
+                                rc = set_port_status(devh, &hubs[i], port, should_be_on);
+                            }
+                        }
+                    }
+                    /* USB3 hubs need extra delay to actually turn off: */
+                    if (k==0 && hubs[i].super_speed)
+                        sleep_ms(150);
+                    
+                    if (!opt_json) {
+                        printf("Sent power %s request\n", should_be_on ? "on" : "off");
+                        printf("New status for hub %s [%s]\n",
+                            hubs[i].location, hubs[i].ds.description);
+                        print_port_status(&hubs[i], opt_ports);
+                    }
+
+                    if (k == 1 && opt_reset == 1) {
+                        if (!opt_json) {
+                            printf("Resetting hub...\n");
+                        }
+                        rc = libusb_reset_device(devh);
+                        if (!opt_json) {
+                            if (rc < 0) {
+                                perror("Reset failed!\n");
+                            } else {
+                                printf("Reset successful!\n");
+                            }
+                        }
                     }
                 }
+                libusb_close(devh);
+
+                if (opt_json) {
+                    cJSON_AddItemToArray(cJSON_GetObjectItem(root, "hubs"), hub_json);
+                }
             }
-            libusb_close(devh);
         }
         if (k == 0 && (opt_action == POWER_CYCLE || opt_action == POWER_FLASH))
             sleep_ms((int)(opt_delay * 1000));
     }
+
+    if (opt_json) {
+        char *json_str = cJSON_Print(root);
+        printf("%s\n", json_str);
+        free(json_str);
+        cJSON_Delete(root);
+    }
+
     rc = 0;
 cleanup:
 #if defined(__linux__) && (LIBUSB_API_VERSION >= 0x01000107)
