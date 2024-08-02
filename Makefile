@@ -36,13 +36,22 @@ else
 endif
 
 PROGRAM = uhubctl
+SOURCES = $(PROGRAM).c cJSON.c
+OBJECTS = $(SOURCES:.c=.o)
 
-$(PROGRAM): $(PROGRAM).c
-	$(CC) $(CPPFLAGS) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
+all: $(PROGRAM)
+
+$(PROGRAM): $(OBJECTS)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(OBJECTS) -o $@ $(LDFLAGS)
+
+%.o: %.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 install:
 	$(INSTALL_DIR) $(DESTDIR)$(sbindir)
 	$(INSTALL_PROGRAM) $(PROGRAM) $(DESTDIR)$(sbindir)
 
 clean:
-	$(RM) $(PROGRAM).o $(PROGRAM).dSYM $(PROGRAM)
+	$(RM) $(OBJECTS) $(PROGRAM).dSYM $(PROGRAM)
+
+.PHONY: all install clean
