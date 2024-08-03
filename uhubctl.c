@@ -404,7 +404,7 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
         return rc;
     if (desc.bDeviceClass != LIBUSB_CLASS_HUB)
         return LIBUSB_ERROR_INVALID_PARAM;
-    int bcd_usb = libusb_le16_to_cpu(desc.bcdUSB);
+    int bcd_usb = desc.bcdUSB;
     int desc_type = bcd_usb >= USB_SS_BCD ? LIBUSB_DT_SUPERSPEED_HUB
                                           : LIBUSB_DT_HUB;
     rc = libusb_open(dev, &devh);
@@ -427,8 +427,8 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
             snprintf(
                 info->vendor, sizeof(info->vendor),
                 "%04x:%04x",
-                libusb_le16_to_cpu(desc.idVendor),
-                libusb_le16_to_cpu(desc.idProduct)
+                desc.idVendor,
+                desc.idProduct
             );
 
             /* Convert bus and ports array into USB location string */
@@ -550,7 +550,7 @@ static int get_port_status(struct libusb_device_handle *devh, int port)
     if (rc < 0) {
         return rc;
     }
-    return ust.wPortStatus;
+    return libusb_le16_to_cpu(ust.wPortStatus);
 }
 
 
@@ -688,8 +688,8 @@ static int get_device_description(struct libusb_device * dev, struct descriptor_
     if (rc)
         return rc;
     bzero(ds, sizeof(*ds));
-    id_vendor  = libusb_le16_to_cpu(desc.idVendor);
-    id_product = libusb_le16_to_cpu(desc.idProduct);
+    id_vendor  = desc.idVendor;
+    id_product = desc.idProduct;
     rc = libusb_open(dev, &devh);
     if (rc == 0) {
         if (!opt_nodesc) {
