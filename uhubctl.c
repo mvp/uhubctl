@@ -574,10 +574,17 @@ static int set_port_status_linux(struct libusb_device_handle *devh, struct hub_i
      * The "disable" sysfs interface is available only starting with kernel version 6.0.
      * For earlier kernel versions the open() call will fail and we fall back to using libusb.
      */
-    snprintf(disable_path, PATH_MAX,
-        "/sys/bus/usb/devices/%s:%d.0/%s-port%i/disable",
-        hub->location, configuration, hub->location, port
-    );
+    if (hub->pn_len == 0) {
+      snprintf(disable_path, PATH_MAX,
+          "/sys/bus/usb/devices/%s-0:%d.0/usb%s-port%i/disable",
+          hub->location, configuration, hub->location, port
+      );
+    } else {
+      snprintf(disable_path, PATH_MAX,
+          "/sys/bus/usb/devices/%s:%d.0/%s-port%i/disable",
+          hub->location, configuration, hub->location, port
+      );
+    }
 
     int disable_fd = open(disable_path, O_WRONLY);
     if (disable_fd >= 0) {
