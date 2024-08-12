@@ -80,6 +80,7 @@ void sleep_ms(int milliseconds)
 #define POWER_ON                 1
 #define POWER_CYCLE              2
 #define POWER_TOGGLE             3
+#define POWER_FLIPOFF            4
 
 #define MAX_HUB_CHAIN            8  /* Per USB 3.0 spec max hub chain is 7 */
 
@@ -269,13 +270,13 @@ static int print_usage(void)
         "Without options, show status for all smart hubs.\n"
         "\n"
         "Options [defaults in brackets]:\n"
-        "--action,   -a - action to off/on/cycle/toggle (0/1/2/3) for affected ports.\n"
+        "--action,   -a - action to off/on/cycle/toggle/flopoff (0/1/2/3/4) for affected ports.\n"
         "--ports,    -p - ports to operate on    [all hub ports].\n"
         "--location, -l - limit hub by location  [all smart hubs].\n"
         "--level     -L - limit hub by location level (e.g. a-b.c is level 3).\n"
         "--vendor,   -n - limit hub by vendor id [%s] (partial ok).\n"
         "--search,   -s - limit hub by attached device description.\n"
-        "--delay,    -d - delay for cycle action [%g sec].\n"
+        "--delay,    -d - delay for cycle/flipoff action [%g sec].\n"
         "--repeat,   -r - repeat power off count [%d] (some devices need it to turn off).\n"
         "--exact,    -e - exact location (no USB3 duality handling).\n"
         "--force,    -f - force operation even on unsupported hubs.\n"
@@ -1112,6 +1113,9 @@ int main(int argc, char *argv[])
             if (!strcasecmp(optarg, "toggle") || !strcasecmp(optarg, "3")) {
                 opt_action = POWER_TOGGLE;
             }
+            if (!strcasecmp(optarg, "flipoff") || !strcasecmp(optarg, "4")) {
+                opt_action = POWER_FLIPOFF;
+            }
             break;
         case 'd':
             opt_delay = atof(optarg);
@@ -1226,7 +1230,7 @@ int main(int argc, char *argv[])
             if (rc == 0) {
                 /* will operate on these ports */
                 int ports = ((1 << hubs[i].nports) - 1) & opt_ports;
-                int should_be_on = k;
+                int should_be_on = opt_action != POWER_FLIPOFF ? k : !k;
 
                 int port;
                 for (port=1; port <= hubs[i].nports; port++) {
@@ -1266,7 +1270,7 @@ int main(int argc, char *argv[])
             }
             libusb_close(devh);
         }
-        if (k == 0 && opt_action == POWER_CYCLE)
+        if (k == 0 && (opt_action == POWER_CYCLE || opt_action == POWER_FLIPOFF))
             sleep_ms((int)(opt_delay * 1000));
     }
     rc = 0;
