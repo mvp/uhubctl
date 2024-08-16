@@ -1232,7 +1232,7 @@ int main(int argc, char *argv[])
                 int ports = ((1 << hubs[i].nports) - 1) & opt_ports;
                 int should_be_on = k;
                 if (opt_action == POWER_FLASH) {
-                    k = !k;
+                    should_be_on = !should_be_on;
                 }
 
                 int port;
