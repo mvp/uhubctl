@@ -47,7 +47,7 @@ int snprintf(char * __restrict __str, size_t __size, const char * __restrict __f
 #include <time.h>   /* for nanosleep */
 #endif
 
-#ifdef __gnu_linux__
+#if defined(__gnu_linux__) || defined(__linux__)
 #include <fcntl.h> /* for open() / O_WRONLY */
 #endif
 
@@ -227,14 +227,14 @@ static int opt_exact  = 0;  /* exact location match - disable USB3 duality handl
 static int opt_reset  = 0;  /* reset hub after operation(s) */
 static int opt_force  = 0;  /* force operation even on unsupported hubs */
 static int opt_nodesc = 0;  /* skip querying device description */
-#ifdef __gnu_linux__
+#if defined(__gnu_linux__) || defined(__linux__)
 static int opt_nosysfs = 0; /* don't use the Linux sysfs port disable interface, even if available */
 #endif
 
 
 static const char short_options[] =
     "l:L:n:a:p:d:r:w:s:hvefRN"
-#ifdef __gnu_linux__
+#if defined(__gnu_linux__) || defined(__linux__)
     "S"
 #endif
 ;
@@ -252,7 +252,7 @@ static const struct option long_options[] = {
     { "exact",    no_argument,       NULL, 'e' },
     { "force",    no_argument,       NULL, 'f' },
     { "nodesc",   no_argument,       NULL, 'N' },
-#ifdef __gnu_linux__
+#if defined(__gnu_linux__) || defined(__linux__)
     { "nosysfs",  no_argument,       NULL, 'S' },
 #endif
     { "reset",    no_argument,       NULL, 'R' },
@@ -281,7 +281,7 @@ static int print_usage(void)
         "--exact,    -e - exact location (no USB3 duality handling).\n"
         "--force,    -f - force operation even on unsupported hubs.\n"
         "--nodesc,   -N - do not query device description (helpful for unresponsive devices).\n"
-#ifdef __gnu_linux__
+#if defined(__gnu_linux__) || defined(__linux__)
         "--nosysfs,  -S - do not use the Linux sysfs port disable interface.\n"
 #endif
         "--reset,    -R - reset hub after each power-on action, causing all devices to reassociate.\n"
@@ -555,7 +555,7 @@ static int get_port_status(struct libusb_device_handle *devh, int port)
 }
 
 
-#ifdef __gnu_linux__
+#if defined(__gnu_linux__) || defined(__linux__)
 /*
  * Try to use the Linux sysfs interface to power a port off/on.
  * Returns 0 on success.
@@ -655,7 +655,7 @@ static int set_port_status_libusb(struct libusb_device_handle *devh, int port, i
 
 static int set_port_status(struct libusb_device_handle *devh, struct hub_info *hub, int port, int on)
 {
-#ifdef __gnu_linux__
+#if defined(__gnu_linux__) || defined(__linux__)
     if (!opt_nosysfs) {
         if (set_port_status_linux(devh, hub, port, on) == 0) {
             return 0;
@@ -1046,7 +1046,7 @@ static int usb_find_hubs(void)
         }
     }
     if (perm_ok == 0 && hub_phys_count == 0) {
-#ifdef __gnu_linux__
+#if defined(__gnu_linux__) || defined(__linux__)
         if (geteuid() != 0) {
             fprintf(stderr,
                 "There were permission problems while accessing USB.\n"
@@ -1129,7 +1129,7 @@ int main(int argc, char *argv[])
         case 'N':
             opt_nodesc = 1;
             break;
-#ifdef __gnu_linux__
+#if defined(__gnu_linux__) || defined(__linux__)
         case 'S':
             opt_nosysfs = 1;
             break;
