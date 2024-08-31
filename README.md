@@ -96,6 +96,7 @@ This is list of known compatible USB hubs:
 | NVidia             | Jetson Nano B01 ([details](https://git.io/JJaFR))    | 4     | 3.0 |           | 2019    |      |
 | NVidia             | Jetson Xavier NX ([details](https://bit.ly/3PN2DDp)) | 4     | 3.0 |           | 2020    |      |
 | Phidgets           | HUB0003_0                                            | 7     | 2.0 |`1A40:0201`| 2017    |      |
+| Philips            | 346B1C UltraWide 34" Curved Monitor                  | 4     | 3.0 |`05E3:0610`| 2019    |      |
 | Plugable           | USB3-HUB7BC                                          | 7     | 3.0 |`2109:0813`| 2015    |      |
 | Plugable           | USB3-HUB7C (only works for 2 charge ports)           | 7     | 3.0 |`2109:0813`| 2015    |      |
 | Plugable           | USBC-HUB7BC (works for 6/7 ports, not the rightmost) | 7     | 3.0 |`2109:0817`| 2021    |      |
