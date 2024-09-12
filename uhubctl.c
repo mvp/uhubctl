@@ -9,7 +9,7 @@
  *
  */
 
-#define _XOPEN_SOURCE 500
+#define _XOPEN_SOURCE 600
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,10 +33,6 @@
 #include <libusb.h>
 #else
 #include <libusb-1.0/libusb.h>
-#endif
-
-#if defined(__APPLE__) || defined(__FreeBSD__) /* snprintf is not available in pure C mode */
-int snprintf(char * __restrict __str, size_t __size, const char * __restrict __format, ...) __printflike(3, 4);
 #endif
 
 #if !defined(LIBUSB_API_VERSION) || (LIBUSB_API_VERSION <= 0x01000103)
