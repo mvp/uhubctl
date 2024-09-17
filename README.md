@@ -422,7 +422,8 @@ to make power switching work on RPi 4B.
 ##### Raspberry Pi 5
 
   Raspberry Pi 5 has two USB2 ports and two USB3 ports (total 4).
-These ports are connected to 4 distinct USB hubs `1`,`2`,`3`,`4` in really weird configuration.
+These ports are connected to 4 distinct USB hubs `1`,`2`,`3`,`4` in really weird configuration
+(but depending on OS and HW revision hubs of interest can be `2`,`3`,`4`,`5`).
 If USB3 device is connected to blue socket, it will be detected on USB3 hub `2` or `4`.
 If USB2 device is connected to any socket or USB3 device connected to black socket,
 it will be detected on USB2 hub `1` or `3`.
@@ -436,15 +437,15 @@ despite belonging to 4 different logical USB hubs.
 To turn off VBUS power it has to be disabled across all onboard hubs and ports with:
 
    ```
-   uhubctl -l 1 -a 0
-   uhubctl -l 3 -a 0
+   uhubctl -l 2 -a 0
+   uhubctl -l 4 -a 0
    ```
 
 To turn it back on:
 
    ```
-   uhubctl -l 1 -a 1
-   uhubctl -l 3 -a 1
+   uhubctl -l 2 -a 1
+   uhubctl -l 4 -a 1
    ```
 
 Note that VBUS power goes down only if all ports are off -

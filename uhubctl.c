@@ -227,6 +227,9 @@ static int opt_nodesc = 0;  /* skip querying device description */
 static int opt_nosysfs = 0; /* don't use the Linux sysfs port disable interface, even if available */
 #endif
 
+/* For Raspberry Pi detection and workarounds: */
+static int is_rpi_4b = 0;
+static int is_rpi_5  = 0;
 
 static const char short_options[] =
     "l:L:n:a:p:d:r:w:s:hvefRN"
@@ -361,6 +364,46 @@ static int ports2bitmap(char* const portlist)
     return ports;
 }
 
+/*
+ * Get model of the computer we are currently running on.
+ * On success return 0 and fill model string (null terminated).
+ * If model is not known or error occurred returns -1.
+ *
+ * Currently this can only return successfully on Linux,
+ * but in the future we may need it on other operating systems too.
+ */
+
+static int get_computer_model(char *model, int len)
+{
+    int fd = open("/sys/firmware/devicetree/base/model", O_RDONLY);
+    if (fd < 0) {
+        return fd;
+    }
+    int bytes_read = read(fd, model, len-1);
+    close(fd);
+    if (bytes_read < 0) {
+        return -1;
+    }
+    model[bytes_read] = 0;
+    return 0;
+}
+
+/*
+ * Check if we are running on given computer model using substring match.
+ * Returns 1 if yes and 0 otherwise.
+ */
+
+static int check_computer_model(char *target)
+{
+    char model[256] = "";
+    if (get_computer_model(model, sizeof(model)) == 0) {
+        if (strstr(model, target) != NULL) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 
 /*
  * Compatibility wrapper around libusb_get_port_numbers()
@@ -466,7 +509,8 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
                 libusb_free_bos_descriptor(bos);
 
                 /* Raspberry Pi 4B hack for USB3 root hub: */
-                if (strlen(info->container_id)==0 &&
+                if (is_rpi_4b &&
+                    strlen(info->container_id)==0 &&
                     strcasecmp(info->vendor, "1d6b:0003")==0 &&
                     info->pn_len==0 &&
                     info->nports==4 &&
@@ -483,32 +527,28 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
                 lpsm = HUB_CHAR_INDV_PORT_LPSM;
             }
             /* Raspberry Pi 4B reports inconsistent descriptors, override: */
-            if (lpsm == HUB_CHAR_COMMON_LPSM && strcasecmp(info->vendor, "2109:3431")==0) {
+            if (is_rpi_4b && lpsm == HUB_CHAR_COMMON_LPSM && strcasecmp(info->vendor, "2109:3431")==0) {
                 lpsm = HUB_CHAR_INDV_PORT_LPSM;
             }
             info->lpsm = lpsm;
 
             /* Raspberry Pi 5 hack */
-
-            /* TODO: make this hack more reliable by querying Raspberry Pi model */
-
-            if (strlen(info->container_id)==0 &&
+            if (is_rpi_5 &&
+                strlen(info->container_id)==0 &&
                 info->lpsm==HUB_CHAR_INDV_PORT_LPSM &&
                 info->pn_len==0)
             {
                 /* USB2 */
                 if (strcasecmp(info->vendor, "1d6b:0002")==0 &&
                     info->nports==2 &&
-                    !info->super_speed &&
-                    (info->bus==1 || info->bus==3))
+                    !info->super_speed)
                 {
                     strcpy(info->container_id, "Raspberry Pi 5 Fake Container Id");
                 }
                 /* USB3 */
                 if (strcasecmp(info->vendor, "1d6b:0003")==0 &&
                     info->nports==1 &&
-                    info->super_speed &&
-                    (info->bus==2 || info->bus==4))
+                    info->super_speed)
                 {
                     strcpy(info->container_id, "Raspberry Pi 5 Fake Container Id");
                 }
@@ -1004,7 +1044,7 @@ static int usb_find_hubs(void)
                 }
 
                 /* Raspberry Pi 4B hack (USB2 hub is one level deeper than USB3): */
-                if (l1 + s1 == l2 + s2 && l1 >= s2 && memcmp(p1 + s2, p2 + s1, l1 - s2)==0) {
+                if (is_rpi_4b && l1 + s1 == l2 + s2 && l1 >= s2 && memcmp(p1 + s2, p2 + s1, l1 - s2)==0) {
                     if (best_score < 3) {
                         best_score = 3;
                         best_match = j;
@@ -1179,6 +1219,9 @@ int main(int argc, char *argv[])
         rc = 1;
         goto cleanup;
     }
+
+    is_rpi_4b = check_computer_model("Raspberry Pi 4 Model B");
+    is_rpi_5  = check_computer_model("Raspberry Pi 5");
 
     rc = usb_find_hubs();
     if (rc <= 0) {
