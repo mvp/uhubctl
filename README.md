@@ -117,6 +117,7 @@ This is list of known compatible USB hubs:
 | Sanwa Supply       | USB-HUB14GPH                                         | 4     | 1.1 |           | 2001    | 2003 |
 | Seagate            | Backup Plus Hub STEL8000100                          | 2     | 3.0 |`0BC2:AB44`| 2016    |      |
 | Seeed Studio       | reTerminal CM4104032                                 | 2     | 2.0 |`0424:2514`| 2021    |      |
+| StarTech           | DKT30CSDHPD3 USB-C Travel Dock                       | 3     | 3.0 |`2109:2817`| 2018    |      |
 | StarTech           | HB30A4AIB ([warning](https://tinyurl.com/ycxravwk))  | 4     | 3.0 |`2109:2817`| 2018    |      |
 | Sunix              | SHB4200MA                                            | 4     | 2.0 |`0409:0058`| 2006    | 2009 |
 | System Talks       | Sugoi USB2-HUB4X                                     | 4     | 2.0 |           | 2007    |      |
