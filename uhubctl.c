@@ -18,6 +18,7 @@
 #include <getopt.h>
 #include <errno.h>
 #include <ctype.h>
+#include <fcntl.h>
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -43,9 +44,6 @@
 #include <time.h>   /* for nanosleep */
 #endif
 
-#if defined(__gnu_linux__) || defined(__linux__)
-#include <fcntl.h> /* for open() / O_WRONLY */
-#endif
 
 /* cross-platform sleep function */
 
