@@ -168,6 +168,7 @@ First, you need to install library libusb-1.0 (version 1.0.12 or later, 1.0.16 o
 
 * Ubuntu: `sudo apt-get install libusb-1.0-0-dev`
 * Redhat: `sudo yum install libusb1-devel`
+* OpenSUSE: `sudo zypper install libusb-1_0-devel`
 * MacOS: `brew install libusb`, or `sudo port install libusb-devel`
 * FreeBSD: libusb is included by default
 * NetBSD: `sudo pkgin install libusb1 gmake pkg-config`
