@@ -223,6 +223,9 @@ static int opt_force  = 0;  /* force operation even on unsupported hubs */
 static int opt_nodesc = 0;  /* skip querying device description */
 #if defined(__gnu_linux__) || defined(__linux__)
 static int opt_nosysfs = 0; /* don't use the Linux sysfs port disable interface, even if available */
+#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107)
+static const char *opt_sysdev;
+#endif
 #endif
 
 /* For Raspberry Pi detection and workarounds: */
@@ -232,7 +235,11 @@ static int is_rpi_5  = 0;
 static const char short_options[] =
     "l:L:n:a:p:d:r:w:s:hvefRN"
 #if defined(__gnu_linux__) || defined(__linux__)
+#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107)
+    "Su:"
+#else
     "S"
+#endif
 #endif
 ;
 
@@ -251,6 +258,9 @@ static const struct option long_options[] = {
     { "nodesc",   no_argument,       NULL, 'N' },
 #if defined(__gnu_linux__) || defined(__linux__)
     { "nosysfs",  no_argument,       NULL, 'S' },
+#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107)
+    { "sysdev",   required_argument, NULL, 'u' },
+#endif
 #endif
     { "reset",    no_argument,       NULL, 'R' },
     { "version",  no_argument,       NULL, 'v' },
@@ -280,6 +290,9 @@ static int print_usage(void)
         "--nodesc,   -N - do not query device description (helpful for unresponsive devices).\n"
 #if defined(__gnu_linux__) || defined(__linux__)
         "--nosysfs,  -S - do not use the Linux sysfs port disable interface.\n"
+#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107)
+        "--sysdev,   -u - open system device node instead of scanning.\n"
+#endif
 #endif
         "--reset,    -R - reset hub after each power-on action, causing all devices to reassociate.\n"
         "--wait,     -w - wait before repeat power off [%d ms].\n"
@@ -1099,6 +1112,12 @@ int main(int argc, char *argv[])
     int rc;
     int c = 0;
     int option_index = 0;
+#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107) && \
+  (defined(__gnu_linux__) || defined(__linux__))
+    int sys_fd;
+    libusb_device_handle *sys_devh = NULL;
+    libusb_device *dev_list[2];
+#endif
 
     for (;;) {
         c = getopt_long(argc, argv, short_options, long_options, &option_index);
@@ -1167,6 +1186,11 @@ int main(int argc, char *argv[])
         case 'S':
             opt_nosysfs = 1;
             break;
+#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107)
+        case 'u':
+            opt_sysdev = optarg;
+            break;
+#endif
 #endif
         case 'e':
             opt_exact = 1;
@@ -1209,7 +1233,30 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107) && \
+  (defined(__gnu_linux__) || defined(__linux__))
+    if (opt_sysdev) {
+        sys_fd = open(opt_sysdev, O_RDWR);
+        if (sys_fd < 0) {
+            fprintf(stderr, "Cannot open system node!\n");
+            rc = 1;
+            goto cleanup;
+        }
+        rc = libusb_wrap_sys_device(NULL, sys_fd, &sys_devh);
+        if (rc != 0) {
+            fprintf(stderr, "Cannot wrap system node!\n");
+            rc = 1;
+            goto cleanup;
+        }
+	dev_list[0] = libusb_get_device(sys_devh);
+	dev_list[1] = NULL;
+	usb_devs = dev_list;
+    } else {
+        rc = libusb_get_device_list(NULL, &usb_devs);
+    }
+#else
     rc = libusb_get_device_list(NULL, &usb_devs);
+#endif
     if (rc < 0) {
         fprintf(stderr,
             "Cannot enumerate USB devices!\n"
@@ -1315,8 +1362,18 @@ int main(int argc, char *argv[])
     }
     rc = 0;
 cleanup:
+#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107) && \
+  (defined(__gnu_linux__) || defined(__linux__))
+    if (opt_sysdev && sys_fd >= 0) {
+        if (sys_devh)
+            libusb_close(sys_devh);
+        close(sys_fd);
+    } else if (usb_devs)
+        libusb_free_device_list(usb_devs, 1);
+#else
     if (usb_devs)
         libusb_free_device_list(usb_devs, 1);
+#endif
     usb_devs = NULL;
     libusb_exit(NULL);
     return rc;
