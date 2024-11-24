@@ -236,7 +236,7 @@ static const char short_options[] =
     "l:L:n:a:p:d:r:w:s:hvefRN"
 #if defined(__gnu_linux__) || defined(__linux__)
 #if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107)
-    "Su:"
+    "Sy:"
 #else
     "S"
 #endif
@@ -259,7 +259,7 @@ static const struct option long_options[] = {
 #if defined(__gnu_linux__) || defined(__linux__)
     { "nosysfs",  no_argument,       NULL, 'S' },
 #if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107)
-    { "sysdev",   required_argument, NULL, 'u' },
+    { "sysdev",   required_argument, NULL, 'y' },
 #endif
 #endif
     { "reset",    no_argument,       NULL, 'R' },
@@ -291,7 +291,7 @@ static int print_usage(void)
 #if defined(__gnu_linux__) || defined(__linux__)
         "--nosysfs,  -S - do not use the Linux sysfs port disable interface.\n"
 #if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107)
-        "--sysdev,   -u - open system device node instead of scanning.\n"
+        "--sysdev,   -y - open system device node instead of scanning.\n"
 #endif
 #endif
         "--reset,    -R - reset hub after each power-on action, causing all devices to reassociate.\n"
@@ -1187,7 +1187,7 @@ int main(int argc, char *argv[])
             opt_nosysfs = 1;
             break;
 #if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107)
-        case 'u':
+        case 'y':
             opt_sysdev = optarg;
             break;
 #endif
