@@ -1244,7 +1244,9 @@ int main(int argc, char *argv[])
         }
         rc = libusb_wrap_sys_device(NULL, sys_fd, &sys_devh);
         if (rc != 0) {
-            fprintf(stderr, "Cannot wrap system node!\n");
+            fprintf(stderr,
+                    "Cannot use %s as USB hub device, failed to wrap system node!\n",
+                    opt_sysdev);
             rc = 1;
             goto cleanup;
         }
