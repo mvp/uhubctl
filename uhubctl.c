@@ -1250,9 +1250,9 @@ int main(int argc, char *argv[])
             rc = 1;
             goto cleanup;
         }
-	dev_list[0] = libusb_get_device(sys_devh);
-	dev_list[1] = NULL;
-	usb_devs = dev_list;
+        dev_list[0] = libusb_get_device(sys_devh);
+        dev_list[1] = NULL;
+        usb_devs = dev_list;
     } else {
         rc = libusb_get_device_list(NULL, &usb_devs);
     }
