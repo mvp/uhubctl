@@ -26,6 +26,7 @@ This is list of known compatible USB hubs:
 | AmazonBasics       | HUC9002V1SBL, HUC9002V1EBL, HUC9002V1ESL             | 10    | 3.1 |`2109:2817`| 2018    |      |
 | AmazonBasics       | U3-7HUB (only works for 1 charge port)               | 7     | 3.0 |`2109:2813`| 2020    |      |
 | Anker              | AK-68ANHUB-BV7A-0004 ([note](https://git.io/JLnZb))  | 7     | 3.0 |`2109:0812`| 2014    |      |
+| Apple              | Mac Mini M4 (2 front ports only)                     | 2     | 3.2 |`05AC:800B`| 2024    |      |
 | Apple              | Pro Display XDR MWPE2LL/A (internal USB hub)         | 4     | 2.0 |`05AC:9139`| 2019    |      |
 | Apple              | Thunderbolt Display 27" (internal USB hub)           | 6     | 2.0 |           | 2011    | 2016 |
 | Apple              | USB Keyboard With Numeric Pad (internal USB hub)     | 3     | 2.0 |           | 2011    |      |
