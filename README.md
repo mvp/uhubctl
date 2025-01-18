@@ -483,6 +483,7 @@ Notable projects using uhubctl
 | [Open source PPPS hub](https://tinyurl.com/yckhystt)     | Open source hardware project for uhubctl compatible hub |
 | [Python Wrapper for uhubctl](https://github.com/nbuchwitz/python3-uhubctl) | Module to use uhubctl with Python     |
 | [labgrid](https://github.com/labgrid-project/labgrid)    | Framework for testing embedded Linux on hardware        |
+| [Thermal Camera](https://tinyurl.com/5asne8hw)           | Turn on/off robot's thermal camera when necessary       |
 
 
 Copyright
