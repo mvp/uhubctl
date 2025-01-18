@@ -120,6 +120,7 @@ This is list of known compatible USB hubs:
 | Seeed Studio       | reTerminal CM4104032                                 | 2     | 2.0 |`0424:2514`| 2021    |      |
 | StarTech           | DKT30CSDHPD3 USB-C Travel Dock                       | 3     | 3.0 |`2109:2817`| 2018    |      |
 | StarTech           | HB30A4AIB ([warning](https://tinyurl.com/ycxravwk))  | 4     | 3.0 |`2109:2817`| 2018    |      |
+| StarTech           | HB31C2A2CB ([note](https://github.com/mvp/uhubctl/issues/601)) | 5 | 3.0 |`14B0:013D`| 2020    |      |
 | Sunix              | SHB4200MA                                            | 4     | 2.0 |`0409:0058`| 2006    | 2009 |
 | System Talks       | Sugoi USB2-HUB4X                                     | 4     | 2.0 |           | 2007    |      |
 | Targus             | PA095UZ                                              | 2     | 2.0 |           | 2004    |      |
