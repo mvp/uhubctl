@@ -111,6 +111,7 @@ This is list of known compatible USB hubs:
 | Rosonway           | RSH-A10 ([see](https://tinyurl.com/2ppyyaj8))        | 10    | 3.0 |`0bda:0411`| 2020    |      |
 | Rosonway           | RSH-A13 ([warning](https://bit.ly/3OToUOL))          | 13    | 3.1 |`2109:2822`| 2021    |      |
 | Rosonway           | RSH-A16 ([note](https://git.io/JTawg), [warning](https://bit.ly/39B0tGS)) | 16    | 3.0 |`0bda:0411`| 2020    |      |
+| Rosonway           | RSH-A37S                                             | 7     | 3.0 |`2109:2822`| 2021    |      |
 | Rosonway           | RSH-A104 ([USB2 only](https://bit.ly/3A0qiKF))       | 4     | 3.1 |`2109:2822`| 2022    |      |
 | Rosonway           | RSH-A107 (aka ikuai A107-5)                          | 7     | 3.1 |`0bda:5411`| 2022    |      |
 | Rosonway           | RSH-ST07C ([only 4](https://tinyurl.com/4pjnujrn))   | 7     | 3.0 |`2109:2822`| 2023    |      |
