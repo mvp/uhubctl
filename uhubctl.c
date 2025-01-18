@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2024 Vadim Mikhailov
+ * Copyright (c) 2009-2025 Vadim Mikhailov
  *
  * Utility to turn USB port power on/off
  * for USB hubs that support per-port power switching.
@@ -30,14 +30,16 @@
 #include <unistd.h>
 #endif
 
-#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(_WIN32)
 #include <libusb.h>
-#else
-#include <libusb-1.0/libusb.h>
+
+/* LIBUSBX_API_VERSION was first defined in libusb 1.0.13
+  and renamed to LIBUSB_API_VERSION since libusb 1.0.16 */
+#if defined(LIBUSBX_API_VERSION) && !defined(LIBUSB_API_VERSION)
+#define LIBUSB_API_VERSION LIBUSBX_API_VERSION
 #endif
 
-#if !defined(LIBUSB_API_VERSION) || (LIBUSB_API_VERSION <= 0x01000103)
-#define LIBUSB_DT_SUPERSPEED_HUB 0x2a
+#if !defined(LIBUSB_API_VERSION)
+#error "libusb-1.0 is required!"
 #endif
 
 #if _POSIX_C_SOURCE >= 199309L
@@ -221,9 +223,9 @@ static int opt_exact  = 0;  /* exact location match - disable USB3 duality handl
 static int opt_reset  = 0;  /* reset hub after operation(s) */
 static int opt_force  = 0;  /* force operation even on unsupported hubs */
 static int opt_nodesc = 0;  /* skip querying device description */
-#if defined(__gnu_linux__) || defined(__linux__)
+#if defined(__linux__)
 static int opt_nosysfs = 0; /* don't use the Linux sysfs port disable interface, even if available */
-#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107)
+#if (LIBUSB_API_VERSION >= 0x01000107) /* 1.0.23 */
 static const char *opt_sysdev;
 #endif
 #endif
@@ -234,11 +236,10 @@ static int is_rpi_5  = 0;
 
 static const char short_options[] =
     "l:L:n:a:p:d:r:w:s:hvefRN"
-#if defined(__gnu_linux__) || defined(__linux__)
-#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107)
-    "Sy:"
-#else
+#if defined(__linux__)
     "S"
+#if (LIBUSB_API_VERSION >= 0x01000107) /* 1.0.23 */
+    "y:"
 #endif
 #endif
 ;
@@ -256,9 +257,9 @@ static const struct option long_options[] = {
     { "exact",    no_argument,       NULL, 'e' },
     { "force",    no_argument,       NULL, 'f' },
     { "nodesc",   no_argument,       NULL, 'N' },
-#if defined(__gnu_linux__) || defined(__linux__)
+#if defined(__linux__)
     { "nosysfs",  no_argument,       NULL, 'S' },
-#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107)
+#if (LIBUSB_API_VERSION >= 0x01000107)
     { "sysdev",   required_argument, NULL, 'y' },
 #endif
 #endif
@@ -288,9 +289,9 @@ static int print_usage(void)
         "--exact,    -e - exact location (no USB3 duality handling).\n"
         "--force,    -f - force operation even on unsupported hubs.\n"
         "--nodesc,   -N - do not query device description (helpful for unresponsive devices).\n"
-#if defined(__gnu_linux__) || defined(__linux__)
+#if defined(__linux__)
         "--nosysfs,  -S - do not use the Linux sysfs port disable interface.\n"
-#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107)
+#if (LIBUSB_API_VERSION >= 0x01000107)
         "--sysdev,   -y - open system device node instead of scanning.\n"
 #endif
 #endif
@@ -423,7 +424,7 @@ static int check_computer_model(char *target)
 static int get_port_numbers(libusb_device *dev, uint8_t *buf, uint8_t bufsize)
 {
     int pcount;
-#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000102)
+#if (LIBUSB_API_VERSION >= 0x01000102)
     /*
      * libusb_get_port_path is deprecated since libusb v1.0.16,
      * therefore use libusb_get_port_numbers when supported
@@ -602,7 +603,7 @@ static int get_port_status(struct libusb_device_handle *devh, int port)
 }
 
 
-#if defined(__gnu_linux__) || defined(__linux__)
+#if defined(__linux__)
 /*
  * Try to use the Linux sysfs interface to power a port off/on.
  * Returns 0 on success.
@@ -702,7 +703,7 @@ static int set_port_status_libusb(struct libusb_device_handle *devh, int port, i
 
 static int set_port_status(struct libusb_device_handle *devh, struct hub_info *hub, int port, int on)
 {
-#if defined(__gnu_linux__) || defined(__linux__)
+#if defined(__linux__)
     if (!opt_nosysfs) {
         if (set_port_status_linux(devh, hub, port, on) == 0) {
             return 0;
@@ -1093,7 +1094,7 @@ static int usb_find_hubs(void)
         }
     }
     if (perm_ok == 0 && hub_phys_count == 0) {
-#if defined(__gnu_linux__) || defined(__linux__)
+#if defined(__linux__)
         if (geteuid() != 0) {
             fprintf(stderr,
                 "There were permission problems while accessing USB.\n"
@@ -1112,8 +1113,7 @@ int main(int argc, char *argv[])
     int rc;
     int c = 0;
     int option_index = 0;
-#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107) && \
-  (defined(__gnu_linux__) || defined(__linux__))
+#if defined(__linux__) && (LIBUSB_API_VERSION >= 0x01000107)
     int sys_fd;
     libusb_device_handle *sys_devh = NULL;
 #endif
@@ -1181,11 +1181,11 @@ int main(int argc, char *argv[])
         case 'N':
             opt_nodesc = 1;
             break;
-#if defined(__gnu_linux__) || defined(__linux__)
+#if defined(__linux__)
         case 'S':
             opt_nosysfs = 1;
             break;
-#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107)
+#if (LIBUSB_API_VERSION >= 0x01000107)
         case 'y':
             opt_sysdev = optarg;
             break;
@@ -1232,8 +1232,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107) && \
-  (defined(__gnu_linux__) || defined(__linux__))
+#if defined(__linux__) && (LIBUSB_API_VERSION >= 0x01000107)
     if (opt_sysdev) {
         sys_fd = open(opt_sysdev, O_RDWR);
         if (sys_fd < 0) {
@@ -1367,8 +1366,7 @@ int main(int argc, char *argv[])
     }
     rc = 0;
 cleanup:
-#if defined(LIBUSB_API_VERSION) && (LIBUSB_API_VERSION >= 0x01000107) && \
-  (defined(__gnu_linux__) || defined(__linux__))
+#if defined(__linux__) && (LIBUSB_API_VERSION >= 0x01000107)
     if (opt_sysdev && sys_fd >= 0) {
         if (sys_devh)
             libusb_close(sys_devh);

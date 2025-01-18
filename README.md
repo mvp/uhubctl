@@ -164,7 +164,8 @@ This may be fixed if `libusb` starts supporting different driver on Windows.
 
 Note that it is highly recommended to have `pkg-config` installed (many platforms provide it by default).
 
-First, you need to install library libusb-1.0 (version 1.0.12 or later, 1.0.16 or later is recommended):
+First, you need to install library libusb-1.0 (version 1.0.13 or later is required,
+1.0.23 or later is recommended):
 
 * Ubuntu: `sudo apt-get install libusb-1.0-0-dev`
 * Redhat: `sudo yum install libusb1-devel`
@@ -485,7 +486,7 @@ Notable projects using uhubctl
 Copyright
 =========
 
-Copyright (C) 2009-2024 Vadim Mikhailov
+Copyright (C) 2009-2025 Vadim Mikhailov
 
 This file can be distributed under the terms and conditions of the
 GNU General Public License version 2.
