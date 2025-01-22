@@ -405,7 +405,7 @@ static int get_computer_model(char *model, int len)
  * Returns 1 if yes and 0 otherwise.
  */
 
-static int check_computer_model(char *target)
+static int check_computer_model(const char *target)
 {
     char model[256] = "";
     if (get_computer_model(model, sizeof(model)) == 0) {
@@ -495,7 +495,7 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
             }
 
             /* Get container_id: */
-            bzero(info->container_id, sizeof(info->container_id));
+            memset(info->container_id, 0, sizeof(info->container_id));
             struct libusb_bos_descriptor *bos;
             rc = libusb_get_bos_descriptor(devh, &bos);
             if (rc == 0) {
@@ -743,7 +743,7 @@ static int get_device_description(struct libusb_device * dev, struct descriptor_
     rc = libusb_get_device_descriptor(dev, &desc);
     if (rc)
         return rc;
-    bzero(ds, sizeof(*ds));
+    memset(ds, 0, sizeof(*ds));
     id_vendor  = desc.idVendor;
     id_product = desc.idProduct;
     rc = libusb_open(dev, &devh);
@@ -767,7 +767,7 @@ static int get_device_description(struct libusb_device * dev, struct descriptor_
         }
         if (desc.bDeviceClass == LIBUSB_CLASS_HUB) {
             struct hub_info info;
-            bzero(&info, sizeof(info));
+            memset(&info, 0, sizeof(info));
             rc = get_hub_info(dev, &info);
             if (rc == 0) {
                 const char * lpsm_type;
@@ -825,7 +825,7 @@ static int print_port_status(struct hub_info * hub, int portmask)
             printf("  Port %d: %04x", port, port_status);
 
             struct descriptor_strings ds;
-            bzero(&ds, sizeof(ds));
+            memset(&ds, 0, sizeof(ds));
             struct libusb_device * udev;
             int i = 0;
             while ((udev = usb_devs[i++]) != NULL) {
@@ -920,7 +920,7 @@ static int usb_find_hubs(void)
         if (rc == 0 && desc.bDeviceClass != LIBUSB_CLASS_HUB)
             continue;
         struct hub_info info;
-        bzero(&info, sizeof(info));
+        memset(&info, 0, sizeof(info));
         rc = get_hub_info(dev, &info);
         if (rc) {
             perm_ok = 0; /* USB permission issue? */
@@ -946,7 +946,7 @@ static int usb_find_hubs(void)
                     (memcmp(info.port_numbers, dev_pn, info.pn_len) == 0))
                 {
                     struct descriptor_strings ds;
-                    bzero(&ds, sizeof(ds));
+                    memset(&ds, 0, sizeof(ds));
                     rc = get_device_description(udev, &ds);
                     if (rc != 0)
                         break;
