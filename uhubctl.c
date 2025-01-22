@@ -38,6 +38,11 @@
 #define LIBUSB_API_VERSION LIBUSBX_API_VERSION
 #endif
 
+/* FreeBSD's libusb does not define LIBUSB_DT_SUPERSPEED_HUB */
+#if !defined(LIBUSB_DT_SUPERSPEED_HUB)
+#define LIBUSB_DT_SUPERSPEED_HUB 0x2a
+#endif
+
 #if !defined(LIBUSB_API_VERSION)
 #error "libusb-1.0 is required!"
 #endif

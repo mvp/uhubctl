@@ -164,17 +164,19 @@ is using `winusb.sys` driver, which according to Microsoft does not support
 [necessary USB control requests](https://social.msdn.microsoft.com/Forums/sqlserver/en-US/f680b63f-ca4f-4e52-baa9-9e64f8eee101).
 This may be fixed if `libusb` starts supporting different driver on Windows.
 
-Note that it is highly recommended to have `pkg-config` installed (many platforms provide it by default).
+Note that it is highly recommended to have utility `pkg-config` installed
+(many platforms provide it in package `pkg-config` or `pkgconf`,
+often it is installed by default).
 
 First, you need to install library libusb-1.0 (version 1.0.13 or later is required,
 1.0.23 or later is recommended):
 
-* Ubuntu: `sudo apt-get install libusb-1.0-0-dev`
-* Redhat: `sudo yum install libusb1-devel`
-* OpenSUSE: `sudo zypper install libusb-1_0-devel`
-* MacOS: `brew install libusb`, or `sudo port install libusb-devel`
-* FreeBSD: libusb is included by default
-* NetBSD: `sudo pkgin install libusb1 gmake pkg-config`
+* Ubuntu: `sudo apt-get install libusb-1.0-0-dev pkgconf`
+* Redhat: `sudo yum install libusb1-devel pkgconf`
+* OpenSUSE: `sudo zypper install libusb-1_0-devel pkgconf`
+* MacOS: `brew install libusb pkgconf`, or `sudo port install libusb-devel pkgconf`
+* FreeBSD: `pkg install gmake pkgconf` (libusb is included by default)
+* NetBSD: `sudo pkgin install libusb1 gmake pkgconf`
 * Windows: TBD?
 
 To fetch uhubctl source and compile it:
