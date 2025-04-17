@@ -6,12 +6,12 @@ class Uhubctl < Formula
   license "GPL-2.0-only"
   head "https://github.com/mvp/uhubctl.git", branch: "master"
 
-  depends_on "pkg-config" => :build
-  depends_on "libusb"
-
   livecheck do
     url :stable
   end
+
+  depends_on "pkg-config" => :build
+  depends_on "libusb"
 
   def install
     system "make"
