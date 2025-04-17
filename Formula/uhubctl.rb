@@ -1,13 +1,13 @@
 class Uhubctl < Formula
   desc "USB hub per-port power control"
   homepage "https://github.com/mvp/uhubctl"
-  head "https://github.com/mvp/uhubctl.git"
-  url "https://github.com/mvp/uhubctl/archive/v2.6.0.tar.gz"
+  url "https://github.com/mvp/uhubctl/archive/refs/tags/v2.6.0.tar.gz"
+  head "https://github.com/mvp/uhubctl.git", branch: "master"
   sha256 "56ca15ddf96d39ab0bf8ee12d3daca13cea45af01bcd5a9732ffcc01664fdfa2"
-  license "GPL-2.0"
+  license "GPL-2.0-only"
 
-  depends_on "libusb"
   depends_on "pkg-config" => :build
+  depends_on "libusb"
 
   livecheck do
     url :stable
@@ -19,6 +19,6 @@ class Uhubctl < Formula
   end
 
   test do
-    system "#{bin}/uhubctl", "-v"
+    system bin/"uhubctl", "-v"
   end
 end
