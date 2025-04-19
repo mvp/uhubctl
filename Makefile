@@ -38,6 +38,10 @@ endif
 
 PROGRAM = uhubctl
 
+.PHONY: all install clean
+
+all: $(PROGRAM)
+
 $(PROGRAM): $(PROGRAM).c
 	$(CC) $(CPPFLAGS) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
 

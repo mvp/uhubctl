@@ -11,7 +11,7 @@ https://www.gniibe.org/development/ac-power-control-by-USB-hub
 Compatible USB hubs
 ===================
 
-Note that very few hubs actually support per-port power switching.
+Note that not many USB hubs correctly support per-port power switching.
 Some of them are no longer manufactured and can be hard to find.
 
 This is list of known compatible USB hubs:
@@ -22,7 +22,7 @@ This is list of known compatible USB hubs:
 | AmazonBasics       | HU3641V1 ([RPi issue](https://goo.gl/CLt46M))        | 4     | 3.0 |`2109:2811`| 2013    |      |
 | AmazonBasics       | HU3770V1 ([RPi issue](https://goo.gl/CLt46M))        | 7     | 3.0 |`2109:2811`| 2013    |      |
 | AmazonBasics       | HU9003V1EBL, HUC9003V1EBL                            | 7     | 3.1 |`2109:2817`| 2018    |      |
-| AmazonBasics       | HU9002V1SBL, HU9002V1EBL, HU9002V1ESL ([note](https://bit.ly/3awM2Ei)) | 10    | 3.1 |`2109:2817`| 2018    |      |
+| AmazonBasics       | HU9002V1SBL, HU9002V1EBL, HU9002V1ESL ([note](https://tinyurl.com/HU9002)) | 10    | 3.1 |`2109:2817`| 2018    |      |
 | AmazonBasics       | HUC9002V1SBL, HUC9002V1EBL, HUC9002V1ESL             | 10    | 3.1 |`2109:2817`| 2018    |      |
 | AmazonBasics       | U3-7HUB (only works for 1 charge port)               | 7     | 3.0 |`2109:2813`| 2020    |      |
 | Anker              | AK-68ANHUB-BV7A-0004 ([note](https://git.io/JLnZb))  | 7     | 3.0 |`2109:0812`| 2014    |      |
@@ -40,12 +40,12 @@ This is list of known compatible USB hubs:
 | Belkin             | F5U238UKCRL-MOB                                      | 4     | 2.0 |`0409:0059`| 2004    | 2010 |
 | BenQ               | PD2700U 4K Monitor (works only in USB2 mode)         | 4     | 3.0 |`05E3:0610`| 2018    |      |
 | BenQ               | PD3220U                                              | 4     | 3.1 |`05E3:0610`| 2019    |      |
-| Bytecc             | BT-UH340 ([warning](https://bit.ly/35BNi5U))         | 4     | 3.0 |`2109:8110`| 2010    |      |
+| Bytecc             | BT-UH340 ([warning](https://tinyurl.com/BT-UH340-1)) | 4     | 3.0 |`2109:8110`| 2010    |      |
 | Centech            | CT-USB4HUB ReTRY HUB                                 | 4     | 3.0 |`0424:2744`| 2017    |      |
 | Circuitco          | Beagleboard-xM (internal USB hub)                    | 4     | 2.0 |`0424:9514`| 2010    |      |
 | Club3D             | CSV-3242HD Dual Display Docking Station              | 4     | 3.0 |`2109:2811`| 2015    |      |
 | Coolgear           | USBG-12U2ML                                          | 12    | 2.0 |`05e3:0607`| 2015    |      |
-| Cypress            | CY4608 HX2VL devkit ([note](https://bit.ly/3sMPfpu)) | 4     | 2.0 |`04B4:6570`| 2012    |      |
+| Cypress            | CY4608 HX2VL ([note](https://tinyurl.com/CY4608-1))  | 4     | 2.0 |`04B4:6570`| 2012    |      |
 | D-Link             | DUB-H4 rev D,E (black). Note: rev A,C,F not supported| 4     | 2.0 |`05E3:0608`| 2012    |      |
 | D-Link             | DUB-H7 rev A (silver)                                | 7     | 2.0 |`2001:F103`| 2005    | 2010 |
 | D-Link             | DUB-H7 rev D,E (black). Rev B,C,F,G not supported    | 7     | 2.0 |`05E3:0608`| 2012    |      |
@@ -58,16 +58,16 @@ This is list of known compatible USB hubs:
 | Delock             | 62537                                                | 4     | 3.0 |           | 2017    | 2021 |
 | Delock             | 87445 ([note](https://git.io/Jsuz5))                 | 4     | 2.0 |`05E3:0608`| 2009    | 2013 |
 | Elecom             | U2H-G4S                                              | 4     | 2.0 |           | 2006    | 2011 |
-| Gigabyte           | G27Q monitor ([see](http://tinyurl.com/G27Q551)      | 4     | 3.0 |`2109:0817`| 2020    |      |
+| Gigabyte           | G27Q monitor ([see](http://tinyurl.com/G27Q551))     | 4     | 3.0 |`2109:0817`| 2020    |      |
 | GlobalScale        | ESPRESSObin SBUD102 V5                               | 1     | 3.0 |`1D6B:0003`| 2017    |      |
 | Hardkernel         | ODROID-C4 ([note](https://git.io/JG0mP))             | 4     | 3.0 |           | 2020    |      |
 | Hawking Technology | UH214                                                | 4     | 2.0 |           | 2003    | 2008 |
 | Hewlett Packard    | USB-C Dock G5 5TW10AA                                | 5     | 3.0 |`03F0:076B`| 2019    |      |
 | Hewlett Packard    | P5Q58UT                                              | 3     | 3.0 |           | 2019    |      |
-| Inateck            | HB2025A ([USB2 only](https://bit.ly/3wXF5UO))        | 4     | 3.1 |`2109:2822`| 2021    |      |
+| Inateck            | HB2025A ([USB2 only](https://tinyurl.com/HB2025A-1)) | 4     | 3.1 |`2109:2822`| 2021    |      |
 | IOI                | U3H415E1                                             | 4     | 3.0 |           | 2012    |      |
-| j5create           | JUH377 ([note](https://bit.ly/3Mx9eQI))              | 7     | 3.0 |           | 2016    |      |
-| j5create           | JUH470 ([note](https://bit.ly/3CRWamP))              | 3     | 3.0 |`05E3:0610`| 2014    |      |
+| j5create           | JUH377 ([note](https://tinyurl.com/JUH377))          | 7     | 3.0 |           | 2016    |      |
+| j5create           | JUH470 ([note](https://tinyurl.com/JUH470))          | 3     | 3.0 |`05E3:0610`| 2014    |      |
 | Juiced Systems     | 6HUB-01                                              | 7     | 3.0 |`0BDA:0411`| 2014    | 2018 |
 | KUNBUS GmbH        | RevPi Connect (+) / S / SE                           | 2     | 2.0 |`0424:9514`| 2018    |      |
 | KUNBUS GmbH        | RevPi Connect 4                                      | 2     | 3.0 |           | 2022    |      |
@@ -94,7 +94,7 @@ This is list of known compatible USB hubs:
 | Microchip          | EVB-USB5807                                          | 7     | 3.0 |           | 2016    |      |
 | Moxa               | Uport-407                                            | 7     | 2.0 |`110A:0407`| 2009    |      |
 | NVidia             | Jetson Nano B01 ([details](https://git.io/JJaFR))    | 4     | 3.0 |           | 2019    |      |
-| NVidia             | Jetson Xavier NX ([details](https://bit.ly/3PN2DDp)) | 4     | 3.0 |           | 2020    |      |
+| NVidia             | Jetson Xavier NX ([details](https://tinyurl.com/Xavier-NX)) | 4     | 3.0 |           | 2020    |      |
 | Phidgets           | HUB0003_0                                            | 7     | 2.0 |`1A40:0201`| 2017    |      |
 | Philips            | 346B1C UltraWide 34" Curved Monitor                  | 4     | 3.0 |`05E3:0610`| 2019    |      |
 | Plugable           | USB3-HUB7BC                                          | 7     | 3.0 |`2109:0813`| 2015    |      |
@@ -108,12 +108,12 @@ This is list of known compatible USB hubs:
 | Raspberry Pi       | 5          ([see below](#raspberry-pi-5))            | 4     | 3.0 |`1d6b:0002`| 2023    |      |
 | Renesas            | uPD720202 PCIe USB 3.0 host controller               | 2     | 3.0 |           | 2013    |      |
 | Rosewill           | RHUB-210                                             | 4     | 2.0 |`0409:005A`| 2011    | 2014 |
-| Rosonway           | RSH-518C ([note](https://bit.ly/3kYZUsA))            | 7     | 3.0 |`2109:0817`| 2021    |      |
+| Rosonway           | RSH-518C ([note](https://tinyurl.com/RSH518))        | 7     | 3.0 |`2109:0817`| 2021    |      |
 | Rosonway           | RSH-A10 ([see](https://tinyurl.com/2ppyyaj8))        | 10    | 3.0 |`0bda:0411`| 2020    |      |
-| Rosonway           | RSH-A13 ([warning](https://bit.ly/3OToUOL))          | 13    | 3.1 |`2109:2822`| 2021    |      |
-| Rosonway           | RSH-A16 ([note](https://git.io/JTawg), [warning](https://bit.ly/39B0tGS)) | 16    | 3.0 |`0bda:0411`| 2020    |      |
+| Rosonway           | RSH-A13 ([warning](https://tinyurl.com/RSH-A13))     | 13    | 3.1 |`2109:2822`| 2021    |      |
+| Rosonway           | RSH-A16 ([note](https://git.io/JTawg), [warning](https://tinyurl.com/RSH-A16)) | 16    | 3.0 |`0bda:0411`| 2020    |      |
 | Rosonway           | RSH-A37S                                             | 7     | 3.0 |`2109:2822`| 2021    |      |
-| Rosonway           | RSH-A104 ([USB2 only](https://bit.ly/3A0qiKF))       | 4     | 3.1 |`2109:2822`| 2022    |      |
+| Rosonway           | RSH-A104 ([USB2 only](https://tinyurl.com/RSH-A104)) | 4     | 3.1 |`2109:2822`| 2022    |      |
 | Rosonway           | RSH-ST07C ([only 4](https://tinyurl.com/4pjnujrn))   | 7     | 3.0 |`2109:2822`| 2023    |      |
 | Sanwa Supply       | USB-HUB14GPH                                         | 4     | 1.1 |           | 2001    | 2003 |
 | Seagate            | Backup Plus Hub STEL8000100                          | 2     | 3.0 |`0BC2:AB44`| 2016    |      |
@@ -152,21 +152,37 @@ virtual hubs for power off/on changes to take effect. `uhubctl` will try to do t
 Unfortunately, while most hubs will cut off data USB connection, some may still not cut off VBUS to port,
 which means connected phone may still continue to charge from port that is powered off by `uhubctl`.
 
+Installing
+==========
+
+For Linux and MacOS uhubctl is available in standard package managers
+and can be installed with following commands:
+
+* MacOS: `brew install uhubctl` or `sudo port install uhubctl`
+* Ubuntu/Debian/Raspbian: `sudo apt install uhubctl`
+* Redhat/EPEL/Fedora/CentOS: `sudo yum install uhubctl`
+* OpenSUSE: `sudo zypper install uhubctl`
+
+However, uhubctl installed from standard package manager may not
+necessarily be latest version, or even severely lag behind current version.
+If [latest published](https://github.com/mvp/uhubctl/releases) uhubctl version
+is newer than what your package manager offers, you may need to compile and install
+from source as described below.
 
 Compiling
 =========
 
-This utility was tested to compile and work on Linux
-(Ubuntu/Debian, Redhat/Fedora/CentOS, Arch Linux, Gentoo, openSUSE, Buildroot), FreeBSD, NetBSD, SunOS and MacOS.
+This utility was tested to compile and work on Linux (Ubuntu/Debian/Raspbian,
+Redhat/EPEL/Fedora/CentOS, Arch Linux, Gentoo, openSUSE, Buildroot),
+FreeBSD, NetBSD, SunOS and MacOS.
 
 While `uhubctl` compiles on Windows, USB power switching does not work on Windows because `libusb`
 is using `winusb.sys` driver, which according to Microsoft does not support
-[necessary USB control requests](https://social.msdn.microsoft.com/Forums/sqlserver/en-US/f680b63f-ca4f-4e52-baa9-9e64f8eee101).
+[necessary USB control requests](https://web.archive.org/web/20210225235523/https://social.msdn.microsoft.com/Forums/sqlserver/en-US/f680b63f-ca4f-4e52-baa9-9e64f8eee101/how-to-send-an-quotusb-control-requestquot-to-an-usbhub?forum=wdk).
 This may be fixed if `libusb` starts supporting different driver on Windows.
 
-Note that it is highly recommended to have utility `pkg-config` installed
-(many platforms provide it in package `pkg-config` or `pkgconf`,
-often it is installed by default).
+Note that it is highly recommended to have utility `pkgconf` (or `pkg-config`) installed
+(often it is installed by default).
 
 First, you need to install library libusb-1.0 (version 1.0.13 or later is required,
 1.0.23 or later is recommended):
@@ -191,17 +207,6 @@ You can install it in your system as `/usr/sbin/uhubctl` using:
     sudo make install
 
 Note that on some OS (e.g. FreeBSD/NetBSD) you need to use `gmake` instead to build.
-
-Also, on MacOS you can install `uhubctl` with all necessary dependencies in one shot using Homebrew tap:
-
-```
-brew tap mvp/uhubctl https://github.com/mvp/uhubctl
-brew install uhubctl
-```
-To build/install from master branch, use `--HEAD`:
-```
-brew install uhubctl --HEAD
-```
 
 Usage
 =====
@@ -334,7 +339,7 @@ Per-port power switching:
 After powering down USB port, udev does not get any event, so it keeps the device files around.
 However, trying to access the device files will lead to an IO error.
 
-This is Linux kernel [issue](https://bit.ly/2JzczjZ) and is [fixed](https://github.com/mvp/uhubctl/pull/450)
+This is Linux kernel [issue](https://tinyurl.com/ym7yvuzw) and is [fixed](https://github.com/mvp/uhubctl/pull/450)
 since uhubctl 2.5.0 for systems with Linux kernel 6.0 or later.
 
 If you are still using Linux 5.x or older, you can use this workaround for this issue:
@@ -350,7 +355,7 @@ When you turn power back on, device should re-enumerate properly (no need to cal
 
 Some device drivers in kernel are surprised by USB device being turned off and automatically try to power it back on.
 
-This is Linux kernel [issue](https://bit.ly/2JzczjZ) and is [fixed](https://github.com/mvp/uhubctl/pull/450)
+This is Linux kernel [issue](https://tinyurl.com/ym7yvuzw) and is [fixed](https://github.com/mvp/uhubctl/pull/450)
 since uhubctl 2.5.0 for systems with Linux kernel 6.0 or later.
 
 If you are still using Linux 5.x or older:
@@ -411,7 +416,7 @@ For reference, supported Raspberry Pi models have following internal USB topolog
 ##### Raspberry Pi 4B
 
  > :warning: If your VL805 firmware is older than `00137ad` (check with `sudo rpi-eeprom-update`),
-you have to [update firmware](https://www.raspberrypi.org/documentation/hardware/raspberrypi/booteeprom.md)
+you have to [update firmware](https://www.raspberrypi.com/documentation/computers/raspberry-pi.html#rpi-eeprom-update)
 to make power switching work on RPi 4B.
 
   * USB2 hub `1`, 1 port, only connects hub `1-1` below.
@@ -468,19 +473,19 @@ Notable projects using uhubctl
 | [Build Status Light](https://goo.gl/3GA82o)              | Create a build status light in under 10 minutes         |
 | [Buildenlights](https://git.io/fj1FC)                    | GitLab/GitHub project build status as green/red light   |
 | [Weather Station](https://goo.gl/3b1FzC)                 | Reset Weather Station when it freezes                   |
-| [sysmoQMOD](https://bit.ly/2VtWrVt)                      | Reset cellular modems when necessary                    |
-| [Smog Sensor](https://bit.ly/2EMwgCk)                    | Raspberry Pi based smog sensor power reset              |
+| [sysmoQMOD](https://tinyurl.com/sysmoQMOD)               | Reset cellular modems when necessary                    |
+| [Smog Sensor](https://tinyurl.com/smogsensor)            | Raspberry Pi based smog sensor power reset              |
 | [Terrible Cluster](https://goo.gl/XjiXFu)                | Power on/off Raspberry Pi cluster nodes as needed       |
-| [Ideal Music Server](https://bit.ly/39MeVFQ)             | Turn off unused USB ports to improve audio quality      |
+| [Ideal Music Server](https://tinyurl.com/ideal-m-srv)    | Turn off unused USB ports to improve audio quality      |
 | [USB drives with no phantom load](https://goo.gl/qfrmGK) | Power USB drives only when needed to save power         |
 | [USB drive data recovery](https://goo.gl/4MddLr)         | Recover data from failing USB hard drive                |
 | [Control power to 3D printer](https://git.io/fh5Tr)      | OctoPrint web plugin for USB power control              |
-| [USB fan for Raspberry Pi](https://bit.ly/2TRV6sM)       | Control USB fan to avoid Raspberry Pi overheating       |
-| [Raspberry Pi Reboot Router](https://bit.ly/3aNbQqs)     | Automatically reboot router if internet isn't working   |
-| [Control USB Lamp With Voice](https://bit.ly/2VtW2SX)    | Voice Control of USB Lamp using Siri and Raspberry Pi   |
-| [Control USB LED Strip](https://bit.ly/3oVWfeZ)          | Controlling USB powered LED Light Strip                 |
+| [USB fan for Raspberry Pi](https://tinyurl.com/fan-rpi)  | Control USB fan to avoid Raspberry Pi overheating       |
+| [Raspberry Pi Reboot Router](https://tinyurl.com/rpi-rtr)| Automatically reboot router if internet isn't working   |
+| [Control USB Lamp With Voice](https://tinyurl.com/usblmp)| Voice Control of USB Lamp using Siri and Raspberry Pi   |
+| [Control USB LED Strip](https://tinyurl.com/usbleds)     | Controlling USB powered LED Light Strip                 |
 | [Brew beer with Raspberry Pi](https://git.io/JtbLd)      | Automated beer brewing system using Raspberry Pi        |
-| [Webcam On-Air Sign](https://bit.ly/3witNsa)             | Automatically light up a sign when webcam is in use     |
+| [Webcam On-Air Sign](https://tinyurl.com/uonair)         | Automatically light up a sign when webcam is in use     |
 | [Do it yourself PPPS](https://git.io/J3lHs)              | Solder wires in your USB hub to support uhubctl         |
 | [Open source PPPS hub](https://tinyurl.com/yckhystt)     | Open source hardware project for uhubctl compatible hub |
 | [Python Wrapper for uhubctl](https://github.com/nbuchwitz/python3-uhubctl) | Module to use uhubctl with Python     |
