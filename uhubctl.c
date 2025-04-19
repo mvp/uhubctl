@@ -11,6 +11,7 @@
 
 #define _XOPEN_SOURCE 600
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -223,6 +224,7 @@ static int opt_level = 0;              /* Hub location level (e.g., a-b is level
 static int opt_ports  = ALL_HUB_PORTS; /* Bitmask of ports to operate on */
 static int opt_action = POWER_KEEP;
 static double opt_delay = 2;
+static int opt_quiet  = 0;  /* quiet operation if set */
 static int opt_repeat = 1;
 static int opt_wait   = 20; /* wait before repeating in ms */
 static int opt_exact  = 0;  /* exact location match - disable USB3 duality handling */
@@ -241,7 +243,7 @@ static int is_rpi_4b = 0;
 static int is_rpi_5  = 0;
 
 static const char short_options[] =
-    "l:L:n:a:p:d:r:w:s:H:hvefRN"
+    "l:L:n:a:p:d:r:w:s:H:qhvefRN"
 #if defined(__linux__)
     "S"
 #if (LIBUSB_API_VERSION >= 0x01000107) /* 1.0.23 */
@@ -263,6 +265,7 @@ static const struct option long_options[] = {
     { "wait",     required_argument, NULL, 'w' },
     { "exact",    no_argument,       NULL, 'e' },
     { "force",    no_argument,       NULL, 'f' },
+    { "quiet",    no_argument,       NULL, 'q' },
     { "nodesc",   no_argument,       NULL, 'N' },
 #if defined(__linux__)
     { "nosysfs",  no_argument,       NULL, 'S' },
@@ -296,6 +299,7 @@ static int print_usage(void)
         "--repeat,   -r - repeat power off count [%d] (some devices need it to turn off).\n"
         "--exact,    -e - exact location (no USB3 duality handling).\n"
         "--force,    -f - force operation even on unsupported hubs.\n"
+        "--quiet,    -q - quiet operation, most output is suppressed.\n"
         "--nodesc,   -N - do not query device description (helpful for unresponsive devices).\n"
 #if defined(__linux__)
         "--nosysfs,  -S - do not use the Linux sysfs port disable interface.\n"
@@ -382,6 +386,20 @@ static int ports2bitmap(char* const portlist)
         }
     }
     return ports;
+}
+
+
+/* Standard printf but gated by quiet option */
+
+int qprintf(const char *format, ...) {
+    int count = 0;
+    if (!opt_quiet) {
+        va_list args;
+        va_start(args, format);
+        count = vprintf(format, args);
+        va_end(args);
+    }
+    return count;
 }
 
 /*
@@ -830,7 +848,7 @@ static int print_port_status(struct hub_info * hub, int portmask)
                 break;
             }
 
-            printf("  Port %d: %04x", port, port_status);
+            qprintf("  Port %d: %04x", port, port_status);
 
             struct descriptor_strings ds;
             memset(&ds, 0, sizeof(ds));
@@ -856,48 +874,48 @@ static int print_port_status(struct hub_info * hub, int portmask)
 
             if (!hub->super_speed) {
                 if (port_status == 0) {
-                    printf(" off");
+                    qprintf(" off");
                 } else {
-                    if (port_status & USB_PORT_STAT_POWER)        printf(" power");
-                    if (port_status & USB_PORT_STAT_INDICATOR)    printf(" indicator");
-                    if (port_status & USB_PORT_STAT_TEST)         printf(" test");
-                    if (port_status & USB_PORT_STAT_HIGH_SPEED)   printf(" highspeed");
-                    if (port_status & USB_PORT_STAT_LOW_SPEED)    printf(" lowspeed");
-                    if (port_status & USB_PORT_STAT_SUSPEND)      printf(" suspend");
+                    if (port_status & USB_PORT_STAT_POWER)        qprintf(" power");
+                    if (port_status & USB_PORT_STAT_INDICATOR)    qprintf(" indicator");
+                    if (port_status & USB_PORT_STAT_TEST)         qprintf(" test");
+                    if (port_status & USB_PORT_STAT_HIGH_SPEED)   qprintf(" highspeed");
+                    if (port_status & USB_PORT_STAT_LOW_SPEED)    qprintf(" lowspeed");
+                    if (port_status & USB_PORT_STAT_SUSPEND)      qprintf(" suspend");
                 }
             } else {
                 if (!(port_status & USB_SS_PORT_STAT_POWER)) {
                     printf(" off");
                 } else {
                     int link_state = port_status & USB_PORT_STAT_LINK_STATE;
-                    if (port_status & USB_SS_PORT_STAT_POWER)     printf(" power");
+                    if (port_status & USB_SS_PORT_STAT_POWER)     qprintf(" power");
                     if ((port_status & USB_SS_PORT_STAT_SPEED)
                          == USB_PORT_STAT_SPEED_5GBPS)
                     {
                         printf(" 5gbps");
                     }
-                    if (link_state == USB_SS_PORT_LS_U0)          printf(" U0");
-                    if (link_state == USB_SS_PORT_LS_U1)          printf(" U1");
-                    if (link_state == USB_SS_PORT_LS_U2)          printf(" U2");
-                    if (link_state == USB_SS_PORT_LS_U3)          printf(" U3");
-                    if (link_state == USB_SS_PORT_LS_SS_DISABLED) printf(" SS.Disabled");
-                    if (link_state == USB_SS_PORT_LS_RX_DETECT)   printf(" Rx.Detect");
-                    if (link_state == USB_SS_PORT_LS_SS_INACTIVE) printf(" SS.Inactive");
-                    if (link_state == USB_SS_PORT_LS_POLLING)     printf(" Polling");
-                    if (link_state == USB_SS_PORT_LS_RECOVERY)    printf(" Recovery");
-                    if (link_state == USB_SS_PORT_LS_HOT_RESET)   printf(" HotReset");
-                    if (link_state == USB_SS_PORT_LS_COMP_MOD)    printf(" Compliance");
-                    if (link_state == USB_SS_PORT_LS_LOOPBACK)    printf(" Loopback");
+                    if (link_state == USB_SS_PORT_LS_U0)          qprintf(" U0");
+                    if (link_state == USB_SS_PORT_LS_U1)          qprintf(" U1");
+                    if (link_state == USB_SS_PORT_LS_U2)          qprintf(" U2");
+                    if (link_state == USB_SS_PORT_LS_U3)          qprintf(" U3");
+                    if (link_state == USB_SS_PORT_LS_SS_DISABLED) qprintf(" SS.Disabled");
+                    if (link_state == USB_SS_PORT_LS_RX_DETECT)   qprintf(" Rx.Detect");
+                    if (link_state == USB_SS_PORT_LS_SS_INACTIVE) qprintf(" SS.Inactive");
+                    if (link_state == USB_SS_PORT_LS_POLLING)     qprintf(" Polling");
+                    if (link_state == USB_SS_PORT_LS_RECOVERY)    qprintf(" Recovery");
+                    if (link_state == USB_SS_PORT_LS_HOT_RESET)   qprintf(" HotReset");
+                    if (link_state == USB_SS_PORT_LS_COMP_MOD)    qprintf(" Compliance");
+                    if (link_state == USB_SS_PORT_LS_LOOPBACK)    qprintf(" Loopback");
                 }
             }
-            if (port_status & USB_PORT_STAT_RESET)       printf(" reset");
-            if (port_status & USB_PORT_STAT_OVERCURRENT) printf(" oc");
-            if (port_status & USB_PORT_STAT_ENABLE)      printf(" enable");
-            if (port_status & USB_PORT_STAT_CONNECTION)  printf(" connect");
+            if (port_status & USB_PORT_STAT_RESET)       qprintf(" reset");
+            if (port_status & USB_PORT_STAT_OVERCURRENT) qprintf(" oc");
+            if (port_status & USB_PORT_STAT_ENABLE)      qprintf(" enable");
+            if (port_status & USB_PORT_STAT_CONNECTION)  qprintf(" connect");
 
-            if (port_status & USB_PORT_STAT_CONNECTION)  printf(" [%s]", ds.description);
+            if (port_status & USB_PORT_STAT_CONNECTION)  qprintf(" [%s]", ds.description);
 
-            printf("\n");
+            qprintf("\n");
         }
         libusb_close(devh);
     }
@@ -1214,6 +1232,9 @@ int main(int argc, char *argv[])
         case 'R':
             opt_reset = 1;
             break;
+        case 'q':
+            opt_quiet = 1;
+            break;
         case 'w':
             opt_wait = atoi(optarg);
             break;
@@ -1323,7 +1344,7 @@ int main(int argc, char *argv[])
         for (i=0; i<hub_count; i++) {
             if (hubs[i].actionable == 0)
                 continue;
-            printf("Current status for hub %s [%s]\n",
+            qprintf("Current status for hub %s [%s]\n",
                 hubs[i].location, hubs[i].ds.description
             );
             print_port_status(&hubs[i], opt_ports);
@@ -1360,19 +1381,19 @@ int main(int argc, char *argv[])
                 /* USB3 hubs need extra delay to actually turn off: */
                 if (k==0 && hubs[i].super_speed)
                     sleep_ms(150);
-                printf("Sent power %s request\n", should_be_on ? "on" : "off");
-                printf("New status for hub %s [%s]\n",
+                qprintf("Sent power %s request\n", should_be_on ? "on" : "off");
+                qprintf("New status for hub %s [%s]\n",
                     hubs[i].location, hubs[i].ds.description
                 );
                 print_port_status(&hubs[i], opt_ports);
 
                 if (k == 1 && opt_reset == 1) {
-                    printf("Resetting hub...\n");
+                    qprintf("Resetting hub...\n");
                     rc = libusb_reset_device(devh);
                     if (rc < 0) {
                         perror("Reset failed!\n");
                     } else {
-                        printf("Reset successful!\n");
+                        qprintf("Reset successful!\n");
                     }
                 }
             }
