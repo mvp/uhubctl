@@ -217,6 +217,7 @@ static int hub_phys_count = 0;
 /* default options */
 static char opt_vendor[16]   = "";
 static char opt_search[64]   = "";     /* Search by attached device description */
+static char opt_searchhub[64] = "";    /* Search by hub description */
 static char opt_location[32] = "";     /* Hub location a-b.c.d */
 static int opt_level = 0;              /* Hub location level (e.g., a-b is level 2, a-b.c is level 3)*/
 static int opt_ports  = ALL_HUB_PORTS; /* Bitmask of ports to operate on */
@@ -240,7 +241,7 @@ static int is_rpi_4b = 0;
 static int is_rpi_5  = 0;
 
 static const char short_options[] =
-    "l:L:n:a:p:d:r:w:s:hvefRN"
+    "l:L:n:a:p:d:r:w:s:H:hvefRN"
 #if defined(__linux__)
     "S"
 #if (LIBUSB_API_VERSION >= 0x01000107) /* 1.0.23 */
@@ -253,6 +254,7 @@ static const struct option long_options[] = {
     { "location", required_argument, NULL, 'l' },
     { "vendor",   required_argument, NULL, 'n' },
     { "search",   required_argument, NULL, 's' },
+    { "searchhub",required_argument, NULL, 'H' },
     { "level",    required_argument, NULL, 'L' },
     { "ports",    required_argument, NULL, 'p' },
     { "action",   required_argument, NULL, 'a' },
@@ -288,6 +290,7 @@ static int print_usage(void)
         "--location, -l - limit hub by location  [all smart hubs].\n"
         "--level     -L - limit hub by location level (e.g. a-b.c is level 3).\n"
         "--vendor,   -n - limit hub by vendor id [%s] (partial ok).\n"
+        "--searchhub,-H - limit hub by description.\n"
         "--search,   -s - limit hub by attached device description.\n"
         "--delay,    -d - delay for cycle/flash action [%g sec].\n"
         "--repeat,   -r - repeat power off count [%d] (some devices need it to turn off).\n"
@@ -963,6 +966,12 @@ static int usb_find_hubs(void)
                 }
             }
         }
+        if (strlen(opt_searchhub) > 0) {
+            /* Search by hub description */
+            if (strstr(info.ds.description, opt_searchhub) == NULL) {
+                info.actionable = 0;
+            }
+        }
         if (strlen(opt_location) > 0) {
             if (strcasecmp(opt_location, info.location)) {
                 info.actionable = 0;
@@ -1148,6 +1157,9 @@ int main(int argc, char *argv[])
             break;
         case 's':
             snprintf(opt_search, sizeof(opt_search), "%s", optarg);
+            break;
+        case 'H':
+            snprintf(opt_searchhub, sizeof(opt_searchhub), "%s", optarg);
             break;
         case 'p':
             if (!strcasecmp(optarg, "all")) { /* all ports is the default */
