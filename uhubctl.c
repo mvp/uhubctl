@@ -396,15 +396,39 @@ static int ports2bitmap(char* const portlist)
 static int get_computer_model(char *model, int len)
 {
     int fd = open("/sys/firmware/devicetree/base/model", O_RDONLY);
-    if (fd < 0) {
-        return fd;
+    if (fd >= 0) {
+        int bytes_read = read(fd, model, len-1);
+        close(fd);
+        if (bytes_read < 0) {
+            return -1;
+        }
+        model[bytes_read] = 0;
+    } else {
+        // devicetree is not available, try parsing /proc/cpuinfo instead.
+        // most Raspberry Pi have /proc/cpuinfo about 1KB, so 4KB buffer should be plenty:
+        char buffer[4096] = {0}; // fill buffer with all zeros
+        fd = open("/proc/cpuinfo", O_RDONLY);
+        if (fd < 0) {
+            return -1;
+        }
+        int bytes_read = read(fd, buffer, sizeof(buffer)-1);
+        close(fd);
+        if (bytes_read < 0) {
+            return -1;
+        }
+        buffer[bytes_read] = 0;
+        char* model_start = strstr(buffer, "Model\t\t: ");
+        if (model_start == NULL) {
+            return -1;
+        }
+        char* model_name = model_start + 9;
+        char* newline_pos = strchr(model_name, '\n');
+        if (newline_pos != NULL) {
+            *newline_pos = 0;
+        }
+        strncpy(model, model_name, len);
+        model[len-1] = 0;
     }
-    int bytes_read = read(fd, model, len-1);
-    close(fd);
-    if (bytes_read < 0) {
-        return -1;
-    }
-    model[bytes_read] = 0;
     return 0;
 }
 
