@@ -124,6 +124,7 @@ This is list of known compatible USB hubs:
 | StarTech           | HB31C2A2CB ([note](https://github.com/mvp/uhubctl/issues/601)) | 5 | 3.0 |`14B0:013D`| 2020    |      |
 | Sunix              | SHB4200MA                                            | 4     | 2.0 |`0409:0058`| 2006    | 2009 |
 | System Talks       | Sugoi USB2-HUB4X                                     | 4     | 2.0 |           | 2007    |      |
+| Targus             | ACH155 (port 3 controls all ports)                   | 4     | 3.0 |           | 2022    |      |
 | Targus             | PA095UZ                                              | 2     | 2.0 |           | 2004    |      |
 | Targus             | PAUH212/PAUH212U                                     | 7     | 2.0 |           | 2004    | 2009 |
 | Texas Instruments  | TUSB4041PAPEVM                                       | 4     | 2.1 |`0451:8142`| 2015    |      |
