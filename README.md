@@ -83,7 +83,7 @@ This is list of known compatible USB hubs:
 | Lenovo             | ThinkPad X6 Ultrabase 42W3107                        | 4     | 2.0 |`17EF:1000`| 2006    | 2009 |
 | Lenovo             | ThinkPlus 4-in-1 USB-C hub 4X90W86497                | 3     | 3.0 |           | 2021    |      |
 | Lenovo             | ThinkVision T24i-10 Monitor                          | 4     | 2.0 |`17EF:0610`| 2018    |      |
-| Lenovo             | USB-C to 4 Port USB-A Hub                            | 4     | 2.0 |`17EF:103A`| 2020    |      |
+| Lenovo             | USB-C to 4 Port USB-A Hub ([USB2 only](https://github.com/mvp/uhubctl/issues/625)) | 4     | 2.0 |`17EF:103A`| 2020    |      |
 | Lindy              | USB serial converter 4 port                          | 4     | 1.1 |`058F:9254`| 2008    |      |
 | Linksys            | USB2HUB4 ([note](https://git.io/JYiDZ))              | 4     | 2.0 |           | 2004    | 2010 |
 | Maplin             | A08CQ                                                | 7     | 2.0 |`0409:0059`| 2008    | 2011 |
