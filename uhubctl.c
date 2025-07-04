@@ -185,6 +185,7 @@ struct usb_port_status {
 #define HUB_CHAR_TTTT           0x0060 /* TT Think Time mask */
 #define HUB_CHAR_PORTIND        0x0080 /* per-port indicators (LEDs) */
 
+
 /*
  * USB Speed definitions
  * Reference: USB 3.2 Specification, Table 10-10
@@ -369,6 +370,28 @@ static char* rtrim(char* str)
     for (i = strlen(str)-1; i>=0 && isspace(str[i]); i--) {
         str[i] = 0;
     }
+    return str;
+}
+
+static char* trim(char* str)
+{
+    // Trim leading spaces by moving content to the beginning
+    char* start = str;
+    while (isspace(*start)) {
+        start++;
+    }
+    
+    // Move content to beginning if there were leading spaces
+    if (start != str) {
+        memmove(str, start, strlen(start) + 1);
+    }
+    
+    // Trim trailing spaces
+    int i;
+    for (i = strlen(str)-1; i>=0 && isspace(str[i]); i--) {
+        str[i] = 0;
+    }
+    
     return str;
 }
 
@@ -564,7 +587,7 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
             for (k=0; k < info->pn_len; k++) {
                 char s[8];
                 snprintf(s, sizeof(s), "%s%d", k==0 ? "-" : ".", info->port_numbers[k]);
-                strcat(info->location, s);
+                strncat(info->location, s, sizeof(info->location) - strlen(info->location) - 1);
             }
 
             /* Get container_id: */
@@ -601,7 +624,8 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
                     info->nports==4 &&
                     bcd_usb==USB_SS_BCD)
                 {
-                    strcpy(info->container_id, "5cf3ee30d5074925b001802d79434c30");
+                    strncpy(info->container_id, "5cf3ee30d5074925b001802d79434c30", sizeof(info->container_id) - 1);
+                    info->container_id[sizeof(info->container_id) - 1] = '\0';
                 }
             }
 
@@ -628,14 +652,16 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
                     info->nports==2 &&
                     !info->super_speed)
                 {
-                    strcpy(info->container_id, "Raspberry Pi 5 Fake Container Id");
+                    strncpy(info->container_id, "Raspberry Pi 5 Fake Container Id", sizeof(info->container_id) - 1);
+                    info->container_id[sizeof(info->container_id) - 1] = '\0';
                 }
                 /* USB3 */
                 if (strcasecmp(info->vendor, "1d6b:0003")==0 &&
                     info->nports==1 &&
                     info->super_speed)
                 {
-                    strcpy(info->container_id, "Raspberry Pi 5 Fake Container Id");
+                    strncpy(info->container_id, "Raspberry Pi 5 Fake Container Id", sizeof(info->container_id) - 1);
+                    info->container_id[sizeof(info->container_id) - 1] = '\0';
                 }
             }
             rc = 0;
@@ -825,12 +851,12 @@ static int get_device_description(struct libusb_device * dev, struct descriptor_
             if (desc.iManufacturer) {
                 rc = libusb_get_string_descriptor_ascii(devh,
                     desc.iManufacturer, (unsigned char*)ds->vendor, sizeof(ds->vendor));
-                rtrim(ds->vendor);
+                trim(ds->vendor);
             }
             if (rc >= 0 && desc.iProduct) {
                 rc = libusb_get_string_descriptor_ascii(devh,
                     desc.iProduct, (unsigned char*)ds->product, sizeof(ds->product));
-                rtrim(ds->product);
+                trim(ds->product);
             }
             if (rc >= 0 && desc.iSerialNumber) {
                 rc = libusb_get_string_descriptor_ascii(devh,
@@ -931,11 +957,12 @@ static int print_port_status(struct hub_info * hub, int portmask)
                     if (port_status & USB_PORT_STAT_SUSPEND)      printf(" suspend");
                 }
             } else {
-                if (!(port_status & USB_SS_PORT_STAT_POWER)) {
+                int power_mask = hub->super_speed ? USB_SS_PORT_STAT_POWER : USB_PORT_STAT_POWER;
+                if (!(port_status & power_mask)) {
                     printf(" off");
                 } else {
                     int link_state = port_status & USB_PORT_STAT_LINK_STATE;
-                    if (port_status & USB_SS_PORT_STAT_POWER)     printf(" power");
+                    if (port_status & power_mask)                 printf(" power");
                     if ((port_status & USB_SS_PORT_STAT_SPEED)
                          == USB_PORT_STAT_SPEED_5GBPS)
                     {
@@ -1211,49 +1238,53 @@ int is_mass_storage_device(struct libusb_device *dev)
 
 
 // Helper function to determine port speed
-void get_port_speed(int port_status, char** speed_str, int64_t* speed_bits)
+void get_port_speed(int port_status, char** speed_str, int64_t* speed_bps, int is_usb3_hub)
 {
     *speed_str = "Disconnected";
-    *speed_bits = 0;
+    *speed_bps = 0;
 
     if (port_status & USB_PORT_STAT_CONNECTION) {
-        if (port_status & USB_PORT_STAT_LOW_SPEED) {
-            *speed_str = "USB1.0 Low Speed 1.5 Mbps";
-            *speed_bits = 1500000; // 1.5 Mbit/s
-        } else if (port_status & USB_PORT_STAT_HIGH_SPEED) {
-            *speed_str = "USB2.0 High Speed 480Mbps";
-            *speed_bits = 480000000; // 480 Mbit/s
-        } else if (port_status & USB_SS_PORT_STAT_POWER) {
+        // Check if this is a USB3 hub first
+        if (is_usb3_hub) {
             int speed_mask = port_status & USB_PORT_STAT_SPEED_MASK;
             switch (speed_mask) {
                 case USB_PORT_STAT_SPEED_5GBPS:
                     *speed_str = "USB3.0 SuperSpeed 5 Gbps";
-                    *speed_bits = 5000000000LL;
+                    *speed_bps = 5000000000LL;
                     break;
                 case USB_PORT_STAT_SPEED_10GBPS:
                     *speed_str = "USB 3.1 Gen 2 SuperSpeed+ 10 Gbps";
-                    *speed_bits = 10000000000LL;
+                    *speed_bps = 10000000000LL;
                     break;
                 case USB_PORT_STAT_SPEED_20GBPS:
                     *speed_str = "USB 3.2 Gen 2x2 SuperSpeed+ 20 Gbps";
-                    *speed_bits = 20000000000LL;
+                    *speed_bps = 20000000000LL;
                     break;
                 case USB_PORT_STAT_SPEED_40GBPS:
                     *speed_str = "USB4 40 Gbps";
-                    *speed_bits = 40000000000LL;
+                    *speed_bps = 40000000000LL;
                     break;
                 case USB_PORT_STAT_SPEED_80GBPS:
                     *speed_str = "USB4 80 Gbps";
-                    *speed_bits = 80000000000LL;
+                    *speed_bps = 80000000000LL;
                     break;
                 default:
                     *speed_str = "USB1.1 Full Speed 12Mbps";
-                    *speed_bits = 12000000; // 12 Mbit/s (default for USB 1.1)
+                    *speed_bps = 12000000; // 12 Mbit/s (default for USB 1.1)
             }
         } else {
-            // USB 2.0 Full Speed (neither low nor high speed)
-            *speed_str = "USB1.1 Full Speed 12Mbps";
-            *speed_bits = 12000000; // 12 Mbit/s
+            // USB2 port - check speed bits
+            if (port_status & USB_PORT_STAT_LOW_SPEED) {
+                *speed_str = "USB1.0 Low Speed 1.5 Mbps";
+                *speed_bps = 1500000; // 1.5 Mbit/s
+            } else if (port_status & USB_PORT_STAT_HIGH_SPEED) {
+                *speed_str = "USB2.0 High Speed 480Mbps";
+                *speed_bps = 480000000; // 480 Mbit/s
+            } else {
+                // USB 2.0 Full Speed (neither low nor high speed)
+                *speed_str = "USB1.1 Full Speed 12Mbps";
+                *speed_bps = 12000000; // 12 Mbit/s
+            }
         }
     }
 }
@@ -1367,8 +1398,11 @@ const char* get_primary_device_class_name(struct libusb_device *dev, struct libu
 
 // Helper function to create the status flags JSON object (using mkjson)
 // Only outputs flags that are true to reduce JSON size
-char* create_status_flags_json(int port_status)
+char* create_status_flags_json(int port_status, int is_usb3_hub)
 {
+    // Use the provided hub USB version information
+    int is_usb3 = is_usb3_hub;
+    
     struct {
         int mask;
         const char* name;
@@ -1378,82 +1412,57 @@ char* create_status_flags_json(int port_status)
         {USB_PORT_STAT_SUSPEND, "suspend"},
         {USB_PORT_STAT_OVERCURRENT, "overcurrent"},
         {USB_PORT_STAT_RESET, "reset"},
-        {USB_PORT_STAT_POWER, "power"},
-        {USB_PORT_STAT_LOW_SPEED, "lowspeed"},
-        {USB_PORT_STAT_HIGH_SPEED, "highspeed"},
+        {is_usb3 ? USB_SS_PORT_STAT_POWER : USB_PORT_STAT_POWER, "power"},
+        {is_usb3 ? 0 : USB_PORT_STAT_LOW_SPEED, "lowspeed"},
+        {is_usb3 ? 0 : USB_PORT_STAT_HIGH_SPEED, "highspeed"},
         {USB_PORT_STAT_TEST, "test"},
         {USB_PORT_STAT_INDICATOR, "indicator"},
         {0, NULL}
     };
     
-    // Count active flags
+    // Calculate exact buffer size needed for flags JSON
+    size_t buffer_size = 3; // "{}" + null terminator
     int active_count = 0;
+    
     for (int i = 0; flag_defs[i].name != NULL; i++) {
-        if (port_status & flag_defs[i].mask) {
+        if ((flag_defs[i].mask != 0) && (port_status & flag_defs[i].mask)) {
+            if (active_count > 0) buffer_size += 2; // ", "
+            buffer_size += 1 + strlen(flag_defs[i].name) + 7; // "name": true
             active_count++;
         }
     }
     
-    // Build JSON with only true flags
-    if (active_count == 0) {
-        return mkjson(MKJSON_OBJ, 0);
-    } else if (active_count == 1) {
-        for (int i = 0; flag_defs[i].name != NULL; i++) {
-            if (port_status & flag_defs[i].mask) {
-                return mkjson(MKJSON_OBJ, 1,
-                    MKJSON_BOOL, flag_defs[i].name, 1
-                );
-            }
+    char* result = malloc(buffer_size);
+    if (!result) return NULL;
+    
+    char* ptr = result;
+    int remaining = buffer_size;
+    
+    int written = snprintf(ptr, remaining, "{");
+    ptr += written;
+    remaining -= written;
+    
+    int first = 1;
+    for (int i = 0; flag_defs[i].name != NULL; i++) {
+        if ((flag_defs[i].mask != 0) && (port_status & flag_defs[i].mask)) {
+            written = snprintf(ptr, remaining, "%s\"%s\": true", 
+                               first ? "" : ", ", flag_defs[i].name);
+            ptr += written;
+            remaining -= written;
+            first = 0;
         }
-    } else if (active_count == 2) {
-        const char *names[2];
-        int idx = 0;
-        for (int i = 0; flag_defs[i].name != NULL; i++) {
-            if (port_status & flag_defs[i].mask) {
-                names[idx++] = flag_defs[i].name;
-            }
-        }
-        return mkjson(MKJSON_OBJ, 2,
-            MKJSON_BOOL, names[0], 1,
-            MKJSON_BOOL, names[1], 1
-        );
-    } else if (active_count == 3) {
-        const char *names[3];
-        int idx = 0;
-        for (int i = 0; flag_defs[i].name != NULL; i++) {
-            if (port_status & flag_defs[i].mask) {
-                names[idx++] = flag_defs[i].name;
-            }
-        }
-        return mkjson(MKJSON_OBJ, 3,
-            MKJSON_BOOL, names[0], 1,
-            MKJSON_BOOL, names[1], 1,
-            MKJSON_BOOL, names[2], 1
-        );
-    } else if (active_count == 4) {
-        const char *names[4];
-        int idx = 0;
-        for (int i = 0; flag_defs[i].name != NULL; i++) {
-            if (port_status & flag_defs[i].mask) {
-                names[idx++] = flag_defs[i].name;
-            }
-        }
-        return mkjson(MKJSON_OBJ, 4,
-            MKJSON_BOOL, names[0], 1,
-            MKJSON_BOOL, names[1], 1,
-            MKJSON_BOOL, names[2], 1,
-            MKJSON_BOOL, names[3], 1
-        );
     }
     
-    // For more than 4 flags, just return empty object for now
-    // In practice, rarely more than 3-4 flags are set
-    return mkjson(MKJSON_OBJ, 0);
+    snprintf(ptr, remaining, "}");
+    return result;
 }
 
-// Helper function to create human-readable descriptions of set flags (using mkjson)
-char* create_human_readable_json(int port_status)
+// Helper function to create human-readable descriptions of set flags
+char* create_human_readable_json(int port_status, int is_usb3_hub)
 {
+    // Use the provided hub USB version information
+    int is_usb3 = is_usb3_hub;
+    
     struct {
         int mask;
         const char* name;
@@ -1464,90 +1473,171 @@ char* create_human_readable_json(int port_status)
         {USB_PORT_STAT_SUSPEND, "suspend", "Port is suspended"},
         {USB_PORT_STAT_OVERCURRENT, "overcurrent", "Over-current condition exists"},
         {USB_PORT_STAT_RESET, "reset", "Port is in reset state"},
-        {USB_PORT_STAT_POWER, "power", "Port power is enabled"},
-        {USB_PORT_STAT_LOW_SPEED, "lowspeed", "Low-speed device attached"},
-        {USB_PORT_STAT_HIGH_SPEED, "highspeed", "High-speed device attached"},
+        {is_usb3 ? USB_SS_PORT_STAT_POWER : USB_PORT_STAT_POWER, "power", "Port power is enabled"},
+        {is_usb3 ? 0 : USB_PORT_STAT_LOW_SPEED, "lowspeed", "Low-speed device attached"},
+        {is_usb3 ? 0 : USB_PORT_STAT_HIGH_SPEED, "highspeed", "High-speed device attached"},
         {USB_PORT_STAT_TEST, "test", "Port is in test mode"},
         {USB_PORT_STAT_INDICATOR, "indicator", "Port indicator control"},
         {0, NULL, NULL}
     };
     
-    // Count active flags
+    // Calculate exact buffer size needed for human_readable JSON
+    size_t buffer_size = 3; // "{}" + null terminator
     int active_count = 0;
+    
     for (int i = 0; flag_defs[i].name != NULL; i++) {
-        if (port_status & flag_defs[i].mask) {
+        if ((flag_defs[i].mask != 0) && (port_status & flag_defs[i].mask)) {
+            if (active_count > 0) buffer_size += 2; // ", "
+            buffer_size += 1 + strlen(flag_defs[i].name) + 4; // "name": "
+            buffer_size += strlen(flag_defs[i].description) + 1; // description"
             active_count++;
         }
     }
     
-    if (active_count == 0) {
-        return mkjson(MKJSON_OBJ, 0); // Empty object
+    char* result = malloc(buffer_size);
+    if (!result) return NULL;
+    
+    char* ptr = result;
+    int remaining = buffer_size;
+    
+    int written = snprintf(ptr, remaining, "{");
+    ptr += written;
+    remaining -= written;
+    
+    int first = 1;
+    for (int i = 0; flag_defs[i].name != NULL; i++) {
+        if ((flag_defs[i].mask != 0) && (port_status & flag_defs[i].mask)) {
+            written = snprintf(ptr, remaining, "%s\"%s\": \"%s\"", 
+                               first ? "" : ", ", flag_defs[i].name, flag_defs[i].description);
+            ptr += written;
+            remaining -= written;
+            first = 0;
+        }
     }
     
-    // mkjson doesn't support variable argument lists well
-    // Let's use a different approach - build individual entries and combine
-    if (active_count == 1) {
-        for (int i = 0; flag_defs[i].name != NULL; i++) {
-            if (port_status & flag_defs[i].mask) {
-                return mkjson(MKJSON_OBJ, 1,
-                    MKJSON_STRING, flag_defs[i].name, flag_defs[i].description
-                );
-            }
-        }
-    } else if (active_count == 2) {
-        const char *names[2], *descs[2];
-        int idx = 0;
-        for (int i = 0; flag_defs[i].name != NULL; i++) {
-            if (port_status & flag_defs[i].mask) {
-                names[idx] = flag_defs[i].name;
-                descs[idx] = flag_defs[i].description;
-                idx++;
-            }
-        }
-        return mkjson(MKJSON_OBJ, 2,
-            MKJSON_STRING, names[0], descs[0],
-            MKJSON_STRING, names[1], descs[1]
-        );
-    } else if (active_count == 3) {
-        const char *names[3], *descs[3];
-        int idx = 0;
-        for (int i = 0; flag_defs[i].name != NULL; i++) {
-            if (port_status & flag_defs[i].mask) {
-                names[idx] = flag_defs[i].name;
-                descs[idx] = flag_defs[i].description;
-                idx++;
-            }
-        }
-        return mkjson(MKJSON_OBJ, 3,
-            MKJSON_STRING, names[0], descs[0],
-            MKJSON_STRING, names[1], descs[1],
-            MKJSON_STRING, names[2], descs[2]
-        );
+    snprintf(ptr, remaining, "}");
+    return result;
+}
+
+// Helper function to create interfaces array JSON
+char* create_interfaces_json(struct libusb_device *dev)
+{
+    if (!dev) {
+        char* result = malloc(3);
+        if (!result) return NULL;
+        strcpy(result, "[]");
+        return result;
     }
     
-    // For simplicity, let's just handle common cases
-    // In practice, usually only 1-3 flags are set
-    return mkjson(MKJSON_OBJ, 0);
+    struct libusb_config_descriptor *config;
+    int rc = libusb_get_active_config_descriptor(dev, &config);
+    if (rc != 0) {
+        char* result = malloc(3);
+        if (!result) return NULL;
+        strcpy(result, "[]");
+        return result;
+    }
+    
+    // Pre-calculate total size by actually formatting each interface
+    // This works for arbitrary data and ensures exact buffer size
+    size_t buffer_size = 3; // "[]" + null terminator
+    int total_altsettings = 0;
+    
+    for (int i = 0; i < config->bNumInterfaces; i++) {
+        const struct libusb_interface *interface = &config->interface[i];
+        for (int j = 0; j < interface->num_altsetting; j++) {
+            const struct libusb_interface_descriptor *altsetting = &interface->altsetting[j];
+            const char* interface_class_name = get_class_name(altsetting->bInterfaceClass);
+            
+            if (total_altsettings > 0) buffer_size += 2; // ", "
+            
+            // Calculate exact size by doing a dry run with snprintf
+            int obj_size = snprintf(NULL, 0,
+                "{\"number\": %d, \"altsetting\": %d, \"class\": %d, \"subclass\": %d, \"protocol\": %d, \"class_name\": \"%s\", \"endpoints\": %d}",
+                altsetting->bInterfaceNumber,
+                altsetting->bAlternateSetting,
+                altsetting->bInterfaceClass,
+                altsetting->bInterfaceSubClass,
+                altsetting->bInterfaceProtocol,
+                interface_class_name,
+                altsetting->bNumEndpoints
+            );
+            
+            buffer_size += obj_size;
+            total_altsettings++;
+        }
+    }
+    
+    char* result = malloc(buffer_size);
+    if (!result) {
+        libusb_free_config_descriptor(config);
+        return NULL;
+    }
+    
+    char* ptr = result;
+    int remaining = buffer_size;
+    
+    int written = snprintf(ptr, remaining, "[");
+    ptr += written;
+    remaining -= written;
+    
+    int first_interface = 1;
+    
+    for (int i = 0; i < config->bNumInterfaces; i++) {
+        const struct libusb_interface *interface = &config->interface[i];
+        
+        // Handle ALL alternate settings, not just the first
+        for (int j = 0; j < interface->num_altsetting; j++) {
+            const struct libusb_interface_descriptor *altsetting = &interface->altsetting[j];
+            const char* interface_class_name = get_class_name(altsetting->bInterfaceClass);
+            
+            written = snprintf(ptr, remaining, 
+                "%s{\"number\": %d, \"altsetting\": %d, \"class\": %d, \"subclass\": %d, \"protocol\": %d, \"class_name\": \"%s\", \"endpoints\": %d}",
+                first_interface ? "" : ", ",
+                altsetting->bInterfaceNumber,
+                altsetting->bAlternateSetting,
+                altsetting->bInterfaceClass,
+                altsetting->bInterfaceSubClass,
+                altsetting->bInterfaceProtocol,
+                interface_class_name,
+                altsetting->bNumEndpoints
+            );
+            
+            ptr += written;
+            remaining -= written;
+            first_interface = 0;
+        }
+    }
+    
+    snprintf(ptr, remaining, "]");
+    libusb_free_config_descriptor(config);
+    return result;
 }
 
 
 // Create complete port status JSON string using mkjson
-char* create_port_status_json(int port, int port_status, const struct descriptor_strings* ds, struct libusb_device *dev)
+char* create_port_status_json(int port, int port_status, const struct descriptor_strings* ds, struct libusb_device *dev, int is_usb3_hub)
 {
     char status_hex[7];
     snprintf(status_hex, sizeof(status_hex), "0x%04x", port_status);
     
     char* speed_str;
-    int64_t speed_bits;
-    get_port_speed(port_status, &speed_str, &speed_bits);
+    int64_t speed_bps;
+    get_port_speed(port_status, &speed_str, &speed_bps, is_usb3_hub);
     
     // Get sub-objects
-    char *flags_json = create_status_flags_json(port_status);
-    char *hr_json = create_human_readable_json(port_status);
+    char *flags_json = create_status_flags_json(port_status, is_usb3_hub);
+    char *hr_json = create_human_readable_json(port_status, is_usb3_hub);
     
-    // For USB3 hubs, get link state
+    // For USB3 hubs, get link state and port speed
     const char* link_state_str = NULL;
-    if (port_status & USB_SS_PORT_STAT_POWER) {
+    const char* port_speed = NULL;
+    if (is_usb3_hub) {
+        // Check if this is a 5Gbps capable port
+        if ((port_status & USB_SS_PORT_STAT_SPEED) == USB_PORT_STAT_SPEED_5GBPS) {
+            port_speed = "5gbps";
+        }
+        
         int link_state = port_status & USB_PORT_STAT_LINK_STATE;
         switch (link_state) {
             case USB_SS_PORT_LS_U0:          link_state_str = "U0"; break;
@@ -1567,30 +1657,46 @@ char* create_port_status_json(int port, int port_status, const struct descriptor
     
     // Basic port info without device
     if (!(port_status & USB_PORT_STAT_CONNECTION) || !dev) {
-        return mkjson(MKJSON_OBJ, 7,
+        int basic_count = 6; // port, status, flags, human_readable, speed, speed_bps
+        if (port_speed) basic_count++; // port_speed
+        if (link_state_str) basic_count++; // link_state
+        
+        char *result = mkjson(
+            MKJSON_OBJ, basic_count,
             MKJSON_INT, "port", port,
             MKJSON_STRING, "status", status_hex,
             MKJSON_JSON_FREE, "flags", flags_json,
             MKJSON_JSON_FREE, "human_readable", hr_json,
             MKJSON_STRING, "speed", speed_str,
-            MKJSON_LLINT, "speed_bits", speed_bits,
+            MKJSON_LLINT, "speed_bps", speed_bps,
+            port_speed ? MKJSON_STRING : MKJSON_IGN_STRING, "port_speed", port_speed,
             link_state_str ? MKJSON_STRING : MKJSON_IGN_STRING, "link_state", link_state_str
         );
+        
+        return result;
     }
     
     // Port with device - add device info
     struct libusb_device_descriptor desc;
     if (libusb_get_device_descriptor(dev, &desc) != 0) {
         // If we can't get descriptor, return basic info
-        return mkjson(MKJSON_OBJ, 7,
+        int desc_error_count = 6; // port, status, flags, human_readable, speed, speed_bps
+        if (port_speed) desc_error_count++; // port_speed
+        if (link_state_str) desc_error_count++; // link_state
+        
+        char *result = mkjson(
+            MKJSON_OBJ, desc_error_count,
             MKJSON_INT, "port", port,
             MKJSON_STRING, "status", status_hex,
             MKJSON_JSON_FREE, "flags", flags_json,
             MKJSON_JSON_FREE, "human_readable", hr_json,
             MKJSON_STRING, "speed", speed_str,
-            MKJSON_LLINT, "speed_bits", speed_bits,
+            MKJSON_LLINT, "speed_bps", speed_bps,
+            port_speed ? MKJSON_STRING : MKJSON_IGN_STRING, "port_speed", port_speed,
             link_state_str ? MKJSON_STRING : MKJSON_IGN_STRING, "link_state", link_state_str
         );
+        
+        return result;
     }
     
     // Build device info inline
@@ -1600,8 +1706,8 @@ char* create_port_status_json(int port, int port_status, const struct descriptor
     
     const char* class_name = get_primary_device_class_name(dev, &desc);
     
-    // For now, skip interfaces array (too complex for mkjson)
-    // We'll add a simplified version later
+    // Build interfaces array
+    char* interfaces_json = create_interfaces_json(dev);
     
     // Build USB and device versions
     char usb_version[8], device_version[8];
@@ -1611,18 +1717,33 @@ char* create_port_status_json(int port, int port_status, const struct descriptor
     // Check if mass storage
     int is_mass_storage = is_mass_storage_device(dev);
     
-    // Return port with basic device info
-    // Note: even when ignored, parameters still count towards total
-    return mkjson(MKJSON_OBJ, 17,
+    // Count all mkjson parameters dynamically (including ignored ones)
+    int field_count = 6; // port, status, flags, human_readable, speed, speed_bps
+    field_count++; // port_speed (always counted, even if ignored)
+    field_count++; // link_state (always counted, even if ignored)
+    field_count += 4; // vid, pid, device_class, class_name
+    field_count++; // vendor (always counted, even if ignored)
+    field_count++; // product (always counted, even if ignored)
+    field_count += 3; // usb_version, device_version, nconfigs
+    field_count++; // serial (always counted, even if ignored)
+    field_count++; // is_mass_storage (always counted, even if ignored)
+    field_count++; // interfaces
+    field_count++; // description
+    
+    char *result = mkjson(
+        MKJSON_OBJ, field_count,
         MKJSON_INT, "port", port,
         MKJSON_STRING, "status", status_hex,
         MKJSON_JSON_FREE, "flags", flags_json,
         MKJSON_JSON_FREE, "human_readable", hr_json,
         MKJSON_STRING, "speed", speed_str,
-        MKJSON_LLINT, "speed_bits", speed_bits,
+        MKJSON_LLINT, "speed_bps", speed_bps,
+        port_speed ? MKJSON_STRING : MKJSON_IGN_STRING, "port_speed", port_speed,
         link_state_str ? MKJSON_STRING : MKJSON_IGN_STRING, "link_state", link_state_str,
         MKJSON_STRING, "vid", vendor_id,
         MKJSON_STRING, "pid", product_id,
+        ds->vendor[0] ? MKJSON_STRING : MKJSON_IGN_STRING, "vendor", ds->vendor,
+        ds->product[0] ? MKJSON_STRING : MKJSON_IGN_STRING, "product", ds->product,
         MKJSON_INT, "device_class", desc.bDeviceClass,
         MKJSON_STRING, "class_name", class_name,
         MKJSON_STRING, "usb_version", usb_version,
@@ -1630,8 +1751,11 @@ char* create_port_status_json(int port, int port_status, const struct descriptor
         MKJSON_INT, "nconfigs", desc.bNumConfigurations,
         ds->serial[0] ? MKJSON_STRING : MKJSON_IGN_STRING, "serial", ds->serial,
         is_mass_storage ? MKJSON_BOOL : MKJSON_IGN_BOOL, "is_mass_storage", is_mass_storage,
+        MKJSON_JSON_FREE, "interfaces", interfaces_json,
         MKJSON_STRING, "description", ds->description[0] ? ds->description : NULL
     );
+    
+    return result;
 }
 
 char* create_hub_json(struct hub_info* hub, int portmask)
@@ -1659,7 +1783,8 @@ char* create_hub_json(struct hub_info* hub, int portmask)
     }
     
     // Create hub_info object
-    char *hub_info_json = mkjson(MKJSON_OBJ, 5,
+    char *hub_info_json = mkjson(
+        MKJSON_OBJ, 5,
         MKJSON_STRING, "vid", vendor_id_hex,
         MKJSON_STRING, "pid", product_id_hex,
         MKJSON_STRING, "usb_version", usb_version,
@@ -1703,7 +1828,7 @@ char* create_hub_json(struct hub_info* hub, int portmask)
                 }
             }
 
-            port_jsons[valid_ports] = create_port_status_json(port, port_status, &ds, udev);
+            port_jsons[valid_ports] = create_port_status_json(port, port_status, &ds, udev, hub->super_speed);
             valid_ports++;
         }
         libusb_close(devh);
@@ -1721,17 +1846,33 @@ char* create_hub_json(struct hub_info* hub, int portmask)
         }
         
         ports_array = malloc(total_size);
-        strcpy(ports_array, "[");
+        if (!ports_array) {
+            for (int i = 0; i < valid_ports; i++) {
+                free(port_jsons[i]);
+            }
+            return NULL;
+        }
+        
+        char* ptr = ports_array;
+        int remaining = total_size;
+        
+        int written = snprintf(ptr, remaining, "[");
+        ptr += written;
+        remaining -= written;
+        
         for (int i = 0; i < valid_ports; i++) {
-            if (i > 0) strcat(ports_array, ", ");
-            strcat(ports_array, port_jsons[i]);
+            written = snprintf(ptr, remaining, "%s%s", i > 0 ? ", " : "", port_jsons[i]);
+            ptr += written;
+            remaining -= written;
             free(port_jsons[i]);
         }
-        strcat(ports_array, "]");
+        
+        snprintf(ptr, remaining, "]");
     }
     
     // Create the final hub object
-    char *hub_json = mkjson(MKJSON_OBJ, 4,
+    char *hub_json = mkjson(
+        MKJSON_OBJ, 4,
         MKJSON_STRING, "location", hub->location,
         MKJSON_STRING, "description", hub->ds.description,
         MKJSON_JSON, "hub_info", hub_info_json,
@@ -1991,8 +2132,7 @@ int main(int argc, char *argv[])
                     for (int port=1; port <= hubs[i].nports; port++) {
                         if ((1 << (port-1)) & ports) {
                             int port_status = get_port_status(devh, port);
-                            int power_mask = hubs[i].super_speed ? USB_SS_PORT_STAT_POWER
-                                                                 : USB_PORT_STAT_POWER;
+                            int power_mask = hubs[i].super_speed ? USB_SS_PORT_STAT_POWER : USB_PORT_STAT_POWER;
                             int is_on = (port_status & power_mask) != 0;
 
                             if (opt_action == POWER_TOGGLE) {
@@ -2054,17 +2194,33 @@ int main(int argc, char *argv[])
             }
             
             hubs_array = malloc(total_size);
-            strcpy(hubs_array, "[");
+            if (!hubs_array) {
+                for (int i = 0; i < hub_json_count; i++) {
+                    free(hub_jsons[i]);
+                }
+                return rc;
+            }
+            
+            char* ptr = hubs_array;
+            int remaining = total_size;
+            
+            int written = snprintf(ptr, remaining, "[");
+            ptr += written;
+            remaining -= written;
+            
             for (int i = 0; i < hub_json_count; i++) {
-                if (i > 0) strcat(hubs_array, ", ");
-                strcat(hubs_array, hub_jsons[i]);
+                written = snprintf(ptr, remaining, "%s%s", i > 0 ? ", " : "", hub_jsons[i]);
+                ptr += written;
+                remaining -= written;
                 free(hub_jsons[i]);
             }
-            strcat(hubs_array, "]");
+            
+            snprintf(ptr, remaining, "]");
         }
         
         // Create the final JSON object
-        char *json_str = mkjson(MKJSON_OBJ, 1,
+        char *json_str = mkjson(
+            MKJSON_OBJ, 1,
             MKJSON_JSON, "hubs", hubs_array
         );
         

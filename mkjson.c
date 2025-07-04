@@ -202,7 +202,7 @@ char *mkjson( enum mkjson_container_type otype, int count, ... )
 				else
 					intval = va_arg( ap, long long int );
 
-				if ( allsprintf( chunks + i, "%s%Ld", prefix, intval ) == -1 ) chunks[i] = NULL;
+				if ( allsprintf( chunks + i, "%s%lld", prefix, intval ) == -1 ) chunks[i] = NULL;
 				break;
 
 			// double / long double

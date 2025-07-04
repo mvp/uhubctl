@@ -239,6 +239,14 @@ are port numbers for all hubs in chain, starting from root hub for a given USB b
 This address is semi-stable - it will not change if you unplug/replug (or turn off/on)
 USB device into the same physical USB port (this method is also used in Linux kernel).
 
+To get the status in machine-readable JSON format, use `-j` option:
+
+    uhubctl -j
+
+This will output status of all hubs and ports in JSON format, making it easy to integrate
+uhubctl with other tools and scripts. The JSON output includes all the same information
+as the text output, including hub info, port status, connected devices, and their properties.
+
 
 Linux USB permissions
 =====================
