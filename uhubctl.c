@@ -1545,15 +1545,9 @@ char* create_port_status_json(int port, int port_status, const struct descriptor
     char *flags_json = create_status_flags_json(port_status);
     char *hr_json = create_human_readable_json(port_status);
     
-    // For USB3 hubs, get link state and port speed capability
+    // For USB3 hubs, get link state
     const char* link_state_str = NULL;
-    const char* port_speed_str = NULL;
     if (port_status & USB_SS_PORT_STAT_POWER) {
-        // Check port speed capability
-        if ((port_status & USB_SS_PORT_STAT_SPEED) == USB_PORT_STAT_SPEED_5GBPS) {
-            port_speed_str = "5gbps";
-        }
-        
         int link_state = port_status & USB_PORT_STAT_LINK_STATE;
         switch (link_state) {
             case USB_SS_PORT_LS_U0:          link_state_str = "U0"; break;
@@ -1619,7 +1613,7 @@ char* create_port_status_json(int port, int port_status, const struct descriptor
     
     // Return port with basic device info
     // Note: even when ignored, parameters still count towards total
-    return mkjson(MKJSON_OBJ, 16,
+    return mkjson(MKJSON_OBJ, 17,
         MKJSON_INT, "port", port,
         MKJSON_STRING, "status", status_hex,
         MKJSON_JSON_FREE, "flags", flags_json,
@@ -1634,6 +1628,7 @@ char* create_port_status_json(int port, int port_status, const struct descriptor
         MKJSON_STRING, "usb_version", usb_version,
         MKJSON_STRING, "device_version", device_version,
         MKJSON_INT, "nconfigs", desc.bNumConfigurations,
+        ds->serial[0] ? MKJSON_STRING : MKJSON_IGN_STRING, "serial", ds->serial,
         is_mass_storage ? MKJSON_BOOL : MKJSON_IGN_BOOL, "is_mass_storage", is_mass_storage,
         MKJSON_STRING, "description", ds->description[0] ? ds->description : NULL
     );
