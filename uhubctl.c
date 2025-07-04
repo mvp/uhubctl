@@ -1545,15 +1545,42 @@ char* create_port_status_json(int port, int port_status, const struct descriptor
     char *flags_json = create_status_flags_json(port_status);
     char *hr_json = create_human_readable_json(port_status);
     
+    // For USB3 hubs, get link state and port speed capability
+    const char* link_state_str = NULL;
+    const char* port_speed_str = NULL;
+    if (port_status & USB_SS_PORT_STAT_POWER) {
+        // Check port speed capability
+        if ((port_status & USB_SS_PORT_STAT_SPEED) == USB_PORT_STAT_SPEED_5GBPS) {
+            port_speed_str = "5gbps";
+        }
+        
+        int link_state = port_status & USB_PORT_STAT_LINK_STATE;
+        switch (link_state) {
+            case USB_SS_PORT_LS_U0:          link_state_str = "U0"; break;
+            case USB_SS_PORT_LS_U1:          link_state_str = "U1"; break;
+            case USB_SS_PORT_LS_U2:          link_state_str = "U2"; break;
+            case USB_SS_PORT_LS_U3:          link_state_str = "U3"; break;
+            case USB_SS_PORT_LS_SS_DISABLED: link_state_str = "SS.Disabled"; break;
+            case USB_SS_PORT_LS_RX_DETECT:   link_state_str = "Rx.Detect"; break;
+            case USB_SS_PORT_LS_SS_INACTIVE: link_state_str = "SS.Inactive"; break;
+            case USB_SS_PORT_LS_POLLING:     link_state_str = "Polling"; break;
+            case USB_SS_PORT_LS_RECOVERY:    link_state_str = "Recovery"; break;
+            case USB_SS_PORT_LS_HOT_RESET:   link_state_str = "HotReset"; break;
+            case USB_SS_PORT_LS_COMP_MOD:    link_state_str = "Compliance"; break;
+            case USB_SS_PORT_LS_LOOPBACK:    link_state_str = "Loopback"; break;
+        }
+    }
+    
     // Basic port info without device
     if (!(port_status & USB_PORT_STAT_CONNECTION) || !dev) {
-        return mkjson(MKJSON_OBJ, 6,
+        return mkjson(MKJSON_OBJ, 7,
             MKJSON_INT, "port", port,
             MKJSON_STRING, "status", status_hex,
             MKJSON_JSON_FREE, "flags", flags_json,
             MKJSON_JSON_FREE, "human_readable", hr_json,
             MKJSON_STRING, "speed", speed_str,
-            MKJSON_LLINT, "speed_bits", speed_bits
+            MKJSON_LLINT, "speed_bits", speed_bits,
+            link_state_str ? MKJSON_STRING : MKJSON_IGN_STRING, "link_state", link_state_str
         );
     }
     
@@ -1561,13 +1588,14 @@ char* create_port_status_json(int port, int port_status, const struct descriptor
     struct libusb_device_descriptor desc;
     if (libusb_get_device_descriptor(dev, &desc) != 0) {
         // If we can't get descriptor, return basic info
-        return mkjson(MKJSON_OBJ, 6,
+        return mkjson(MKJSON_OBJ, 7,
             MKJSON_INT, "port", port,
             MKJSON_STRING, "status", status_hex,
             MKJSON_JSON_FREE, "flags", flags_json,
             MKJSON_JSON_FREE, "human_readable", hr_json,
             MKJSON_STRING, "speed", speed_str,
-            MKJSON_LLINT, "speed_bits", speed_bits
+            MKJSON_LLINT, "speed_bits", speed_bits,
+            link_state_str ? MKJSON_STRING : MKJSON_IGN_STRING, "link_state", link_state_str
         );
     }
     
@@ -1590,13 +1618,15 @@ char* create_port_status_json(int port, int port_status, const struct descriptor
     int is_mass_storage = is_mass_storage_device(dev);
     
     // Return port with basic device info
-    return mkjson(MKJSON_OBJ, 14 + (is_mass_storage ? 1 : 0),
+    // Note: even when ignored, parameters still count towards total
+    return mkjson(MKJSON_OBJ, 16,
         MKJSON_INT, "port", port,
         MKJSON_STRING, "status", status_hex,
         MKJSON_JSON_FREE, "flags", flags_json,
         MKJSON_JSON_FREE, "human_readable", hr_json,
         MKJSON_STRING, "speed", speed_str,
         MKJSON_LLINT, "speed_bits", speed_bits,
+        link_state_str ? MKJSON_STRING : MKJSON_IGN_STRING, "link_state", link_state_str,
         MKJSON_STRING, "vid", vendor_id,
         MKJSON_STRING, "pid", product_id,
         MKJSON_INT, "device_class", desc.bDeviceClass,
@@ -1671,7 +1701,10 @@ char* create_hub_json(struct hub_info* hub, int portmask)
                     libusb_get_port_number(udev) == port)
                 {
                     rc = get_device_description(udev, &ds);
-                    if (rc == 0) break;
+                    if (rc == 0) {
+                        // Found the device
+                        break;
+                    }
                 }
             }
 
