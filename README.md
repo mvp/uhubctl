@@ -201,7 +201,11 @@ To fetch uhubctl source and compile it:
 
     git clone https://github.com/mvp/uhubctl
     cd uhubctl
+    git submodule init
+    git submodule update
     make
+
+Note: uhubctl uses a forked version of mkjson for JSON output generation. The fork includes a critical bug fix for 64-bit integer handling. See [mkjson fork](https://github.com/benroeder/mkjson) for details.
 
 This should generate `uhubctl` binary.
 You can install it in your system as `/usr/sbin/uhubctl` using:

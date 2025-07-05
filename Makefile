@@ -14,7 +14,7 @@ PKG_CONFIG	?= pkg-config
 
 CC ?= gcc
 CFLAGS ?= -g -O0
-CFLAGS += -Wall -Wextra -Wno-zero-length-array -std=c99 -pedantic
+CFLAGS += -Wall -Wextra -Wno-zero-length-array -std=c99 -pedantic -I.
 GIT_VERSION := $(shell git describe --match "v[0-9]*" --abbrev=8 --dirty --tags | cut -c2-)
 ifeq ($(GIT_VERSION),)
 	GIT_VERSION := $(shell cat VERSION)
@@ -37,7 +37,7 @@ else
 endif
 
 PROGRAM = uhubctl
-SOURCES = $(PROGRAM).c mkjson.c
+SOURCES = $(PROGRAM).c mkjson/mkjson.c
 OBJECTS = $(SOURCES:.c=.o)
 
 all: $(PROGRAM)

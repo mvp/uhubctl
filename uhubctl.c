@@ -21,7 +21,7 @@
 #include <fcntl.h>
 #include <stdbool.h>
 
-#include "mkjson.h"
+#include "mkjson/mkjson.h"
 
 #if defined(_WIN32)
 #include <windows.h>
