@@ -201,11 +201,7 @@ To fetch uhubctl source and compile it:
 
     git clone https://github.com/mvp/uhubctl
     cd uhubctl
-    git submodule init
-    git submodule update
     make
-
-Note: uhubctl uses a forked version of mkjson for JSON output generation. The fork includes a critical bug fix for 64-bit integer handling. See [mkjson fork](https://github.com/benroeder/mkjson) for details.
 
 This should generate `uhubctl` binary.
 You can install it in your system as `/usr/sbin/uhubctl` using:
@@ -250,6 +246,140 @@ To get the status in machine-readable JSON format, use `-j` option:
 This will output status of all hubs and ports in JSON format, making it easy to integrate
 uhubctl with other tools and scripts. The JSON output includes all the same information
 as the text output, including hub info, port status, connected devices, and their properties.
+
+
+JSON Output
+===========
+
+The `-j` option enables JSON output for all commands, including status queries and power actions.
+The JSON is pretty-printed with proper indentation for human readability.
+
+Status Query JSON Format
+------------------------
+
+When querying hub status, the output follows this structure:
+
+The `status` field provides three levels of detail:
+- `raw`: Original hex value from USB hub
+- `decoded`: Human-readable interpretation (e.g., "device_active", "powered_no_device")
+- `bits`: Individual status bits broken down by name
+
+```json
+{
+  "hubs": [
+    {
+      "location": "3-1.4",
+      "description": "05e3:0610 GenesysLogic USB2.1 Hub, USB 2.10, 4 ports, ppps",
+      "hub_info": {
+        "vid": "0x05e3",
+        "pid": "0x0610",
+        "usb_version": "2.10",
+        "nports": 4,
+        "ppps": "ppps"
+      },
+      "ports": [
+        {
+          "port": 1,
+          "status": {
+            "raw": "0x0103",
+            "decoded": "device_active",
+            "bits": {
+              "connection": true,
+              "enabled": true,
+              "powered": true,
+              "suspended": false,
+              "overcurrent": false,
+              "reset": false,
+              "highspeed": false,
+              "lowspeed": false
+            }
+          },
+          "flags": {
+            "connection": true,
+            "enable": true,
+            "power": true
+          },
+          "human_readable": {
+            "connection": "Device is connected",
+            "enable": "Port is enabled",
+            "power": "Port power is enabled"
+          },
+          "speed": "USB1.1 Full Speed 12Mbps",
+          "speed_bps": 12000000,
+          "vid": "0x0403",
+          "pid": "0x6001",
+          "vendor": "FTDI",
+          "product": "FT232R USB UART",
+          "device_class": 0,
+          "class_name": "Composite Device",
+          "usb_version": "2.00",
+          "device_version": "6.00",
+          "serial": "A10KZP45",
+          "description": "0403:6001 FTDI FT232R USB UART A10KZP45"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Power Action JSON Events
+------------------------
+
+When performing power actions (on/off/toggle/cycle), uhubctl outputs real-time JSON events:
+
+```bash
+uhubctl -j -a cycle -l 3-1.4 -p 1 -d 2
+```
+
+Outputs events like:
+
+```json
+{"event": "hub_status", "hub": "3-1.4", "description": "05e3:0610 GenesysLogic USB2.1 Hub, USB 2.10, 4 ports, ppps"}
+{"event": "power_change", "hub": "3-1.4", "port": 1, "action": "off", "from_state": true, "to_state": false, "success": true}
+{"event": "delay", "reason": "power_cycle", "duration_seconds": 2.0}
+{"event": "power_change", "hub": "3-1.4", "port": 1, "action": "on", "from_state": false, "to_state": true, "success": true}
+```
+
+Event types include:
+- `hub_status`: Initial hub information
+- `power_change`: Port power state change
+- `delay`: Wait period during power cycling
+- `hub_reset`: Hub reset operation (when using `-R`)
+
+JSON Usage Examples
+-------------------
+
+Find all FTDI devices and show how to control them:
+```bash
+uhubctl -j | jq -r '.hubs[] | . as $hub | .ports[] | select(.vendor == "FTDI") | 
+  "Device: \(.description)\nControl: uhubctl -l \($hub.location) -p \(.port) -a off\n"'
+```
+
+Find a device by serial number:
+```bash
+SERIAL="A10KZP45"
+uhubctl -j | jq -r --arg serial "$SERIAL" '.hubs[] | . as $hub | .ports[] | 
+  select(.serial == $serial) | "Found at hub \($hub.location) port \(.port)"'
+```
+
+List all empty ports:
+```bash
+uhubctl -j | jq -r '.hubs[] | . as $hub | .ports[] | 
+  select(.vid == null) | "Empty: hub \($hub.location) port \(.port)"'
+```
+
+Generate CSV of all connected devices:
+```bash
+echo "Location,Port,VID,PID,Vendor,Product,Serial"
+uhubctl -j | jq -r '.hubs[] | . as $hub | .ports[] | select(.vid) | 
+  "\($hub.location),\(.port),\(.vid),\(.pid),\(.vendor // ""),\(.product // ""),\(.serial // "")"'
+```
+
+Monitor power action results:
+```bash
+uhubctl -j -a cycle -l 3-1 -p 2 | jq 'select(.event == "power_change")'
+```
 
 
 Linux USB permissions

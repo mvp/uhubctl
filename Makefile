@@ -37,7 +37,7 @@ else
 endif
 
 PROGRAM = uhubctl
-SOURCES = $(PROGRAM).c mkjson/mkjson.c
+SOURCES = $(PROGRAM).c mkjson.c
 OBJECTS = $(SOURCES:.c=.o)
 
 all: $(PROGRAM)
