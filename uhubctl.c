@@ -328,6 +328,7 @@ static const struct option long_options[] = {
 static int is_mass_storage_device(struct libusb_device *dev);
 static const char* get_primary_device_class_name(struct libusb_device *dev, struct libusb_device_descriptor *desc);
 static struct libusb_device* find_device_on_hub_port(struct hub_info *hub, int port);
+static void format_hex_id(char *buffer, size_t buffer_size, uint16_t value);
 
 static int print_usage(void)
 {
@@ -936,6 +937,12 @@ static struct libusb_device* find_device_on_hub_port(struct hub_info *hub, int p
         }
     }
     return NULL;
+}
+
+/* Helper function to format hex IDs consistently */
+static void format_hex_id(char *buffer, size_t buffer_size, uint16_t value)
+{
+    snprintf(buffer, buffer_size, "0x%04x", value);
 }
 
 
@@ -1595,7 +1602,7 @@ const char* decode_port_status(int port_status, int super_speed)
 char* create_port_status_json(int port, int port_status, const struct descriptor_strings* ds, struct libusb_device *dev, int super_speed)
 {
     char status_hex[7];
-    snprintf(status_hex, sizeof(status_hex), "0x%04x", port_status);
+    format_hex_id(status_hex, sizeof(status_hex), port_status);
 
     char* speed_str;
     int64_t speed_bps;
@@ -1673,8 +1680,8 @@ char* create_port_status_json(int port, int port_status, const struct descriptor
 
     /* Use device info from descriptor_strings (already populated by get_device_description) */
     char vendor_id[8], product_id[8];
-    snprintf(vendor_id, sizeof(vendor_id), "0x%04x", ds->vid);
-    snprintf(product_id, sizeof(product_id), "0x%04x", ds->pid);
+    format_hex_id(vendor_id, sizeof(vendor_id), ds->vid);
+    format_hex_id(product_id, sizeof(product_id), ds->pid);
 
     /* Build USB and device versions */
     char usb_version[8], device_version[8];
@@ -1747,8 +1754,8 @@ char* create_hub_json(struct hub_info* hub, int portmask)
     sscanf(hub->vendor, "%x:%x", &vendor_id, &product_id);
 
     char vendor_id_hex[8], product_id_hex[8];
-    snprintf(vendor_id_hex, sizeof(vendor_id_hex), "0x%04x", vendor_id);
-    snprintf(product_id_hex, sizeof(product_id_hex), "0x%04x", product_id);
+    format_hex_id(vendor_id_hex, sizeof(vendor_id_hex), vendor_id);
+    format_hex_id(product_id_hex, sizeof(product_id_hex), product_id);
 
     char usb_version[16];
     snprintf(usb_version, sizeof(usb_version), "%x.%02x", hub->bcd_usb >> 8, hub->bcd_usb & 0xFF);
