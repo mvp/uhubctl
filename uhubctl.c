@@ -327,6 +327,7 @@ static const struct option long_options[] = {
 /* Forward declarations */
 static int is_mass_storage_device(struct libusb_device *dev);
 static const char* get_primary_device_class_name(struct libusb_device *dev, struct libusb_device_descriptor *desc);
+static struct libusb_device* find_device_on_hub_port(struct hub_info *hub, int port);
 
 static int print_usage(void)
 {
@@ -915,6 +916,28 @@ static int get_device_description(struct libusb_device * dev, struct descriptor_
     return 0;
 }
 
+/* Helper function to find a device connected to a specific hub port */
+static struct libusb_device* find_device_on_hub_port(struct hub_info *hub, int port)
+{
+    struct libusb_device *udev = NULL;
+    int i = 0;
+    
+    while ((udev = usb_devs[i++]) != NULL) {
+        uint8_t dev_bus = libusb_get_bus_number(udev);
+        if (dev_bus != hub->bus) continue;
+        
+        uint8_t dev_pn[MAX_HUB_CHAIN];
+        int dev_plen = get_port_numbers(udev, dev_pn, sizeof(dev_pn));
+        if ((dev_plen == hub->pn_len + 1) &&
+            (memcmp(hub->port_numbers, dev_pn, hub->pn_len) == 0) &&
+            libusb_get_port_number(udev) == port)
+        {
+            return udev;
+        }
+    }
+    return NULL;
+}
+
 
 /*
  * show status for hub ports
@@ -946,24 +969,9 @@ static int print_port_status(struct hub_info * hub, int portmask)
 
             struct descriptor_strings ds;
             memset(&ds, 0, sizeof(ds));
-            struct libusb_device * udev;
-            int i = 0;
-            while ((udev = usb_devs[i++]) != NULL) {
-                uint8_t dev_bus;
-                uint8_t dev_pn[MAX_HUB_CHAIN];
-                int dev_plen;
-                dev_bus = libusb_get_bus_number(udev);
-                /* only match devices on the same bus: */
-                if (dev_bus != hub->bus) continue;
-                dev_plen = get_port_numbers(udev, dev_pn, sizeof(dev_pn));
-                if ((dev_plen == hub->pn_len + 1) &&
-                    (memcmp(hub->port_numbers, dev_pn, hub->pn_len) == 0) &&
-                    libusb_get_port_number(udev) == port)
-                {
-                    rc = get_device_description(udev, &ds);
-                    if (rc == 0)
-                        break;
-                }
+            struct libusb_device *udev = find_device_on_hub_port(hub, port);
+            if (udev) {
+                get_device_description(udev, &ds);
             }
 
             if (!hub->super_speed) {
@@ -1784,24 +1792,9 @@ char* create_hub_json(struct hub_info* hub, int portmask)
 
             struct descriptor_strings ds;
             bzero(&ds, sizeof(ds));
-            struct libusb_device* udev = NULL;
-            int i = 0;
-            while ((udev = usb_devs[i++]) != NULL) {
-                uint8_t dev_bus = libusb_get_bus_number(udev);
-                if (dev_bus != hub->bus) continue;
-
-                uint8_t dev_pn[MAX_HUB_CHAIN];
-                int dev_plen = get_port_numbers(udev, dev_pn, sizeof(dev_pn));
-                if ((dev_plen == hub->pn_len + 1) &&
-                    (memcmp(hub->port_numbers, dev_pn, hub->pn_len) == 0) &&
-                    libusb_get_port_number(udev) == port)
-                {
-                    rc = get_device_description(udev, &ds);
-                    if (rc == 0) {
-                        /* Found the device */
-                        break;
-                    }
-                }
+            struct libusb_device* udev = find_device_on_hub_port(hub, port);
+            if (udev) {
+                get_device_description(udev, &ds);
             }
 
             port_jsons[valid_ports] = create_port_status_json(port, port_status, &ds, udev, hub->super_speed);
