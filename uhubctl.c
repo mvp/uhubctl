@@ -226,6 +226,14 @@ struct descriptor_strings {
     char product[64];
     char serial[64];
     char description[512];
+    /* Additional fields for JSON output */
+    uint16_t vid;
+    uint16_t pid;
+    uint8_t device_class;
+    char class_name[64];
+    uint16_t usb_version;
+    uint16_t device_version;
+    int is_mass_storage;
 };
 
 struct hub_info {
@@ -316,6 +324,9 @@ static const struct option long_options[] = {
     { 0,          0,                 NULL, 0   },
 };
 
+/* Forward declarations */
+static int is_mass_storage_device(struct libusb_device *dev);
+static const char* get_primary_device_class_name(struct libusb_device *dev, struct libusb_device_descriptor *desc);
 
 static int print_usage(void)
 {
@@ -879,6 +890,20 @@ static int get_device_description(struct libusb_device * dev, struct descriptor_
         }
         libusb_close(devh);
     }
+    
+    /* Populate additional fields for JSON output */
+    ds->vid = desc.idVendor;
+    ds->pid = desc.idProduct;
+    ds->device_class = desc.bDeviceClass;
+    ds->usb_version = desc.bcdUSB;
+    ds->device_version = desc.bcdDevice;
+    ds->is_mass_storage = (dev && is_mass_storage_device(dev)) ? 1 : 0;
+    
+    /* Get device class name */
+    const char* class_name = get_primary_device_class_name(dev, &desc);
+    strncpy(ds->class_name, class_name, sizeof(ds->class_name) - 1);
+    ds->class_name[sizeof(ds->class_name) - 1] = '\0';
+    
     snprintf(ds->description, sizeof(ds->description),
         "%04x:%04x%s%s%s%s%s%s%s",
         id_vendor, id_product,
@@ -1636,46 +1661,17 @@ char* create_port_status_json(int port, int port_status, const struct descriptor
     }
 
     /* Port with device - add device info */
-    struct libusb_device_descriptor desc;
-    if (libusb_get_device_descriptor(dev, &desc) != 0) {
-        /* If we can't get descriptor, return basic info */
-        mkjson_arg desc_error_args[10];
-        int arg_idx = 0;
+    /* Note: device descriptor info is already available in ds from get_device_description */
 
-        desc_error_args[arg_idx++] = (mkjson_arg){ MKJSON_INT, "port", .value.int_val = port };
-        desc_error_args[arg_idx++] = (mkjson_arg){ MKJSON_JSON_FREE, "status", .value.str_free_val = status_json };
-        desc_error_args[arg_idx++] = (mkjson_arg){ MKJSON_JSON_FREE, "flags", .value.str_free_val = flags_json };
-        desc_error_args[arg_idx++] = (mkjson_arg){ MKJSON_JSON_FREE, "human_readable", .value.str_free_val = hr_json };
-        desc_error_args[arg_idx++] = (mkjson_arg){ MKJSON_STRING, "speed", .value.str_val = speed_str };
-        desc_error_args[arg_idx++] = (mkjson_arg){ MKJSON_LLINT, "speed_bps", .value.llint_val = speed_bps };
-
-        if (port_speed) {
-            desc_error_args[arg_idx++] = (mkjson_arg){ MKJSON_STRING, "port_speed", .value.str_val = port_speed };
-        }
-        if (link_state_str) {
-            desc_error_args[arg_idx++] = (mkjson_arg){ MKJSON_STRING, "link_state", .value.str_val = link_state_str };
-        }
-        desc_error_args[arg_idx] = (mkjson_arg){ 0 };
-
-        char *result = mkjson_array_pretty(MKJSON_OBJ, desc_error_args, 2);
-
-        return result;
-    }
-
-    /* Build device info inline */
+    /* Use device info from descriptor_strings (already populated by get_device_description) */
     char vendor_id[8], product_id[8];
-    snprintf(vendor_id, sizeof(vendor_id), "0x%04x", desc.idVendor);
-    snprintf(product_id, sizeof(product_id), "0x%04x", desc.idProduct);
-
-    const char* class_name = get_primary_device_class_name(dev, &desc);
+    snprintf(vendor_id, sizeof(vendor_id), "0x%04x", ds->vid);
+    snprintf(product_id, sizeof(product_id), "0x%04x", ds->pid);
 
     /* Build USB and device versions */
     char usb_version[8], device_version[8];
-    snprintf(usb_version, sizeof(usb_version), "%x.%02x", desc.bcdUSB >> 8, desc.bcdUSB & 0xFF);
-    snprintf(device_version, sizeof(device_version), "%x.%02x", desc.bcdDevice >> 8, desc.bcdDevice & 0xFF);
-
-    /* Check if mass storage */
-    int is_mass_storage = is_mass_storage_device(dev);
+    snprintf(usb_version, sizeof(usb_version), "%x.%02x", ds->usb_version >> 8, ds->usb_version & 0xFF);
+    snprintf(device_version, sizeof(device_version), "%x.%02x", ds->device_version >> 8, ds->device_version & 0xFF);
 
     mkjson_arg device_args[25]; /* Max possible args */
     int arg_idx = 0;
@@ -1709,8 +1705,8 @@ char* create_port_status_json(int port, int port_status, const struct descriptor
     }
 
     /* Device class info */
-    device_args[arg_idx++] = (mkjson_arg){ MKJSON_INT, "device_class", .value.int_val = desc.bDeviceClass };
-    device_args[arg_idx++] = (mkjson_arg){ MKJSON_STRING, "class_name", .value.str_val = class_name };
+    device_args[arg_idx++] = (mkjson_arg){ MKJSON_INT, "device_class", .value.int_val = ds->device_class };
+    device_args[arg_idx++] = (mkjson_arg){ MKJSON_STRING, "class_name", .value.str_val = ds->class_name };
 
     /* Version info */
     device_args[arg_idx++] = (mkjson_arg){ MKJSON_STRING, "usb_version", .value.str_val = usb_version };
@@ -1722,8 +1718,8 @@ char* create_port_status_json(int port, int port_status, const struct descriptor
     }
 
     /* Optional mass storage flag */
-    if (is_mass_storage) {
-        device_args[arg_idx++] = (mkjson_arg){ MKJSON_BOOL, "is_mass_storage", .value.bool_val = is_mass_storage };
+    if (ds->is_mass_storage) {
+        device_args[arg_idx++] = (mkjson_arg){ MKJSON_BOOL, "is_mass_storage", .value.bool_val = ds->is_mass_storage };
     }
 
     device_args[arg_idx++] = (mkjson_arg){ MKJSON_STRING, "description", .value.str_val = ds->description[0] ? ds->description : NULL };
