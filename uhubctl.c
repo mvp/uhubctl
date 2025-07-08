@@ -329,6 +329,7 @@ static int is_mass_storage_device(struct libusb_device *dev);
 static const char* get_primary_device_class_name(struct libusb_device *dev, struct libusb_device_descriptor *desc);
 static struct libusb_device* find_device_on_hub_port(struct hub_info *hub, int port);
 static void format_hex_id(char *buffer, size_t buffer_size, uint16_t value);
+static void format_usb_version(char *buffer, size_t buffer_size, uint16_t version);
 
 static int print_usage(void)
 {
@@ -943,6 +944,12 @@ static struct libusb_device* find_device_on_hub_port(struct hub_info *hub, int p
 static void format_hex_id(char *buffer, size_t buffer_size, uint16_t value)
 {
     snprintf(buffer, buffer_size, "0x%04x", value);
+}
+
+/* Helper function to format USB version consistently */
+static void format_usb_version(char *buffer, size_t buffer_size, uint16_t version)
+{
+    snprintf(buffer, buffer_size, "%x.%02x", version >> 8, version & 0xFF);
 }
 
 
@@ -1685,8 +1692,8 @@ char* create_port_status_json(int port, int port_status, const struct descriptor
 
     /* Build USB and device versions */
     char usb_version[8], device_version[8];
-    snprintf(usb_version, sizeof(usb_version), "%x.%02x", ds->usb_version >> 8, ds->usb_version & 0xFF);
-    snprintf(device_version, sizeof(device_version), "%x.%02x", ds->device_version >> 8, ds->device_version & 0xFF);
+    format_usb_version(usb_version, sizeof(usb_version), ds->usb_version);
+    format_usb_version(device_version, sizeof(device_version), ds->device_version);
 
     mkjson_arg device_args[25]; /* Max possible args */
     int arg_idx = 0;
@@ -1758,7 +1765,7 @@ char* create_hub_json(struct hub_info* hub, int portmask)
     format_hex_id(product_id_hex, sizeof(product_id_hex), product_id);
 
     char usb_version[16];
-    snprintf(usb_version, sizeof(usb_version), "%x.%02x", hub->bcd_usb >> 8, hub->bcd_usb & 0xFF);
+    format_usb_version(usb_version, sizeof(usb_version), hub->bcd_usb);
 
     const char* power_switching_mode;
     switch (hub->lpsm) {
