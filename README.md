@@ -161,6 +161,11 @@ For Linux and MacOS uhubctl is available in standard package managers
 and can be installed with following commands:
 
 * MacOS: `brew install uhubctl` or `sudo port install uhubctl`
+  - :warning: MacOS 26+ requires [fix](https://github.com/libusb/libusb/pull/1700).
+  Until libusb version 1.0.30 with this fix is released, install libusb from master:
+
+        brew uninstall libusb --ignore-dependencies
+        brew install libusb --head
 * Ubuntu/Debian/Raspbian: `sudo apt install uhubctl`
 * Redhat/EPEL/Fedora/CentOS: `sudo yum install uhubctl`
 * OpenSUSE: `sudo zypper install uhubctl`
