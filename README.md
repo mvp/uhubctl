@@ -87,7 +87,7 @@ This is list of known compatible USB hubs:
 | Lenovo             | USB-C to 4 Port USB-A Hub ([USB2 only](https://github.com/mvp/uhubctl/issues/625)) | 4     | 2.0 |`17EF:103A`| 2020    |      |
 | Lindy              | USB serial converter 4 port                          | 4     | 1.1 |`058F:9254`| 2008    |      |
 | Linksys            | USB2HUB4 ([note](https://git.io/JYiDZ))              | 4     | 2.0 |           | 2004    | 2010 |
-| Maplin             | A08CQ                                                | 7     | 2.0 |`0409:0059`| 2008    | 2011 |
+| Maplin             | A08CQ ([red ports only](https://tinyurl.com/gh635))  | 7     | 2.0 |`0409:0059`| 2008    | 2011 |
 | Metadot            | Das Keyboard 4                                       | 2     | 3.0 |           | 2014    |      |
 | Microchip          | EVB9512                                              | 2     | 2.0 |           | 2009    |      |
 | Microchip          | EVB-USB2517                                          | 7     | 2.0 |           | 2008    |      |
