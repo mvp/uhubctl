@@ -77,6 +77,7 @@ This is list of known compatible USB hubs:
 | LG Electronics     | 27UK850-W monitor                                    | 2     | 3.0 |           | 2018    |      |
 | LG Electronics     | 27UN83A-W monitor                                    | 2     | 3.0 |`0451:8142`| 2020    |      |
 | LG Electronics     | 38WK95C-W monitor                                    | 4     | 3.0 |`0451:8142`| 2018    |      |
+| Lenovo             | ThinkPad Mini Dock Series 3 (433710U)                | 6     | 2.0 |`17EF:100A`| 2016    |      |
 | Lenovo             | ThinkPad Ultra Docking Station (40A20090EU)          | 6     | 2.0 |`17EF:100F`| 2015    |      |
 | Lenovo             | ThinkPad Ultra Docking Station (40AJ0135EU)          | 7     | 3.1 |`17EF:3070`| 2018    |      |
 | Lenovo             | ThinkPad X200 Ultrabase 42X4963                      | 3     | 2.0 |`17EF:1005`| 2008    | 2011 |
