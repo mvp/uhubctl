@@ -14,7 +14,7 @@ PKG_CONFIG	?= pkg-config
 
 CC ?= gcc
 CFLAGS ?= -g -O0
-CFLAGS += -Wall -Wextra -Wno-zero-length-array -std=c99 -pedantic
+CFLAGS += -Wall -Wextra -Wno-zero-length-array -std=c99 -pedantic -I.
 GIT_VERSION := $(shell git describe --match "v[0-9]*" --abbrev=8 --dirty --tags | cut -c2-)
 ifeq ($(GIT_VERSION),)
 	GIT_VERSION := $(shell cat VERSION)
@@ -37,17 +37,22 @@ else
 endif
 
 PROGRAM = uhubctl
-
-.PHONY: all install clean
+SOURCES = $(PROGRAM).c mkjson.c
+OBJECTS = $(SOURCES:.c=.o)
 
 all: $(PROGRAM)
 
-$(PROGRAM): $(PROGRAM).c
-	$(CC) $(CPPFLAGS) $(CFLAGS) $@.c -o $@ $(LDFLAGS)
+$(PROGRAM): $(OBJECTS)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(OBJECTS) -o $@ $(LDFLAGS)
+
+%.o: %.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 install:
 	$(INSTALL_DIR) $(DESTDIR)$(sbindir)
 	$(INSTALL_PROGRAM) $(PROGRAM) $(DESTDIR)$(sbindir)
 
 clean:
-	$(RM) $(PROGRAM).o $(PROGRAM).dSYM $(PROGRAM)
+	$(RM) $(OBJECTS) $(PROGRAM).dSYM $(PROGRAM)
+
+.PHONY: all install clean
