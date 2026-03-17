@@ -123,7 +123,7 @@ This is list of known compatible USB hubs:
 | Sanwa Supply       | USB-HUB14GPH                                         | 4     | 1.1 |           | 2001    | 2003 |
 | Seagate            | Backup Plus Hub STEL8000100                          | 2     | 3.0 |`0BC2:AB44`| 2016    |      |
 | Seeed Studio       | reTerminal CM4104032                                 | 2     | 2.0 |`0424:2514`| 2021    |      |
-| Sipolar            | A-173                                                | 7     | 3.0 |`0BDA:0411`| 2016    |      |
+| Sipolar            | A-173 ([warning](https://github.com/mvp/uhubctl/issues/645)) | 7     | 3.0 |`0BDA:0411`| 2016    |      |
 | StarTech           | DKT30CSDHPD3 USB-C Travel Dock                       | 3     | 3.0 |`2109:2817`| 2018    |      |
 | StarTech           | HB30A4AIB ([warning](https://tinyurl.com/ycxravwk))  | 4     | 3.0 |`2109:2817`| 2018    |      |
 | StarTech           | HB31C2A2CB ([note](https://github.com/mvp/uhubctl/issues/601)) | 5 | 3.0 |`14B0:013D`| 2020    |      |
