@@ -32,6 +32,7 @@ ifneq (,$(shell which $(PKG_CONFIG)))
 	LDFLAGS += $(shell $(PKG_CONFIG) --libs libusb-1.0)
 else
 # But it should still build even if pkg-config is not available
+$(warning pkg-config not found; consider installing pkgconf.)
 	CFLAGS += -I/usr/include/libusb-1.0
 	LDFLAGS += -lusb-1.0
 endif
