@@ -128,6 +128,7 @@ This is list of known compatible USB hubs:
 | StarTech           | DKT30CSDHPD3 USB-C Travel Dock                       | 3     | 3.0 |`2109:2817`| 2018    |      |
 | StarTech           | HB30A4AIB ([warning](https://tinyurl.com/ycxravwk))  | 4     | 3.0 |`2109:2817`| 2018    |      |
 | StarTech           | HB31C2A2CB ([note](https://github.com/mvp/uhubctl/issues/601)) | 5 | 3.0 |`14B0:013D`| 2020    |      |
+| StarTech           | HB31C3A1CPD3 ([note](https://github.com/mvp/uhubctl/issues/656)) | 5 | 3.1 |`14B0:013A`| 2019    |      |
 | Sunix              | SHB4200MA                                            | 4     | 2.0 |`0409:0058`| 2006    | 2009 |
 | System Talks       | Sugoi USB2-HUB4X ([warning](https://github.com/mvp/uhubctl/issues/636))|4|2.0| | 2007    |      |
 | Targus             | ACH155 (port 3 controls all ports)                   | 4     | 3.0 |           | 2022    |      |
