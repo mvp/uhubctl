@@ -45,7 +45,7 @@ This is list of known compatible USB hubs:
 | Centech            | CT-USB4HUB ReTRY HUB ([note](https://github.com/mvp/uhubctl/issues/630)) | 4     | 3.0 |`0424:2744`| 2017    |      |
 | Circuitco          | Beagleboard-xM (internal USB hub)                    | 4     | 2.0 |`0424:9514`| 2010    |      |
 | Club3D             | CSV-3242HD Dual Display Docking Station              | 4     | 3.0 |`2109:2811`| 2015    |      |
-| Coolgear           | USBG-12U2ML                                          | 12    | 2.0 |`05e3:0607`| 2015    |      |
+| Coolgear           | USBG-12U2ML                                          | 12    | 2.0 |`05E3:0607`| 2015    |      |
 | Cypress            | CY4608 HX2VL ([note](https://tinyurl.com/CY4608-1))  | 4     | 2.0 |`04B4:6570`| 2012    |      |
 | D-Link             | DUB-2332 rev A1                                      | 3     | 3.0 |           | 2022    |      |
 | D-Link             | DUB-H4 rev D,E (black). Note: rev A,C,F not supported| 4     | 2.0 |`05E3:0608`| 2012    |      |
@@ -110,17 +110,17 @@ This is list of known compatible USB hubs:
 | Raspberry Pi       | B+, 2B, 3B ([see below](#raspberry-pi-b2b3b))        | 4     | 2.0 |           | 2011    |      |
 | Raspberry Pi       | 3B+        ([see below](#raspberry-pi-3b))           | 4     | 2.0 |`0424:2514`| 2018    |      |
 | Raspberry Pi       | 4B         ([see below](#raspberry-pi-4b))           | 4     | 3.0 |`2109:3431`| 2019    |      |
-| Raspberry Pi       | 5          ([see below](#raspberry-pi-5))            | 4     | 3.0 |`1d6b:0002`| 2023    |      |
+| Raspberry Pi       | 5          ([see below](#raspberry-pi-5))            | 4     | 3.0 |`1D6B:0002`| 2023    |      |
 | Renesas            | uPD720202 PCIe USB 3.0 host controller               | 2     | 3.0 |           | 2013    |      |
 | Rosewill           | RHUB-210                                             | 4     | 2.0 |`0409:005A`| 2011    | 2014 |
 | Rosonway           | RSH-518C ([note](https://tinyurl.com/RSH518))        | 7     | 3.0 |`2109:0817`| 2021    |      |
-| Rosonway           | RSH-A10 ([see](https://tinyurl.com/2ppyyaj8))        | 10    | 3.0 |`0bda:0411`| 2020    |      |
+| Rosonway           | RSH-A10 ([see](https://tinyurl.com/2ppyyaj8))        | 10    | 3.0 |`0BDA:0411`| 2020    |      |
 | Rosonway           | RSH-A13 ([warning](https://tinyurl.com/RSH-A13))     | 13    | 3.1 |`2109:2822`| 2021    |      |
 | Rosonway           | RSH-A16 ([note](https://git.io/JTawg), [warning](https://tinyurl.com/RSH-A16)) | 16    | 3.0 |`0bda:0411`| 2020    |      |
 | Rosonway           | RSH-A37S                                             | 7     | 3.0 |`2109:2822`| 2021    |      |
 | Rosonway           | RSH-A104 ([USB2 only](https://tinyurl.com/RSH-A104)) | 4     | 3.1 |`2109:2822`| 2022    |      |
 | Rosonway           | RSH-ST07C ([only 4](https://tinyurl.com/4pjnujrn))   | 7     | 3.0 |`2109:2822`| 2023    |      |
-| Rosonway           | RSH-ST10C-6 ([note](https://tinyurl.com/428vpa2f))   | 10    | 3.1 |`0bda:0423`| 2024    |      |
+| Rosonway           | RSH-ST10C-6 ([note](https://tinyurl.com/428vpa2f))   | 10    | 3.1 |`0BDA:0423`| 2024    |      |
 | Sanwa Supply       | USB-HUB14GPH                                         | 4     | 1.1 |           | 2001    | 2003 |
 | Satechi            | Mac Mini Hub (M1/M2)                                 | 4     | 3.0 |`2109:2817`| 2023    |      |
 | Seagate            | Backup Plus Hub STEL8000100                          | 2     | 3.0 |`0BC2:AB44`| 2016    |      |
