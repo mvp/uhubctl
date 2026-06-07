@@ -120,7 +120,7 @@ This is list of known compatible USB hubs:
 | Rosonway           | RSH-A37S                                             | 7     | 3.0 |`2109:2822`| 2021    |      |
 | Rosonway           | RSH-A104 ([USB2 only](https://tinyurl.com/RSH-A104)) | 4     | 3.1 |`2109:2822`| 2022    |      |
 | Rosonway           | RSH-ST07C ([only 4](https://tinyurl.com/4pjnujrn))   | 7     | 3.0 |`2109:2822`| 2023    |      |
-| Rosonway           | RSH-ST10C-6 ([note](https://tinyurl.com/428vpa2f))   | 10    | 3.1 |           | 2024    |      |
+| Rosonway           | RSH-ST10C-6 ([note](https://tinyurl.com/428vpa2f))   | 10    | 3.1 |`0bda:0423`| 2024    |      |
 | Sanwa Supply       | USB-HUB14GPH                                         | 4     | 1.1 |           | 2001    | 2003 |
 | Satechi            | Mac Mini Hub (M1/M2)                                 | 4     | 3.0 |`2109:2817`| 2023    |      |
 | Seagate            | Backup Plus Hub STEL8000100                          | 2     | 3.0 |`0BC2:AB44`| 2016    |      |
