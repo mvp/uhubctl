@@ -514,3 +514,37 @@ Copyright (C) 2009-2026 Vadim Mikhailov
 
 This file can be distributed under the terms and conditions of the
 GNU General Public License version 2.
+
+### Optional VIA controller recovery
+
+Some VIA-based RSH-A13 revisions disconnect data while retaining measured USB
+voltage. Ordinary port off/on commands and the generic `-R` USB reset did not
+recover the tested Sony cameras from their charging-only state. An explicit
+`--via-reset` operation is available for the observed **2109:0822, revision 0134,
+VT3599 C1** controller only:
+
+```sh
+sudo uhubctl -e -l 4-1.4.3 --via-reset
+```
+
+Rediscover the location on your machine first. This resets the **entire physical
+controller and both USB companions**, including every downstream camera, hub and
+capture device. Stop recording and finish storage writes first. The option
+requires one exact location and refuses combination with a port-power action,
+port selection or `-R`. `-f` does not bypass its chip/revision checks. It does not
+erase/program firmware or write GPIO configuration.
+
+The request follows [fwupd's VLI ChipReset implementation](https://github.com/fwupd/fwupd/blob/main/plugins/vli/fu-vli-usbhub-device.c).
+A disconnect or transfer timeout alone is not accepted as success: the selected
+controller must re-enumerate at a new device address within seven seconds. Check
+the other companion and actual downstream device readiness separately.
+
+In software-only tests on two A13 units, enabling the external Sony camera supply
+**before** this chip reset, then immediately performing the camera's ordered
+external-power/USB reconnect sequence, recovered an a6700 and an FX2. Three
+consecutive FX2 trials verified fresh PTP in about 29 seconds after the chip reset;
+the a6700 also passed three integrated cold-start trials in 32–35 seconds.
+These results do not establish VBUS cutoff, compatibility with other A13 board
+revisions, complete FX2 controls, or Nikon recovery. Existing power commands are
+unchanged. The observed tester still showed approximately 5 V with port control
+disabled; do not describe this reset as an electrical power-off.

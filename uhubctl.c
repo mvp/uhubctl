@@ -226,6 +226,7 @@ static double opt_delay = 2;
 static int opt_repeat = 1;
 static int opt_wait   = 20; /* wait before repeating in ms */
 static int opt_exact  = 0;  /* exact location match - disable USB3 duality handling */
+static int opt_via_reset = 0; /* explicit whole-chip reset, not port power control */
 static int opt_reset  = 0;  /* reset hub after operation(s) */
 static int opt_force  = 0;  /* force operation even on unsupported hubs */
 static int opt_nodesc = 0;  /* skip querying device description */
@@ -270,6 +271,7 @@ static const struct option long_options[] = {
     { "sysdev",   required_argument, NULL, 'y' },
 #endif
 #endif
+    { "via-reset",no_argument,       NULL, 1000 },
     { "reset",    no_argument,       NULL, 'R' },
     { "version",  no_argument,       NULL, 'v' },
     { "help",     no_argument,       NULL, 'h' },
@@ -303,6 +305,7 @@ static int print_usage(void)
         "--sysdev,   -y - open system device node instead of scanning.\n"
 #endif
 #endif
+        "--via-reset    - reset a qualified VIA chip and all downstream devices (requires -e -l).\n"
         "--reset,    -R - reset hub after each power-on action, causing all devices to reassociate.\n"
         "--wait,     -w - wait before repeat power off [%d ms].\n"
         "--version,  -v - print program version.\n"
@@ -1146,13 +1149,87 @@ static int usb_find_hubs(void)
 }
 
 
+/* fwupd VLI ChipReset: deliberately separate from USB PORT_POWER and -R.
+ * Qualify the observed silicon; never use -f to bypass vendor-reset checks. */
+static int reset_via_chip(const struct hub_info *hub)
+{
+    struct libusb_device_descriptor desc;
+    libusb_device_handle *handle = NULL;
+    const uint16_t registers[] = {0xf88e, 0xf88f, 0xf88c};
+    const uint8_t expected[] = {0x99, 0x35, 0xc1};
+    uint8_t old_address = libusb_get_device_address(hub->dev);
+    int rc, i;
+    if (libusb_get_device_descriptor(hub->dev, &desc) ||
+        !hub->super_speed || desc.idVendor != 0x2109 ||
+        desc.idProduct != 0x0822 || desc.bcdDevice != 0x0134) {
+        fprintf(stderr, "VIA reset refused: requires qualified 2109:0822 revision 0134 SuperSpeed hub.\n");
+        return 1;
+    }
+    rc = libusb_open(hub->dev, &handle);
+    if (rc < 0) {
+        fprintf(stderr, "Cannot open VIA hub: %s\n", libusb_error_name(rc));
+        return 1;
+    }
+    for (i = 0; i < 3; i++) {
+        uint8_t value = 0;
+        rc = libusb_control_transfer(handle, 0xc0, registers[i] >> 8,
+                                    registers[i] & 0xff, 0, &value, 1, 1000);
+        if (rc != 1 || value != expected[i]) {
+            fprintf(stderr, "VIA reset refused: silicon is not qualified VT3599 C1.\n");
+            libusb_close(handle);
+            return 1;
+        }
+    }
+    printf("Resetting VIA chip at %s: ALL downstream devices and both USB companions are affected.\n",
+           hub->location);
+    fflush(stdout);
+    rc = libusb_control_transfer(handle, 0x40, 0xf6, 0x0040, 0x0002,
+                                NULL, 0, 1000);
+    libusb_close(handle);
+    if (rc != 0 && rc != LIBUSB_ERROR_IO && rc != LIBUSB_ERROR_NO_DEVICE &&
+        rc != LIBUSB_ERROR_TIMEOUT) {
+        fprintf(stderr, "VIA chip reset transfer failed: %s\n", libusb_error_name(rc));
+        return 1;
+    }
+    /* Transfer disconnect/timeout is expected on some hosts, but is not proof
+     * of success. Require the selected controller at a new device address. */
+    for (i = 0; i < 35; i++) {
+        libusb_device **devices = NULL;
+        ssize_t count = libusb_get_device_list(NULL, &devices), j;
+        int found = 0;
+        for (j = 0; j < count; j++) {
+            uint8_t ports[MAX_HUB_CHAIN];
+            struct libusb_device_descriptor current;
+            if (libusb_get_bus_number(devices[j]) != hub->bus ||
+                libusb_get_device_address(devices[j]) == old_address ||
+                get_port_numbers(devices[j], ports, sizeof(ports)) != hub->pn_len ||
+                memcmp(ports, hub->port_numbers, hub->pn_len) ||
+                libusb_get_device_descriptor(devices[j], &current))
+                continue;
+            if (current.idVendor == desc.idVendor && current.idProduct == desc.idProduct &&
+                current.bcdDevice == desc.bcdDevice) {
+                found = 1;
+                break;
+            }
+        }
+        if (devices) libusb_free_device_list(devices, 1);
+        if (found) {
+            printf("Selected VIA controller re-enumerated; verify companion devices and downstream readiness separately.\n");
+            return 0;
+        }
+        sleep_ms(200);
+    }
+    fprintf(stderr, "Selected VIA controller did not re-enumerate after chip reset.\n");
+    return 1;
+}
+
 int main(int argc, char *argv[])
 {
     int rc;
     int c = 0;
     int option_index = 0;
 #if defined(__linux__) && (LIBUSB_API_VERSION >= 0x01000107)
-    int sys_fd;
+    int sys_fd = -1;
     libusb_device_handle *sys_devh = NULL;
 #endif
 
@@ -1235,6 +1312,9 @@ int main(int argc, char *argv[])
         case 'e':
             opt_exact = 1;
             break;
+        case 1000:
+            opt_via_reset = 1;
+            break;
         case 'R':
             opt_reset = 1;
             break;
@@ -1263,6 +1343,12 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Invalid command line syntax!\n");
         fprintf(stderr, "Run with -h to get usage info.\n");
         exit(1);
+    }
+
+    if (opt_via_reset && (!opt_exact || !strlen(opt_location) ||
+                          opt_action != POWER_KEEP || opt_reset || opt_ports != ALL_HUB_PORTS)) {
+        fprintf(stderr, "--via-reset requires -e and an exact -l location; do not combine with -a, -p or -R.\n");
+        return 1;
     }
 
     rc = libusb_init(NULL);
@@ -1322,6 +1408,21 @@ int main(int argc, char *argv[])
             opt_location
         );
         rc = 1;
+        goto cleanup;
+    }
+
+    if (opt_via_reset) {
+        int i, selected = -1;
+        for (i = 0; i < hub_count; i++) {
+            if (!hubs[i].actionable) continue;
+            if (selected >= 0) {
+                fprintf(stderr, "VIA reset requires exactly one selected hub.\n");
+                rc = 1;
+                goto cleanup;
+            }
+            selected = i;
+        }
+        rc = selected < 0 ? 1 : reset_via_chip(&hubs[selected]);
         goto cleanup;
     }
 
