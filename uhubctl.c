@@ -199,6 +199,8 @@ struct hub_info {
     int nports;
     int lpsm; /* logical power switching mode */
     int actionable; /* true if this hub is subject to action */
+    int via_power; /* VT3599 C1 retained port-power driver */
+    int dual; /* index of the USB2/USB3 companion, or -1 */
     char container_id[33]; /* container ID as hex string */
     char vendor[16];
     char location[32];
@@ -226,6 +228,7 @@ static double opt_delay = 2;
 static int opt_repeat = 1;
 static int opt_wait   = 20; /* wait before repeating in ms */
 static int opt_exact  = 0;  /* exact location match - disable USB3 duality handling */
+static int opt_no_via = 0; /* disable the VT3599 C1 port-power workaround */
 static int opt_reset  = 0;  /* reset hub after operation(s) */
 static int opt_force  = 0;  /* force operation even on unsupported hubs */
 static int opt_nodesc = 0;  /* skip querying device description */
@@ -241,7 +244,7 @@ static int is_rpi_4b = 0;
 static int is_rpi_5  = 0;
 
 static const char short_options[] =
-    "l:L:n:a:p:d:r:w:s:H:hvefRN"
+    "l:L:n:a:p:d:r:w:s:H:hvefRNV"
 #if defined(__linux__)
     "S"
 #if (LIBUSB_API_VERSION >= 0x01000107) /* 1.0.23 */
@@ -270,6 +273,7 @@ static const struct option long_options[] = {
     { "sysdev",   required_argument, NULL, 'y' },
 #endif
 #endif
+    { "no-via",   no_argument,       NULL, 'V' },
     { "reset",    no_argument,       NULL, 'R' },
     { "version",  no_argument,       NULL, 'v' },
     { "help",     no_argument,       NULL, 'h' },
@@ -294,6 +298,7 @@ static int print_usage(void)
         "--search,   -s - limit hub by attached device description.\n"
         "--delay,    -d - delay for cycle/flash action [%g sec].\n"
         "--repeat,   -r - repeat power off count [%d] (some devices need it to turn off).\n"
+        "--no-via,   -V - disable VIA VT3599 C1 port-power workaround.\n"
         "--exact,    -e - exact location (no USB3 duality handling).\n"
         "--force,    -f - force operation even on unsupported hubs.\n"
         "--nodesc,   -N - do not query device description (helpful for unresponsive devices).\n"
@@ -468,6 +473,35 @@ static int get_port_numbers(libusb_device *dev, uint8_t *buf, uint8_t bufsize)
     return pcount;
 }
 
+/* VT3599 C1 XDATA access (VIA 2109:0822/2822, bcdDevice 0134).
+ * The normal PORT_POWER request leaves an additional driver-enable bit set.
+ * Limit writes to bit 1 of the four external ports; port 5 is internal.
+ */
+static int via_read_register(libusb_device_handle *devh, uint16_t address, uint8_t *value)
+{
+    int rc = libusb_control_transfer(devh, 0xc0, 0xf0 | (address >> 12),
+        address & 0x0fff, 0, value, 1, USB_CTRL_GET_TIMEOUT);
+    return rc == 1 ? 0 : LIBUSB_ERROR_IO;
+}
+
+static int is_via_power_hub(libusb_device_handle *devh,
+    const struct libusb_device_descriptor *desc, int nports)
+{
+    const uint16_t registers[] = {0x808e, 0x808f, 0x808c};
+    const uint8_t silicon[] = {0x99, 0x35, 0xc1};
+    int i;
+    if (opt_no_via || desc->idVendor != 0x2109 || desc->bcdDevice != 0x0134 ||
+        !((desc->idProduct == 0x0822 && nports == 4) ||
+          (desc->idProduct == 0x2822 && nports == 5)))
+        return 0;
+    for (i = 0; i < 3; i++) {
+        uint8_t value;
+        if (via_read_register(devh, registers[i], &value) || value != silicon[i])
+            return 0;
+    }
+    return 1;
+}
+
 /*
  * get USB hub properties.
  * most hub_info fields are filled, except for description.
@@ -508,6 +542,8 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
             info->bcd_usb = bcd_usb;
             info->super_speed = (bcd_usb >= USB_SS_BCD);
             info->nports  = uhd->bNbrPorts;
+            info->dual = -1;
+            info->via_power = is_via_power_hub(devh, &desc, info->nports);
             snprintf(
                 info->vendor, sizeof(info->vendor),
                 "%04x:%04x",
@@ -575,6 +611,7 @@ static int get_hub_info(struct libusb_device *dev, struct hub_info *info)
                 lpsm = HUB_CHAR_INDV_PORT_LPSM;
             }
             info->lpsm = lpsm;
+            info->via_power = info->via_power && lpsm == HUB_CHAR_INDV_PORT_LPSM;
 
             /* Raspberry Pi 5 hack */
             if (is_rpi_5 &&
@@ -728,6 +765,53 @@ static int set_port_status_libusb(struct libusb_device_handle *devh, int port, i
 }
 
 
+/* Both standard power states must be off before clearing the shared driver.
+ * Reuse the ordinary companion detection; -e deliberately controls one half.
+ */
+static int set_via_power(libusb_device_handle *devh, struct hub_info *hub, int port, int on)
+{
+    struct libusb_device_handle *peer = NULL, *ss;
+    uint8_t current, desired, actual, fault;
+    uint16_t address = 0x8100 + 16 * port;
+    int rc, status, peer_status, faulted = 0;
+    if (hub->dual < 0 || !hubs[hub->dual].via_power) {
+        fprintf(stderr, "Cannot identify VIA USB companion; use -V for standard port control.\n");
+        return LIBUSB_ERROR_NOT_FOUND;
+    }
+    rc = libusb_open(hubs[hub->dual].dev, &peer);
+    if (rc) return rc;
+    ss = hub->super_speed ? devh : peer;
+    rc = LIBUSB_ERROR_IO;
+    if (via_read_register(ss, address, &current)) goto done;
+    if (on) {
+        if (via_read_register(ss, 0x704d, &fault) || (fault & (1 << (3 + port)))) {
+            fprintf(stderr, "VIA port %d fault status is asserted or unreadable.\n", port);
+            on = 0;
+            faulted = 1;
+        }
+    } else {
+        status = get_port_status(devh, port);
+        peer_status = get_port_status(peer, port);
+        if (status < 0 || peer_status < 0) goto done;
+        if ((status & (hub->super_speed ? USB_SS_PORT_STAT_POWER : USB_PORT_STAT_POWER)) ||
+            (peer_status & (hub->super_speed ? USB_PORT_STAT_POWER : USB_SS_PORT_STAT_POWER))) {
+            /* The other half will finish the operation after its standard request. */
+            rc = 0;
+            goto done;
+        }
+        if (current & 1) goto done;
+    }
+    desired = on ? current | 2 : current & ~2;
+    if (desired != current && libusb_control_transfer(ss, 0x40, 0xf8,
+        address & 0x0fff, desired, NULL, 0, USB_CTRL_GET_TIMEOUT) != 0) goto done;
+    if (via_read_register(ss, address, &actual) || (actual & 2) != (desired & 2)) goto done;
+    rc = faulted ? LIBUSB_ERROR_IO : 0;
+done:
+    if (rc) fprintf(stderr, "VIA port %d driver power did not verify.\n", port);
+    libusb_close(peer);
+    return rc;
+}
+
 /*
  * Try different methods to power a port off/on.
  * Return >= 0 on success.
@@ -735,17 +819,22 @@ static int set_port_status_libusb(struct libusb_device_handle *devh, int port, i
 
 static int set_port_status(struct libusb_device_handle *devh, struct hub_info *hub, int port, int on)
 {
+    int rc;
+    int via = hub->via_power && port <= 4 && !opt_exact;
+    if (via && on) {
+        rc = set_via_power(devh, hub, port, 1);
+        if (rc) return rc;
+    }
 #if defined(__linux__)
     if (!opt_nosysfs) {
-        if (set_port_status_linux(devh, hub, port, on) == 0) {
+        if (set_port_status_linux(devh, hub, port, on) == 0 && !via) {
             return 0;
         }
     }
-#else
-    (void)hub;
 #endif
-
-    return set_port_status_libusb(devh, port, on);
+    rc = set_port_status_libusb(devh, port, on);
+    if (rc >= 0 && via) rc = set_via_power(devh, hub, port, on);
+    return rc;
 }
 
 
@@ -1057,7 +1146,8 @@ static int usb_find_hubs(void)
                 /* Hubs should have the same number of ports */
                 if (hubs[i].nports != hubs[j].nports) {
                     /* Except for some weird hubs like Apple mini-dock (has 2 usb2 + 1 usb3 ports) */
-                    if (hubs[i].nports + hubs[j].nports > 3) {
+                    if (hubs[i].nports + hubs[j].nports > 3 &&
+                        !(hubs[i].via_power && hubs[j].via_power)) {
                         continue;
                     }
                 }
@@ -1116,6 +1206,8 @@ static int usb_find_hubs(void)
                 }
             }
             if (best_match >= 0) {
+                hubs[i].dual = best_match;
+                hubs[best_match].dual = i;
                 if (!hubs[best_match].actionable) {
                     /* Use 2 to signify that this is derived dual device */
                     hubs[best_match].actionable = 2;
@@ -1234,6 +1326,9 @@ int main(int argc, char *argv[])
 #endif
         case 'e':
             opt_exact = 1;
+            break;
+        case 'V':
+            opt_no_via = 1;
             break;
         case 'R':
             opt_reset = 1;
@@ -1376,8 +1471,12 @@ int main(int argc, char *argv[])
                             should_be_on = !is_on;
                         }
 
-                        if (is_on != should_be_on) {
+                        if (is_on != should_be_on || (hubs[i].via_power && port <= 4)) {
                             rc = set_port_status(devh, &hubs[i], port, should_be_on);
+                            if (rc < 0 && hubs[i].via_power) {
+                                libusb_close(devh);
+                                goto cleanup;
+                            }
                         }
                     }
                 }
