@@ -139,6 +139,7 @@ This is list of known compatible USB hubs:
 | Texas Instruments  | TUSB4041PAPEVM                                       | 4     | 2.1 |`0451:8142`| 2015    |      |
 | UUGear             | MEGA4 (for Raspberry Pi 4B)                          | 4     | 3.0 |`2109:0817`| 2021    |      |
 | VirtualHere        | USB3 4-port hub ([note](https://tinyurl.com/vhusb))  | 4     | 3.0 |           | 2024    |      |
+| xiaomage-uav       | [CH634X 4-port hub](https://oshwhub.com/xiaomage-uav/ch634x_usb3-0hub_v1)|4|3.0|`1a86:80a1`|2025||
 
 This table is by no means complete.
 If your hub works with `uhubctl`, but is not listed above, please report it
