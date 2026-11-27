@@ -27,6 +27,7 @@ This is list of known compatible USB hubs:
 | AmazonBasics       | U3-7HUB (only works for 1 charge port)               | 7     | 3.0 |`2109:2813`| 2020    |      |
 | Anker              | AK-68ANHUB-BV7A-0004 ([note](https://git.io/JLnZb))  | 7     | 3.0 |`2109:0812`| 2014    |      |
 | Apple              | Mac Mini M4 (2 front ports only)                     | 2     | 3.2 |`05AC:800B`| 2024    |      |
+| Apple              | Mac Studio M4 Max (front USB-C, rear USB-A only)     | 4     | 3.2 |`05AC:800A`| 2025    |      |
 | Apple              | MacBook Air (Late 2010)                              | 2     | 2.0 |`1D6B:0002`| 2010    | 2020 |
 | Apple              | Pro Display XDR MWPE2LL/A (internal USB hub)         | 4     | 2.0 |`05AC:9139`| 2019    |      |
 | Apple              | Thunderbolt Display 27" (internal USB hub)           | 6     | 2.0 |           | 2011    | 2016 |
